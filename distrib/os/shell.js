@@ -49,6 +49,12 @@ var DOGES;
             // prompt <string>
             sc = new DOGES.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new DOGES.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+            // whereami
+            sc = new DOGES.ShellCommand(this.shellWhere, "whereami", "- Displays the user's current location.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -216,6 +222,12 @@ var DOGES;
                     case "prompt":
                         _StdOut.putText("Prompt sets the prompt for the terminal.");
                         break;
+                    case "date":
+                        _StdOut.putText("Date displays the current date and time (based on your timezone).");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami displays your current location.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -265,6 +277,24 @@ var DOGES;
             else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        };
+        Shell.prototype.shellDate = function (args) {
+            var date = new Date().toDateString();
+            var time = new Date().toTimeString();
+            _StdOut.putText(date + ", " + time);
+        };
+        Shell.prototype.shellWhere = function (args) {
+            var location = [
+                "Yes.",
+                "You are in Dogeland. The land of the doges.",
+                "Why ask me? You know where you are.",
+                "Ruff!",
+                "You are on a web browser.",
+                "Such home.",
+                "Somewhere in Marist College."
+            ];
+            var randomNum = Math.floor(Math.random() * location.length);
+            _StdOut.putText(location[randomNum]);
         };
         return Shell;
     })();

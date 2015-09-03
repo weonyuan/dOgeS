@@ -3,9 +3,9 @@
 <head>
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
    <meta name="author"             content="Alan G. Labouseur" />
-   <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
+   <link rel="stylesheet" href="doges.css" type="text/css" media="screen" />
    <title>
-      TSOS - a browser-based virtual Operating System in TypeScript
+      dOgeS
    </title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
@@ -31,7 +31,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment this line below to enable GLaDOS testing -->
-   <script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>
+   <!--<script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>-->
 </head>
 
 <body onload="onDocumentLoad()">
@@ -45,7 +45,7 @@
              class="normal_button"
              value="Start"
              tabindex="0"
-             onclick="TSOS.Control.hostBtnStartOS_click(this);">
+             onclick="DOGES.Control.hostBtnStartOS_click(this);">
 
       <input type="button"
              id = "btnHaltOS"
@@ -54,7 +54,7 @@
              disabled="disabled"
              value="Halt"
              tabindex="1"
-             onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+             onclick="DOGES.Control.hostBtnHaltOS_click(this);">
 
       <input type="button"
              id = "btnReset"
@@ -63,7 +63,7 @@
              disabled="disabled"
              value="Reset"
              tabindex="2"
-             onclick="TSOS.Control.hostBtnReset_click(this);">
+             onclick="DOGES.Control.hostBtnReset_click(this);">
    </div>
 
    <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
@@ -101,10 +101,7 @@
 
 <p class="footerText" style="clear:both;">
    <br>
-   Copyright &copy; 2008 - 2015 No Rights Reserved.
-   <br>
-   Reproduction is inhibited without the express written consent of
-   Ted Codd, Stevie Ray Vaughan, and Ian Fleming.
+   Much Powered by Mugen. Copyright &copy; 2015.
 </p>
 
 </body>

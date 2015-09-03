@@ -4,7 +4,7 @@
    Utility functions.
    -------- */
 
-module TSOS {
+module DOGES {
 
     export class Utils {
 

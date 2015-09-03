@@ -13,8 +13,8 @@
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
-var TSOS;
-(function (TSOS) {
+var DOGES;
+(function (DOGES) {
     var Cpu = (function () {
         function Cpu(PC, Acc, Xreg, Yreg, Zflag, isExecuting) {
             if (PC === void 0) { PC = 0; }
@@ -45,5 +45,5 @@ var TSOS;
         };
         return Cpu;
     })();
-    TSOS.Cpu = Cpu;
-})(TSOS || (TSOS = {}));
+    DOGES.Cpu = Cpu;
+})(DOGES || (DOGES = {}));

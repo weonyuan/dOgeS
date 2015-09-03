@@ -9,7 +9,7 @@
    The Kernel Keyboard Device Driver.
    ---------------------------------- */
 
-module TSOS {
+module DOGES {
 
     // Extends DeviceDriver
     export class DeviceDriverKeyboard extends DeviceDriver {

@@ -23,7 +23,7 @@
 //
 // Control Services
 //
-module TSOS {
+module DOGES {
 
     export class Control {
 

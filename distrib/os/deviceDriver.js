@@ -3,8 +3,8 @@
 
      The "base class" for all Device Drivers.
      ------------------------------ */
-var TSOS;
-(function (TSOS) {
+var DOGES;
+(function (DOGES) {
     var DeviceDriver = (function () {
         function DeviceDriver(driverEntry, isr) {
             if (driverEntry === void 0) { driverEntry = null; }
@@ -17,5 +17,5 @@ var TSOS;
         }
         return DeviceDriver;
     })();
-    TSOS.DeviceDriver = DeviceDriver;
-})(TSOS || (TSOS = {}));
+    DOGES.DeviceDriver = DeviceDriver;
+})(DOGES || (DOGES = {}));

@@ -234,10 +234,30 @@ module DOGES {
             if (args.length > 0) {
                 var topic = args[0];
                 switch (topic) {
+                    case "ver":
+                        _StdOut.putText("Ver displays the current OS version.");
+                        break;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "shutdown":
+                        _StdOut.putText("Shutdown terminates the current OS session but leaves the underlying host / hardware simulation running.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls clears the screen and resets the cursor position.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Man displays a detailed description of a command (i.e., man).");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Trace turns the OS trace on or off, depending on the parameter value (on/off) following the command.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Rot13 takes the given string and performs rot13 obfuscation on it.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Prompt sets the prompt for the terminal.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }

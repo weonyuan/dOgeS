@@ -154,8 +154,10 @@ var DOGES;
         };
         Kernel.prototype.krnTrapError = function (msg) {
             DOGES.Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            // TODO: Display error on console
+            _Console.showBsod(msg);
             this.krnShutdown();
+            clearInterval(_hardwareClockID);
         };
         return Kernel;
     })();

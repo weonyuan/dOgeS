@@ -87,5 +87,27 @@ module DOGES {
 
             // TODO: Handle scrolling. (iProject 1)
         }
+
+        public showBsod(msg): void {
+            console.log("showBsod(msg)");
+            console.log(msg);
+            
+            // draw the blue background
+            _DrawingContext.rect(0, 0, _Canvas.width, _Canvas.height);
+            _DrawingContext.fillStyle = "#2067b2";
+            _DrawingContext.fill();
+            this.resetFillStyle();
+
+            // draw the message
+            _DrawingContext.font = "40pt Calibri";
+            _DrawingContext.fillStyle = "#ffffff";
+            _DrawingContext.fillText("wow", 40, 100);
+            _DrawingContext.font = "12pt Calibri";
+            _DrawingContext.fillText("such calibri. very blue. much dead.", 40, 150);
+            _DrawingContext.fillText("ERROR_MSG: " + msg, 40, 170);
+
+        public resetFillStyle(): void {
+            _DrawingContext.fillStyle = "#dfdbc3";
+        }
     }
  }

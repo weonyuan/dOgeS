@@ -55,6 +55,9 @@ var DOGES;
             // whereami
             sc = new DOGES.ShellCommand(this.shellWhere, "whereami", "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
+            // bsod
+            sc = new DOGES.ShellCommand(this.shellBsod, "bsod", "- Initiates the Blue Screen of Death.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -228,6 +231,9 @@ var DOGES;
                     case "whereami":
                         _StdOut.putText("Whereami displays your current location.");
                         break;
+                    case "bsod":
+                        _StdOut.putText("Bsod initiates the Blue Screen of Death.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -279,9 +285,8 @@ var DOGES;
             }
         };
         Shell.prototype.shellDate = function (args) {
-            var date = new Date().toDateString();
-            var time = new Date().toTimeString();
-            _StdOut.putText(date + ", " + time);
+            var datetime = new Date().toString();
+            _StdOut.putText(datetime);
         };
         Shell.prototype.shellWhere = function (args) {
             var location = [
@@ -295,6 +300,9 @@ var DOGES;
             ];
             var randomNum = Math.floor(Math.random() * location.length);
             _StdOut.putText(location[randomNum]);
+        };
+        Shell.prototype.shellBsod = function (args) {
+            _Kernel.krnTrapError("INITIATED_BSOD_CMD");
         };
         return Shell;
     })();

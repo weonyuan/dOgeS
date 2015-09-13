@@ -173,8 +173,10 @@ module DOGES {
 
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            // TODO: Display error on console
+            _Console.showBsod(msg);
             this.krnShutdown();
+            clearInterval(_hardwareClockID);
         }
     }
 }

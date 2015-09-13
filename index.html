@@ -36,37 +36,37 @@
 </head>
 
 <body onload="onDocumentLoad()">
+<div id="header">
+  <div id="logo">< <img src="logo.png" style="position: relative; top: 5px;" width="40px" height="40px"> dOgeS ></div>
+  <div id="divButtonBar" style="margin:4px;">
+     <input type="button"
+            id = "btnStartOS"
+            name="brnStartOS"
+            class="normal_button"
+            value="Start"
+            tabindex="0"
+            onclick="DOGES.Control.hostBtnStartOS_click(this);">
 
-<div id="divMain" style="width:100%;">
+     <input type="button"
+            id = "btnHaltOS"
+            name="brnHaltOS"
+            class="normal_button"
+            disabled="disabled"
+            value="Halt"
+            tabindex="1"
+            onclick="DOGES.Control.hostBtnHaltOS_click(this);">
 
-   <div id="divButtonBar" style="margin:4px;">
-      <input type="button"
-             id = "btnStartOS"
-             name="brnStartOS"
-             class="normal_button"
-             value="Start"
-             tabindex="0"
-             onclick="DOGES.Control.hostBtnStartOS_click(this);">
-
-      <input type="button"
-             id = "btnHaltOS"
-             name="brnHaltOS"
-             class="normal_button"
-             disabled="disabled"
-             value="Halt"
-             tabindex="1"
-             onclick="DOGES.Control.hostBtnHaltOS_click(this);">
-
-      <input type="button"
-             id = "btnReset"
-             name="brnReset"
-             class="normal_button"
-             disabled="disabled"
-             value="Reset"
-             tabindex="2"
-             onclick="DOGES.Control.hostBtnReset_click(this);">
-   </div>
-
+     <input type="button"
+            id = "btnReset"
+            name="brnReset"
+            class="normal_button"
+            disabled="disabled"
+            value="Reset"
+            tabindex="2"
+            onclick="DOGES.Control.hostBtnReset_click(this);">
+  </div>
+</div>
+<div id="divMain">
    <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
       <canvas id="display"
               width="500px"
@@ -81,8 +81,8 @@
          <br>
          <textarea name="taHostLog"
                    id  ="taHostLog"
-                   rows="26"
-                   cols="48"
+                   rows="20"
+                   cols="43"
          ></textarea>
       </label>
    </div>
@@ -94,7 +94,7 @@
          <textarea name="taProgramInput"
                    id  ="taProgramInput"
                    rows="8"
-                   cols="48"
+                   cols="43"
          ></textarea>
       </label>
    </div>

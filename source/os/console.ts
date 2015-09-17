@@ -68,11 +68,18 @@ module DOGES {
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+
+                if (this.currentXPosition + offset > _Canvas.width) {                    
+                    // line wrap
+                    this.advanceLine();
+                    this.currentXPosition = 0;
+                } else {
+                    // Draw the text at the current X and Y coordinates.
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                    // Move the current X position.
+                    this.currentXPosition = this.currentXPosition + offset;
+                }
             }
          }
 
@@ -92,31 +99,22 @@ module DOGES {
             this.handleScrolling();
         }
 
-        // TODO: Handle scrolling?
         public handleScrolling(): void {
-            console.log(_HistoryCanvas);
-
-            // if you are towards the end of the canvas
-            // clear the screen and start from the top again
             if (this.currentYPosition > _Canvas.height) {
-                // expand the canvas height
-
-                // main canvas and storage canvas (storing all previous logs)
-                // when main canvas needs to expand its height, it needs to store its context to storage
-                // because when height is changed, the canvas is cleared
-                // therefore, we need to draw that canvas over to storage canvas
-                // and storage canvas can draw back that over to the newly expanded main canvas
+                // define the history canvas size as the main canvas size
                 _HistoryCanvas.width = _Canvas.width;
                 _HistoryCanvas.height = _Canvas.height;
 
+                // then draw whatever is on the main canvas to the history canvas
                 _HistoryCanvas.getContext("2d").drawImage(_Canvas, 0, 0);
-                _Canvas.height += 40;
-                console.log(_DefaultFontSize);
-                console.log(_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
-                console.log(_FontHeightMargin);
 
+                // increase the main canvas height, which will clear everything drawn
+                _Canvas.height += 45;
+                
+                // then draw the history canvas back onto the extended main canvas
                 _DrawingContext.drawImage(_HistoryCanvas, 0, 0);
 
+                // automatically scroll to the bottom of shell
                 document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
             }
         }

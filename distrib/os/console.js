@@ -100,12 +100,15 @@ var DOGES;
                 // because when height is changed, the canvas is cleared
                 // therefore, we need to draw that canvas over to storage canvas
                 // and storage canvas can draw back that over to the newly expanded main canvas
-                _HistoryCanvas.getContext("2d").drawImage(_Canvas, 0, 0);
-                _Canvas.height += 30;
-                _DrawingContext.drawImage(_HistoryCanvas, 0, 0);
                 _HistoryCanvas.width = _Canvas.width;
                 _HistoryCanvas.height = _Canvas.height;
-                console.log(_HistoryCanvas);
+                _HistoryCanvas.getContext("2d").drawImage(_Canvas, 0, 0);
+                _Canvas.height += 40;
+                console.log(_DefaultFontSize);
+                console.log(_DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+                console.log(_FontHeightMargin);
+                _DrawingContext.drawImage(_HistoryCanvas, 0, 0);
+                document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
             }
         };
         Console.prototype.showBsod = function (msg) {

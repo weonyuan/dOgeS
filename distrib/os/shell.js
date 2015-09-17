@@ -98,7 +98,12 @@ var DOGES;
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + DOGES.Utils.rot13(cmd) + "]") >= 0) {
+                if (cmd.length === 0) {
+                    // Just advance the line and write the prompt again.
+                    _StdOut.advanceLine();
+                    this.putPrompt();
+                }
+                else if (this.curses.indexOf("[" + DOGES.Utils.rot13(cmd) + "]") >= 0) {
                     this.execute(this.shellCurse);
                 }
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
@@ -120,9 +125,7 @@ var DOGES;
                 _StdOut.advanceLine();
             }
             // ... and finally write the prompt again.
-            if (!this.shellBsod) {
-                this.putPrompt();
-            }
+            this.putPrompt();
         };
         Shell.prototype.parseInput = function (buffer) {
             var retVal = new DOGES.UserCommand();

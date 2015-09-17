@@ -45,6 +45,9 @@ var DOGES;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === String.fromCharCode(8)) {
+                    this.buffer;
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -72,6 +75,7 @@ var DOGES;
             }
         };
         Console.prototype.advanceLine = function () {
+            _DrawingContext.restore();
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.
@@ -81,7 +85,28 @@ var DOGES;
             this.currentYPosition += _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
-            // TODO: Handle scrolling. (iProject 1)
+            _DrawingContext.save();
+            this.handleScrolling();
+        };
+        // TODO: Handle scrolling?
+        Console.prototype.handleScrolling = function () {
+            console.log(_HistoryCanvas);
+            // if you are towards the end of the canvas
+            // clear the screen and start from the top again
+            if (this.currentYPosition > _Canvas.height) {
+                // expand the canvas height
+                // main canvas and storage canvas (storing all previous logs)
+                // when main canvas needs to expand its height, it needs to store its context to storage
+                // because when height is changed, the canvas is cleared
+                // therefore, we need to draw that canvas over to storage canvas
+                // and storage canvas can draw back that over to the newly expanded main canvas
+                _HistoryCanvas.getContext("2d").drawImage(_Canvas, 0, 0);
+                _Canvas.height += 30;
+                _DrawingContext.drawImage(_HistoryCanvas, 0, 0);
+                _HistoryCanvas.width = _Canvas.width;
+                _HistoryCanvas.height = _Canvas.height;
+                console.log(_HistoryCanvas);
+            }
         };
         Console.prototype.showBsod = function (msg) {
             console.log("showBsod(msg)");

@@ -40,6 +40,7 @@ h3 {
   position: fixed;
   width: 100%;
   height: 54px;
+  z-index: 99;
 }
 
 #logo {
@@ -65,10 +66,19 @@ h3 {
   padding-top: 60px;
 }
 
+#divConsole {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 #display {
   background-color:#DFDBC3;
   border: 2px solid red;
   cursor: default;
+}
+
+#history {
+  display: none;
 }
 
 .normal_button {

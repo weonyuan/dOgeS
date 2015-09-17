@@ -118,6 +118,7 @@ module DOGES {
             // ... and assign the command and args to local variables.
             var cmd = userCommand.command;
             var args = userCommand.args;
+
             //
             // Determine the command and execute it.
             //
@@ -138,7 +139,11 @@ module DOGES {
                 this.execute(fn, args);
             } else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses.
+                if (cmd.length === 0) {
+                  // Just advance the line and write the prompt again.
+                  _StdOut.advanceLine();
+                  this.putPrompt();
+                } else if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses.
                     this.execute(this.shellCurse);
                 } else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {        // Check for apologies.
                     this.execute(this.shellApology);
@@ -159,9 +164,7 @@ module DOGES {
                 _StdOut.advanceLine();
             }
             // ... and finally write the prompt again.
-            if (!this.shellBsod) {
-              this.putPrompt();
-            }
+            this.putPrompt();
         }
 
         public parseInput(buffer): UserCommand {

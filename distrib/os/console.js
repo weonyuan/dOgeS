@@ -46,7 +46,8 @@ var DOGES;
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(8)) {
-                    this.buffer;
+                    this.backspaceChar();
+                    this.buffer = this.buffer.substring(0, this.buffer.length - 1);
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -55,7 +56,17 @@ var DOGES;
                     // ... and add it to our buffer.
                     this.buffer += chr;
                 }
+                console.log(this.buffer);
             }
+        };
+        Console.prototype.backspaceChar = function () {
+            var lastChar = this.buffer.charAt(this.buffer.length - 1);
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
+            this.currentXPosition = this.currentXPosition - offset;
+            console.log(this.currentXPosition);
+            console.log(this.currentYPosition);
+            console.log(offset);
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - 13, this.currentXPosition, 20);
         };
         Console.prototype.putText = function (text) {
             // My first inclination here was to write two functions: putChar() and putString().
@@ -82,7 +93,6 @@ var DOGES;
             }
         };
         Console.prototype.advanceLine = function () {
-            _DrawingContext.restore();
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.
@@ -92,7 +102,6 @@ var DOGES;
             this.currentYPosition += _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
-            _DrawingContext.save();
             this.handleScrolling();
         };
         Console.prototype.handleScrolling = function () {

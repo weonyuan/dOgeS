@@ -46,7 +46,8 @@ module DOGES {
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) { //    Delete key
-                    this.buffer;
+                    this.backspaceChar();
+                    this.buffer = this.buffer.substring(0, this.buffer.length - 1);
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -54,8 +55,20 @@ module DOGES {
                     // ... and add it to our buffer.
                     this.buffer += chr;
                 }
+                    console.log(this.buffer);
+
                 // TODO: Write a case for Ctrl-C.
             }
+        }
+
+        public backspaceChar(): void {
+            var lastChar = this.buffer.charAt(this.buffer.length - 1);
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
+            this.currentXPosition = this.currentXPosition - offset;
+            console.log(this.currentXPosition);
+            console.log(this.currentYPosition);
+            console.log(offset);
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - 13, this.currentXPosition, 20);
         }
 
         public putText(text): void {
@@ -69,7 +82,6 @@ module DOGES {
             //         Consider fixing that.
             if (text !== "") {
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-
                 if (this.currentXPosition + offset > _Canvas.width) {                    
                     // line wrap
                     this.advanceLine();
@@ -84,7 +96,6 @@ module DOGES {
          }
 
         public advanceLine(): void {
-            _DrawingContext.restore();
             this.currentXPosition = 0;
             /*
              * Font size measures from the baseline to the highest point in the font.
@@ -95,7 +106,6 @@ module DOGES {
                                      _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                      _FontHeightMargin;
 
-            _DrawingContext.save();
             this.handleScrolling();
         }
 

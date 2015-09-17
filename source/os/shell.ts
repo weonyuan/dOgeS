@@ -93,7 +93,7 @@ module DOGES {
 
             // bsod
             sc = new ShellCommand(this.shellBsod,
-                                  "bsod",
+                                  "bsodwow",
                                   "- Initiates the Blue Screen of Death.");
             this.commandList[this.commandList.length] = sc;
 
@@ -159,7 +159,9 @@ module DOGES {
                 _StdOut.advanceLine();
             }
             // ... and finally write the prompt again.
-            this.putPrompt();
+            if (!this.shellBsod) {
+              this.putPrompt();
+            }
         }
 
         public parseInput(buffer): UserCommand {
@@ -282,8 +284,8 @@ module DOGES {
                     case "whereami":
                         _StdOut.putText("Whereami displays your current location.");
                         break;
-                    case "bsod":
-                        _StdOut.putText("Bsod initiates the Blue Screen of Death.");
+                    case "bsodwow":
+                        _StdOut.putText("Bsodwow initiates the Blue Screen of Death.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");

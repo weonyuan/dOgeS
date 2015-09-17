@@ -103,7 +103,7 @@ module DOGES {
             _DrawingContext.fillStyle = "#ffffff";
             _DrawingContext.fillText("wow", 40, 100);
             _DrawingContext.font = "12pt Calibri";
-            _DrawingContext.fillText("such calibri. very blue. much dead.", 40, 150);
+            _DrawingContext.fillText("such calibri. very blue. much rekt.", 40, 150);
             _DrawingContext.fillText("ERROR_MSG: " + msg, 40, 170);
         }
         

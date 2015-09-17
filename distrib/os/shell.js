@@ -56,7 +56,7 @@ var DOGES;
             sc = new DOGES.ShellCommand(this.shellWhere, "whereami", "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
             // bsod
-            sc = new DOGES.ShellCommand(this.shellBsod, "bsod", "- Initiates the Blue Screen of Death.");
+            sc = new DOGES.ShellCommand(this.shellBsod, "bsodwow", "- Initiates the Blue Screen of Death.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -120,7 +120,9 @@ var DOGES;
                 _StdOut.advanceLine();
             }
             // ... and finally write the prompt again.
-            this.putPrompt();
+            if (!this.shellBsod) {
+                this.putPrompt();
+            }
         };
         Shell.prototype.parseInput = function (buffer) {
             var retVal = new DOGES.UserCommand();
@@ -231,8 +233,8 @@ var DOGES;
                     case "whereami":
                         _StdOut.putText("Whereami displays your current location.");
                         break;
-                    case "bsod":
-                        _StdOut.putText("Bsod initiates the Blue Screen of Death.");
+                    case "bsodwow":
+                        _StdOut.putText("Bsodwow initiates the Blue Screen of Death.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");

@@ -45,7 +45,7 @@ module DOGES {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
-                } else if (chr === String.fromCharCode(8)) { //    Delete key
+                } else if (chr === String.fromCharCode(8)) { //    Backspace key
                     this.backspaceChar();
                     this.buffer = this.buffer.substring(0, this.buffer.length - 1);
                 } else {
@@ -64,11 +64,22 @@ module DOGES {
         public backspaceChar(): void {
             var lastChar = this.buffer.charAt(this.buffer.length - 1);
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
-            this.currentXPosition = this.currentXPosition - offset;
-            console.log(this.currentXPosition);
-            console.log(this.currentYPosition);
+
+
+            if (this.currentXPosition < 0 && this.buffer.length > 0) {
+                console.log("go back one line up");
+                this.currentXPosition = _Canvas.width - offset - 8;
+                this.currentYPosition -= 21;
+            } else {
+                this.currentXPosition = this.currentXPosition - offset;
+            }
+
             console.log(offset);
-            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - 13, this.currentXPosition, 20);
+            console.log("X: " + this.currentXPosition);
+            console.log("Y: " + this.currentYPosition);
+
+            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - 13, 30, 20);
+
         }
 
         public putText(text): void {
@@ -81,17 +92,23 @@ module DOGES {
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
+                 // Draw the text at the current X and Y coordinates.
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                this.currentXPosition = this.currentXPosition + offset;
+                
+                console.log(offset);
+                console.log("X: " + this.currentXPosition);
+                console.log("Y: " + this.currentYPosition);
+
                 if (this.currentXPosition + offset > _Canvas.width) {                    
                     // line wrap
-                    this.advanceLine();
                     this.currentXPosition = 0;
-                } else {
-                    // Draw the text at the current X and Y coordinates.
-                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                    // Move the current X position.
-                    this.currentXPosition = this.currentXPosition + offset;
+                    this.advanceLine();
                 }
+
+               
             }
          }
 

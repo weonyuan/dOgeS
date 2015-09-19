@@ -38,6 +38,15 @@ module DOGES {
         }
 
         //
+        // Taskbar Clock Pulse
+        //
+        public static taskbarClockPulse(): void {
+            // Update the clock on the graphic taskbar.
+            var datetime = new Date();
+            (<HTMLDivElement> document.getElementById("clock")).innerHTML = datetime.toLocaleString();
+        }
+
+        //
         // Keyboard Interrupt, a HARDWARE Interrupt Request. (See pages 560-561 in our text book.)
         //
         public static hostEnableKeyboardInterrupt(): void {

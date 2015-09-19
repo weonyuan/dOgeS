@@ -43,12 +43,30 @@ h3 {
   z-index: 99;
 }
 
+#taskbar {
+  background-color: white;
+  float: left;
+  margin: 8px;
+  padding: 10px;
+  width: 40.8%;
+  height: 33%;
+}
+
+#clock {
+  float: left;
+  width: 40%;
+}
+
+#status {
+  float: right;
+  width: 60%;
+}
+
 #logo {
   color: white;
   display: table;
   font-size: 24pt;
   font-weight: bold;
-  margin-left: auto;
   margin-right: auto;
 }
 

@@ -61,7 +61,6 @@ var DOGES;
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-            // TODO in the future: Optionally update a log database or some streaming service.
         };
         //
         // Host Events
@@ -77,8 +76,9 @@ var DOGES;
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new DOGES.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
-            // ... then set the host clock pulse ...
+            // ... then set the host and taskbar clocks pulse ...
             _hardwareClockID = setInterval(DOGES.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
+            _taskbarClockID = setInterval(DOGES.Devices.taskbarClockPulse, 100);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new DOGES.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.

@@ -33,6 +33,14 @@ var DOGES;
             _Kernel.krnOnCPUClockPulse();
         };
         //
+        // Taskbar Clock Pulse
+        //
+        Devices.taskbarClockPulse = function () {
+            // Update the clock on the graphic taskbar.
+            var datetime = new Date();
+            document.getElementById("clock").innerHTML = datetime.toLocaleString();
+        };
+        //
         // Keyboard Interrupt, a HARDWARE Interrupt Request. (See pages 560-561 in our text book.)
         //
         Devices.hostEnableKeyboardInterrupt = function () {

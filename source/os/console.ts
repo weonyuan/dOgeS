@@ -47,7 +47,6 @@ module DOGES {
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(8)) { //    Backspace key
                     this.backspaceChar();
-                    this.buffer = this.buffer.substring(0, this.buffer.length - 1);
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -66,9 +65,9 @@ module DOGES {
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
 
 
-            if (this.currentXPosition < 0 && this.buffer.length > 0) {
+            if (this.currentXPosition <= 0 && this.buffer.length > 0) {
                 console.log("go back one line up");
-                this.currentXPosition = _Canvas.width - offset - 8;
+                this.currentXPosition = _Canvas.width - offset;
                 this.currentYPosition -= 21;
             } else {
                 this.currentXPosition = this.currentXPosition - offset;
@@ -77,9 +76,8 @@ module DOGES {
             console.log(offset);
             console.log("X: " + this.currentXPosition);
             console.log("Y: " + this.currentYPosition);
-
+            this.buffer = this.buffer.substring(0, this.buffer.length - 1);
             _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - 13, 30, 20);
-
         }
 
         public putText(text): void {
@@ -147,9 +145,9 @@ module DOGES {
         }
 
         public showBsod(msg): void {
-            console.log("showBsod(msg)");
-            console.log(msg);
-            
+            _Canvas.width = 479;
+            _Canvas.height = 472;
+
             // draw the blue background
             _DrawingContext.rect(0, 0, _Canvas.width, _Canvas.height);
             _DrawingContext.fillStyle = "#2067b2";

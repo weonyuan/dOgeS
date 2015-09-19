@@ -61,6 +61,7 @@ var _SarcasticMode: boolean = false;
 var _krnKeyboardDriver; //  = null;
 
 var _hardwareClockID: number = null;
+var _taskbarClockID: number = null;
 
 // For testing (and enrichment)...
 var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.

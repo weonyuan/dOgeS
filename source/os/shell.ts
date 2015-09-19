@@ -97,6 +97,12 @@ module DOGES {
                                   "- Initiates the Blue Screen of Death.");
             this.commandList[this.commandList.length] = sc;
 
+            // status
+            sc = new ShellCommand(this.shellStatus,
+                                 "status",
+                                 "<string> - Sets the status on the graphical taskbar.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -290,6 +296,9 @@ module DOGES {
                     case "bsodwow":
                         _StdOut.putText("Bsodwow initiates the Blue Screen of Death.");
                         break;
+                    case "status":
+                        _StdOut.putText("Status updates the status message on the taskbar.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -360,6 +369,19 @@ module DOGES {
 
         public shellBsod(args) {
             _Kernel.krnTrapError("INITIATED_BSOD_CMD");
+        }
+
+        public shellStatus(args) {
+            // Set status based from status command in console
+            console.log(args);
+            for (var i = 0; i < args.length; i++) {
+                console.log(i);
+                if (i === 0) {
+                    (<HTMLDivElement> document.getElementById("status")).innerHTML = args[i];
+                } else {
+                    (<HTMLDivElement> document.getElementById("status")).innerHTML += " " + args[i];
+                }
+            }
         }
     }
 }

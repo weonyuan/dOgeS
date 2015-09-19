@@ -61,6 +61,9 @@ var DOGES;
             // status
             sc = new DOGES.ShellCommand(this.shellStatus, "status", "<string> - Sets the status on the graphical taskbar.");
             this.commandList[this.commandList.length] = sc;
+            // load
+            sc = new DOGES.ShellCommand(this.shellLoad, "load", "- Loads the code in the User Program Input.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -245,6 +248,9 @@ var DOGES;
                     case "status":
                         _StdOut.putText("Status updates the status message on the taskbar.");
                         break;
+                    case "load":
+                        _StdOut.putText("Load executes the user code in the User Program Input text box.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -326,6 +332,31 @@ var DOGES;
                 else {
                     document.getElementById("status").innerHTML += " " + args[i];
                 }
+            }
+        };
+        Shell.prototype.shellLoad = function (args) {
+            // Validate the input by allowing only hexadecimal numbers and spaces
+            var programInput = document.getElementById("taProgramInput").value;
+            var currentChar = "";
+            var isValid;
+            if (programInput.length > 0) {
+                for (var j = 0; j < programInput.length; j++) {
+                    // We want to read one character at a time
+                    currentChar = programInput.substring(j, j + 1);
+                    // If any character in user input is invalid, the entire input is invalid.
+                    if (!currentChar.match(/([a-fA-F0-9\s])/g)) {
+                        isValid = false;
+                    }
+                }
+                if (isValid === false) {
+                    _StdOut.putText("Wat. Such invalid code.");
+                }
+                else {
+                    _StdOut.putText("Very validated.");
+                }
+            }
+            else {
+                _StdOut.putText("Need code input. Much appreciate.");
             }
         };
         return Shell;

@@ -45,9 +45,6 @@ var DOGES;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
-                else if (chr === String.fromCharCode(8)) {
-                    this.backspaceChar();
-                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -58,9 +55,8 @@ var DOGES;
                 console.log(this.buffer);
             }
         };
-        Console.prototype.backspaceChar = function () {
-            var lastChar = this.buffer.charAt(this.buffer.length - 1);
-            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
+        Console.prototype.handleBackspace = function (chr) {
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
             if (this.currentXPosition <= 0 && this.buffer.length > 0) {
                 console.log("go back one line up");
                 this.currentXPosition = _Canvas.width - offset;

@@ -45,8 +45,6 @@ module DOGES {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
-                } else if (chr === String.fromCharCode(8)) { //    Backspace key
-                    this.backspaceChar();
                 } else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -60,10 +58,8 @@ module DOGES {
             }
         }
 
-        public backspaceChar(): void {
-            var lastChar = this.buffer.charAt(this.buffer.length - 1);
-            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
-
+        public handleBackspace(chr): void {
+            var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
 
             if (this.currentXPosition <= 0 && this.buffer.length > 0) {
                 console.log("go back one line up");

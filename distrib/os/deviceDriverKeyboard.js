@@ -47,13 +47,79 @@ var DOGES;
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
             }
-            else if (((keyCode >= 48) && (keyCode <= 57)) ||
-                (keyCode == 32) ||
-                (keyCode == 13) ||
-                (keyCode == 8)) {
+            else if (keyCode >= 48 && keyCode <= 57) {
                 chr = String.fromCharCode(keyCode);
+                if (isShifted) {
+                    chr = this.handleShiftedSymbols(keyCode);
+                }
                 _KernelInputQueue.enqueue(chr);
             }
+            else if (keyCode == 8) {
+                var lastChar = _Console.buffer.charAt(_Console.buffer.length - 1);
+                _Console.handleBackspace(lastChar);
+            }
+            else if (keyCode == 32 ||
+                keyCode == 13) {
+                chr = String.fromCharCode(keyCode);
+                if (isShifted) {
+                    chr = this.handleShiftedSymbols(keyCode);
+                }
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if ((keyCode >= 186) && (keyCode <= 192) ||
+                (keyCode >= 219) && (keyCode <= 222)) {
+                chr = String.fromCharCode(keyCode);
+                if (isShifted) {
+                    chr = this.handleShiftedSymbols(keyCode);
+                }
+                else {
+                    chr = this.handleNonShiftedSymbols(keyCode);
+                }
+                console.log(chr);
+                _KernelInputQueue.enqueue(chr);
+            }
+        };
+        DeviceDriverKeyboard.prototype.handleShiftedSymbols = function (keyCode) {
+            var shiftedSymbols = {
+                '48': ')',
+                '49': '!',
+                '50': '@',
+                '51': '#',
+                '52': '$',
+                '53': '%',
+                '54': '^',
+                '55': '&',
+                '56': '*',
+                '57': '(',
+                '186': ':',
+                '187': '+',
+                '188': '<',
+                '189': '_',
+                '190': '>',
+                '191': '?',
+                '192': '~',
+                '219': '{',
+                '220': '|',
+                '221': '}',
+                '222': '"'
+            };
+            return shiftedSymbols[keyCode];
+        };
+        DeviceDriverKeyboard.prototype.handleNonShiftedSymbols = function (keyCode) {
+            var nonShiftedSymbols = {
+                '186': ';',
+                '187': '=',
+                '188': ',',
+                '189': '-',
+                '190': '.',
+                '191': '/',
+                '192': '`',
+                '219': '[',
+                '220': '\\',
+                '221': ']',
+                '222': '\''
+            };
+            return nonShiftedSymbols[keyCode];
         };
         return DeviceDriverKeyboard;
     })(DOGES.DeviceDriver);

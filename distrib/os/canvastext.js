@@ -22,7 +22,6 @@ var DOGES;
         function CanvasTextFunctions() {
         }
         CanvasTextFunctions.letter = function (ch) {
-            console.log(ch);
             return CanvasTextFunctions.symbols[ch];
         };
         CanvasTextFunctions.ascent = function (font, size) {

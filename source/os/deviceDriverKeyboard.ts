@@ -52,9 +52,34 @@ module DOGES {
                 }
 
                 _KernelInputQueue.enqueue(chr);
-            } else if (keyCode == 8) {
+            } else if (keyCode == 8) {                      // backspace
                 var lastChar = _Console.buffer.charAt(_Console.buffer.length - 1);
                 _Console.handleBackspace(lastChar);
+            } else if (keyCode == 9) {                      // tab
+                // Set the regex so we look at possible commands from buffer
+                var bufferRegex = new RegExp("^" + _Console.buffer + "\\w+");
+                var matchedBuffer = "";
+                var numMatched = 0;
+
+                // Iterate through the commandList
+                for (var i in _OsShell.commandList) {
+                    if (bufferRegex.test(_OsShell.commandList[i].command)) {
+                        numMatched++;
+                        matchedBuffer = _OsShell.commandList[i].command;
+                        
+                        // If there are more than one match, do not return anything
+                        if (numMatched > 1) {
+                            matchedBuffer = "";
+                            break;
+                        }
+                    }
+                }
+
+                if (numMatched === 1) {
+                    // Fill in the missing characters of the buffer
+                    _Console.putText(matchedBuffer.replace(_Console.buffer, ""));
+                    _Console.buffer = matchedBuffer;
+                }
             } else if (keyCode == 32 ||   // space
                        keyCode == 13) {   // enter
                 chr = String.fromCharCode(keyCode);

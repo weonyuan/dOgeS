@@ -121,7 +121,6 @@ module DOGES {
         };
 
         public static letter(ch) {
-            console.log(ch);
             return CanvasTextFunctions.symbols[ch];
         }
 

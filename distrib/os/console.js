@@ -93,6 +93,7 @@ var DOGES;
                     this.currentXPosition = 0;
                     this.advanceLine();
                 }
+                document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
             }
         };
         Console.prototype.advanceLine = function () {

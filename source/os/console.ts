@@ -102,7 +102,7 @@ module DOGES {
                     this.advanceLine();
                 }
 
-               
+                document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
             }
          }
 

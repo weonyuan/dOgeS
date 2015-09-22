@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+   <meta name="author"             content="Weon Yuan" />
+   <link rel="stylesheet" href="doges.css" type="text/css" media="screen" />
+   <title>
+      dOgeS
+   </title>
+
+   <!-- Globals CONSTANTS and _Variables. Must included be first. -->
+   <script type="text/javascript" src="distrib/globals.js"></script>
+   <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+   <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
+   <script type="text/javascript" src="distrib/host/control.js"></script>
+   <script type="text/javascript" src="distrib/host/devices.js"></script>
+   <script type="text/javascript" src="distrib/host/cpu.js"></script>
+
+   <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
+   <script type="text/javascript" src="distrib/os/interrupt.js"></script>
+   <script type="text/javascript" src="distrib/os/canvastext.js"></script>
+   <script type="text/javascript" src="distrib/os/console.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
+   <script type="text/javascript" src="distrib/os/queue.js"></script>
+   <script type="text/javascript" src="distrib/os/shell.js"></script>
+   <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
+   <script type="text/javascript" src="distrib/os/userCommand.js"></script>
+   <script type="text/javascript" src="distrib/os/kernel.js"></script>
+
+   <!-- Other Routines -->
+   <script type="text/javascript" src="distrib/utils.js"></script>
+   <!-- Uncomment this line below to enable GLaDOS testing -->
+   <!--<script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>-->
+</head>
+
+<body onload="onDocumentLoad()">
+<div id="header">
+  <div id="taskbar">
+    <div id="clock">Welcome!</div>
+    <div id="status">Status</div>
+  </div>
+  <div id="logo">< <img src="logo.png" style="position: relative; top: 5px;" width="40px" height="40px"> dOgeS ></div>
+  <div id="divButtonBar" style="margin:4px;">
+     <input type="button"
+            id = "btnStartOS"
+            name="brnStartOS"
+            class="normal_button"
+            value="Start"
+            tabindex="0"
+            onclick="DOGES.Control.hostBtnStartOS_click(this);">
+
+     <input type="button"
+            id = "btnHaltOS"
+            name="brnHaltOS"
+            class="normal_button"
+            disabled="disabled"
+            value="Halt"
+            tabindex="1"
+            onclick="DOGES.Control.hostBtnHaltOS_click(this);">
+
+     <input type="button"
+            id = "btnReset"
+            name="brnReset"
+            class="normal_button"
+            disabled="disabled"
+            value="Reset"
+            tabindex="2"
+            onclick="DOGES.Control.hostBtnReset_click(this);">
+  </div>
+</div>
+<div id="divMain">
+   <div id="divConsole" style="margin:4px; width:500px; height:480px; float:left;">
+      <canvas id="display"
+              width="479px"
+              height="472px"
+              tabindex="3">
+      </canvas>
+      <canvas id="history"></canvas>
+   </div>
+
+   <div id="divLog" style="margin-left:520px;">
+      <label>
+         Host Log
+         <br>
+         <textarea name="taHostLog"
+                   id  ="taHostLog"
+                   rows="20"
+                   cols="43"
+         ></textarea>
+      </label>
+   </div>
+
+   <div id="divUserProgramInput" style="margin-left:520px;">
+      <label>
+         User Program Input
+         <br>
+         <textarea name="taProgramInput"
+                   id  ="taProgramInput"
+                   rows="8"
+                   cols="43"
+         ></textarea>
+      </label>
+   </div>
+</div>
+
+<p class="footerText" style="clear:both;">
+   <br>
+   Much Powered by Mugen. Copyright &copy; 2015.
+</p>
+
+</body>
+</html>

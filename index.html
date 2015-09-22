@@ -32,16 +32,16 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment this line below to enable GLaDOS testing -->
-   <!--<script type="text/javascript" src="http://www.labouseur.com/courses/os/projects/glados.js"></script>-->
+   <script type="text/javascript" src="glados.js"></script>
 </head>
 
 <body onload="onDocumentLoad()">
 <div id="header">
   <div id="taskbar">
     <div id="clock">Welcome!</div>
-    <div id="status">Status</div>
+    <div id="status"></div>
   </div>
-  <div id="logo">< <img src="logo.png" style="position: relative; top: 5px;" width="40px" height="40px"> dOgeS ></div>
+  <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: 5px;" width="40px" height="40px"> dOgeS ></div>
   <div id="divButtonBar" style="margin:4px;">
      <input type="button"
             id = "btnStartOS"

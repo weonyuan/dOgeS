@@ -140,23 +140,23 @@ module DOGES {
 
         public handleScrolling(): void {
             if (this.currentYPosition > _Canvas.height) {
-                // define the history canvas size as the main canvas size
+                // Define the history canvas size as the main canvas size.
                 _HistoryCanvas.width = _Canvas.width;
                 _HistoryCanvas.height = _Canvas.height;
 
-                // then draw whatever is on the main canvas to the history canvas
+                // Then draw whatever is on the main canvas to the history canvas.
                 _HistoryCanvas.getContext("2d").drawImage(_Canvas, 0, 0);
 
-                // increase the main canvas height, which will clear everything drawn
+                // Increase the main canvas height, which will clear everything drawn.
                 _Canvas.height += _DefaultFontSize * 2 + 
                                   _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                   _DrawingContext.fontAscent(this.currentFont, this.currentFontSize) +
                                   _FontHeightMargin;
                 
-                // then draw the history canvas back onto the extended main canvas
+                // Then draw the history canvas back onto the extended main canvas.
                 _DrawingContext.drawImage(_HistoryCanvas, 0, 0);
 
-                // automatically scroll to the bottom of shell
+                // Automatically scroll to the bottom of shell.
                 document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
             }
         }

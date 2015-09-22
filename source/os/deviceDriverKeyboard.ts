@@ -51,7 +51,7 @@ module DOGES {
                 }
 
                 _KernelInputQueue.enqueue(chr);
-            } else if ((keyCode >= 186) && (keyCode <= 192) ||
+            } else if ((keyCode >= 186) && (keyCode <= 192) ||    // symbols
                        (keyCode >= 219) && (keyCode <= 222)) {                         
                 chr = String.fromCharCode(keyCode);
 
@@ -118,6 +118,8 @@ module DOGES {
             }
         }
 
+        // The two symbol tables below are mapped to the appropriate key
+        // ASCII values (U.S. QWERTY).
         public handleShiftedSymbols(keyCode) {
             var shiftedSymbols = {
                 '48': ')',

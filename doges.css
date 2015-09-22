@@ -44,11 +44,13 @@ h3 {
 }
 
 #taskbar {
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
   float: left;
   margin: 8px;
+  margin-right: 20px;
   padding: 10px;
-  width: 40.8%;
+  width: 40%;
   height: 33%;
 }
 
@@ -68,6 +70,21 @@ h3 {
   font-size: 24pt;
   font-weight: bold;
   margin-right: auto;
+}
+
+@keyframes spinRight {
+  0%{ transform:rotate(0deg); transform-origin:50% 50%; }
+  100%{ transform:rotate(360deg); }
+}
+
+@-moz-keyframes spinRight{
+  0%{ -moz-transform:rotate(0deg); -moz-transform-origin:50% 50%; }
+  100%{ -moz-transform:rotate(360deg); }
+}
+
+@-webkit-keyframes spinRight{
+  0%{ -webkit-transform:rotate(0deg); -webkit-transform-origin:50% 50%; }
+  100%{ -webkit-transform:rotate(360deg); }
 }
 
 #divButtonBar {

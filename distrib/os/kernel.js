@@ -62,6 +62,7 @@ var DOGES;
             // Unload the Device Drivers?
             // More?
             //
+            clearInterval(_hardwareClockID);
             this.krnTrace("end shutdown OS");
         };
         Kernel.prototype.krnOnCPUClockPulse = function () {
@@ -158,7 +159,6 @@ var DOGES;
             // TODO: Display error on console
             _Console.showBsod(msg);
             this.krnShutdown();
-            clearInterval(_hardwareClockID);
         };
         return Kernel;
     })();

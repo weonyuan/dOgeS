@@ -64,6 +64,9 @@ var DOGES;
             // load
             sc = new DOGES.ShellCommand(this.shellLoad, "load", "- Loads the code in the User Program Input.");
             this.commandList[this.commandList.length] = sc;
+            // suchspin
+            sc = new DOGES.ShellCommand(this.shellSpin, "suchspin", "- Dogey the Shiba will spin. Just for you.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -119,6 +122,7 @@ var DOGES;
                     this.execute(this.shellInvalidCommand);
                 }
             }
+            // Store the input into the buffer history.
             if (DOGES.Utils.trim(buffer).length != 0) {
                 _KernelBuffers.push(buffer);
             }
@@ -255,6 +259,9 @@ var DOGES;
                     case "load":
                         _StdOut.putText("Load executes the user code in the User Program Input text box.");
                         break;
+                    case "suchspin":
+                        _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -326,14 +333,19 @@ var DOGES;
             _Kernel.krnTrapError("INITIATED_BSOD_CMD");
         };
         Shell.prototype.shellStatus = function (args) {
-            // Set status based from status command in console
-            for (var i = 0; i < args.length; i++) {
-                if (i === 0) {
-                    document.getElementById("status").innerHTML = args[i];
+            if (args.length > 0) {
+                // Set status based from status command in console
+                for (var i = 0; i < args.length; i++) {
+                    if (i === 0) {
+                        document.getElementById("status").innerHTML = args[i];
+                    }
+                    else {
+                        document.getElementById("status").innerHTML += " " + args[i];
+                    }
                 }
-                else {
-                    document.getElementById("status").innerHTML += " " + args[i];
-                }
+            }
+            else {
+                _StdOut.putText("Usage: status <msg>  Please supply a message.");
             }
         };
         Shell.prototype.shellLoad = function (args) {
@@ -360,6 +372,10 @@ var DOGES;
             else {
                 _StdOut.putText("Need code input. Much appreciate.");
             }
+        };
+        Shell.prototype.shellSpin = function (args) {
+            document.getElementById("dogey").style.animation = "2s spinRight infinite linear";
+            document.getElementById("dogey").style.webkitAnimation = "2s spinRight infinite linear";
         };
         return Shell;
     })();

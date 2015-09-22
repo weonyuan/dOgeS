@@ -119,8 +119,10 @@ var DOGES;
                     this.execute(this.shellInvalidCommand);
                 }
             }
-            _KernelBuffers.push(buffer);
-            CURRENT_BUFFER_INDEX = _KernelBuffers.length;
+            if (DOGES.Utils.trim(buffer).length != 0) {
+                _KernelBuffers.push(buffer);
+            }
+            _CurrentBufferIndex = _KernelBuffers.length;
         };
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
         Shell.prototype.execute = function (fn, args) {
@@ -325,9 +327,7 @@ var DOGES;
         };
         Shell.prototype.shellStatus = function (args) {
             // Set status based from status command in console
-            console.log(args);
             for (var i = 0; i < args.length; i++) {
-                console.log(i);
                 if (i === 0) {
                     document.getElementById("status").innerHTML = args[i];
                 }

@@ -62,28 +62,25 @@ var DOGES;
                 else {
                     chr = this.handleNonShiftedSymbols(keyCode);
                 }
-                console.log(chr);
                 _KernelInputQueue.enqueue(chr);
             }
             else if (keyCode == 38 ||
                 keyCode == 40) {
                 if (keyCode == 38) {
-                    if (CURRENT_BUFFER_INDEX == 0) {
-                        CURRENT_BUFFER_INDEX = _KernelBuffers.length;
+                    if (_CurrentBufferIndex == 0) {
+                        _CurrentBufferIndex = _KernelBuffers.length;
                     }
-                    CURRENT_BUFFER_INDEX--;
+                    _CurrentBufferIndex--;
                 }
                 else {
-                    if (CURRENT_BUFFER_INDEX + 1 == _KernelBuffers.length) {
-                        CURRENT_BUFFER_INDEX = _KernelBuffers.length - 1;
+                    if (_CurrentBufferIndex + 1 == _KernelBuffers.length) {
+                        _CurrentBufferIndex = _KernelBuffers.length - 1;
                     }
                     else {
-                        CURRENT_BUFFER_INDEX++;
+                        _CurrentBufferIndex++;
                     }
                 }
-                _Console.handleBufferHistory(CURRENT_BUFFER_INDEX);
-                console.log(CURRENT_BUFFER_INDEX);
-                console.log(_KernelBuffers[CURRENT_BUFFER_INDEX]);
+                _Console.handleBufferHistory(_CurrentBufferIndex);
             }
             else if (keyCode == 8) {
                 var lastChar = _Console.buffer.charAt(_Console.buffer.length - 1);

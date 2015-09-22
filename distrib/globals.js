@@ -16,7 +16,6 @@ var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
-var CURRENT_BUFFER_INDEX = 0;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -48,6 +47,7 @@ var _SarcasticMode = false;
 var _krnKeyboardDriver; //  = null;
 var _hardwareClockID = null;
 var _taskbarClockID = null;
+var _CurrentBufferIndex = 0;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.

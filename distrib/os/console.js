@@ -31,7 +31,7 @@ var DOGES;
         };
         Console.prototype.clearLine = function () {
             var startX = this.currentXPosition;
-            var startY = this.currentYPosition - _DefaultFontSize - 1;
+            var startY = this.currentYPosition - _DefaultFontSize;
             for (var i = 0; i < this.buffer.length; i++) {
                 var currentChar = this.buffer.charAt(i);
                 startX -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, currentChar);
@@ -62,29 +62,25 @@ var DOGES;
                     // ... and add it to our buffer.
                     this.buffer += chr;
                 }
-                console.log(this.buffer);
             }
         };
-        Console.prototype.handleBufferHistory = function (CURRENT_BUFFER_INDEX) {
+        Console.prototype.handleBufferHistory = function (_CurrentBufferIndex) {
             this.clearLine();
-            this.buffer = _KernelBuffers[CURRENT_BUFFER_INDEX];
+            this.buffer = _KernelBuffers[_CurrentBufferIndex];
             this.putText(_Console.buffer);
         };
         Console.prototype.handleBackspace = function (chr) {
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
+            // Backspacing to a previous line.
             if (this.currentXPosition <= 0 && this.buffer.length > 0) {
-                console.log("go back one line up");
-                this.currentXPosition = _Canvas.width - offset;
+                this.currentXPosition = _Canvas.width;
                 this.currentYPosition -= 21;
             }
-            else {
-                this.currentXPosition = this.currentXPosition - offset;
-            }
-            console.log(offset);
-            console.log("X: " + this.currentXPosition);
-            console.log("Y: " + this.currentYPosition);
+            var startX = this.currentXPosition - offset;
+            var startY = this.currentYPosition - _DefaultFontSize - 1;
             this.buffer = this.buffer.substring(0, this.buffer.length - 1);
-            _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - 13, 30, 20);
+            _DrawingContext.clearRect(startX, startY, this.currentXPosition, this.currentYPosition + 4);
+            this.currentXPosition -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
         };
         Console.prototype.putText = function (text) {
             // My first inclination here was to write two functions: putChar() and putString().
@@ -96,19 +92,22 @@ var DOGES;
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
-                console.log(offset);
-                console.log("X: " + this.currentXPosition);
-                console.log("Y: " + this.currentYPosition);
-                if (this.currentXPosition + offset > _Canvas.width) {
-                    // line wrap
-                    this.currentXPosition = 0;
-                    this.advanceLine();
+                // Scan every character so we can check when to line wrap.
+                for (var i = 0; i < text.length; i++) {
+                    // Draw the text at the current X and Y coordinates.
+                    _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text[i]);
+                    var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text[i]);
+                    var newXPosition = this.currentXPosition + offset;
+                    // The 10 is there just so the character doesn't go offscreen.
+                    if (newXPosition + 10 >= _Canvas.width) {
+                        this.advanceLine();
+                    }
+                    else {
+                        this.currentXPosition = newXPosition;
+                    }
+                    // Focus on the bottom of canvas when a character is typed.
+                    document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
                 }
-                document.getElementById("divConsole").scrollTop = document.getElementById("divConsole").scrollHeight;
             }
         };
         Console.prototype.advanceLine = function () {
@@ -131,7 +130,10 @@ var DOGES;
                 // then draw whatever is on the main canvas to the history canvas
                 _HistoryCanvas.getContext("2d").drawImage(_Canvas, 0, 0);
                 // increase the main canvas height, which will clear everything drawn
-                _Canvas.height += 45;
+                _Canvas.height += _DefaultFontSize * 2 +
+                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                    _DrawingContext.fontAscent(this.currentFont, this.currentFontSize) +
+                    _FontHeightMargin;
                 // then draw the history canvas back onto the extended main canvas
                 _DrawingContext.drawImage(_HistoryCanvas, 0, 0);
                 // automatically scroll to the bottom of shell

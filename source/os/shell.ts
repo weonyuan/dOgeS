@@ -164,8 +164,10 @@ module DOGES {
                 }
             }
 
-            _KernelBuffers.push(buffer);
-            CURRENT_BUFFER_INDEX = _KernelBuffers.length;
+            if (Utils.trim(buffer).length != 0) {
+                _KernelBuffers.push(buffer);
+            }
+            _CurrentBufferIndex = _KernelBuffers.length;
         }
 
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
@@ -385,9 +387,7 @@ module DOGES {
 
         public shellStatus(args) {
             // Set status based from status command in console
-            console.log(args);
             for (var i = 0; i < args.length; i++) {
-                console.log(i);
                 if (i === 0) {
                     (<HTMLDivElement> document.getElementById("status")).innerHTML = args[i];
                 } else {

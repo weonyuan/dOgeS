@@ -19,7 +19,7 @@ const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 100
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
-const CURRENT_BUFFER_INDEX: number = 0;
+
 
 
 //
@@ -63,6 +63,8 @@ var _krnKeyboardDriver; //  = null;
 
 var _hardwareClockID: number = null;
 var _taskbarClockID: number = null;
+
+var _CurrentBufferIndex: number = 0;
 
 // For testing (and enrichment)...
 var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.

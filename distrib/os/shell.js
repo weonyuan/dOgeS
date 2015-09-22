@@ -119,6 +119,8 @@ var DOGES;
                     this.execute(this.shellInvalidCommand);
                 }
             }
+            _KernelBuffers.push(buffer);
+            CURRENT_BUFFER_INDEX = _KernelBuffers.length;
         };
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
         Shell.prototype.execute = function (fn, args) {

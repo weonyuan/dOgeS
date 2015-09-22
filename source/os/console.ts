@@ -29,6 +29,19 @@ module DOGES {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         }
 
+        private clearLine(): void {
+            var startX = this.currentXPosition;
+            var startY = this.currentYPosition - _DefaultFontSize - 1;
+
+            for (var i = 0; i < this.buffer.length; i++) {
+                var currentChar = this.buffer.charAt(i);
+                startX -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, currentChar);
+            }
+
+            _DrawingContext.clearRect(startX, startY, this.currentXPosition, this.currentYPosition);
+            this.currentXPosition = startX;
+        }
+
         private resetXY(): void {
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;
@@ -56,6 +69,12 @@ module DOGES {
 
                 // TODO: Write a case for Ctrl-C.
             }
+        }
+
+        public handleBufferHistory(CURRENT_BUFFER_INDEX): void {
+            this.clearLine();
+            this.buffer = _KernelBuffers[CURRENT_BUFFER_INDEX];
+            this.putText(_Console.buffer);
         }
 
         public handleBackspace(chr): void {

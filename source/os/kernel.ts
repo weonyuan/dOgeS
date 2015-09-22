@@ -26,7 +26,8 @@ module DOGES {
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
-
+            _KernelBuffers.push("");
+            
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
             _Console.init();

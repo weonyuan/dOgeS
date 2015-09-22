@@ -29,7 +29,6 @@ var DOGES;
         };
         DeviceDriverKeyboard.prototype.krnKbdDispatchKeyPress = function (params) {
             // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
-            console.log(params);
             var keyCode = params[0];
             var isShifted = params[1];
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
@@ -54,9 +53,49 @@ var DOGES;
                 }
                 _KernelInputQueue.enqueue(chr);
             }
+            else if ((keyCode >= 186) && (keyCode <= 192) ||
+                (keyCode >= 219) && (keyCode <= 222)) {
+                chr = String.fromCharCode(keyCode);
+                if (isShifted) {
+                    chr = this.handleShiftedSymbols(keyCode);
+                }
+                else {
+                    chr = this.handleNonShiftedSymbols(keyCode);
+                }
+                console.log(chr);
+                _KernelInputQueue.enqueue(chr);
+            }
+            else if (keyCode == 38 ||
+                keyCode == 40) {
+                if (keyCode == 38) {
+                    if (CURRENT_BUFFER_INDEX == 0) {
+                        CURRENT_BUFFER_INDEX = _KernelBuffers.length;
+                    }
+                    CURRENT_BUFFER_INDEX--;
+                }
+                else {
+                    if (CURRENT_BUFFER_INDEX + 1 == _KernelBuffers.length) {
+                        CURRENT_BUFFER_INDEX = _KernelBuffers.length - 1;
+                    }
+                    else {
+                        CURRENT_BUFFER_INDEX++;
+                    }
+                }
+                _Console.handleBufferHistory(CURRENT_BUFFER_INDEX);
+                console.log(CURRENT_BUFFER_INDEX);
+                console.log(_KernelBuffers[CURRENT_BUFFER_INDEX]);
+            }
             else if (keyCode == 8) {
                 var lastChar = _Console.buffer.charAt(_Console.buffer.length - 1);
                 _Console.handleBackspace(lastChar);
+            }
+            else if (keyCode == 32 ||
+                keyCode == 13) {
+                chr = String.fromCharCode(keyCode);
+                if (isShifted) {
+                    chr = this.handleShiftedSymbols(keyCode);
+                }
+                _KernelInputQueue.enqueue(chr);
             }
             else if (keyCode == 9) {
                 // Set the regex so we look at possible commands from buffer
@@ -80,26 +119,6 @@ var DOGES;
                     _Console.putText(matchedBuffer.replace(_Console.buffer, ""));
                     _Console.buffer = matchedBuffer;
                 }
-            }
-            else if (keyCode == 32 ||
-                keyCode == 13) {
-                chr = String.fromCharCode(keyCode);
-                if (isShifted) {
-                    chr = this.handleShiftedSymbols(keyCode);
-                }
-                _KernelInputQueue.enqueue(chr);
-            }
-            else if ((keyCode >= 186) && (keyCode <= 192) ||
-                (keyCode >= 219) && (keyCode <= 222)) {
-                chr = String.fromCharCode(keyCode);
-                if (isShifted) {
-                    chr = this.handleShiftedSymbols(keyCode);
-                }
-                else {
-                    chr = this.handleNonShiftedSymbols(keyCode);
-                }
-                console.log(chr);
-                _KernelInputQueue.enqueue(chr);
             }
         };
         DeviceDriverKeyboard.prototype.handleShiftedSymbols = function (keyCode) {

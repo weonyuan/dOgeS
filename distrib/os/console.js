@@ -29,6 +29,16 @@ var DOGES;
         Console.prototype.clearScreen = function () {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
         };
+        Console.prototype.clearLine = function () {
+            var startX = this.currentXPosition;
+            var startY = this.currentYPosition - _DefaultFontSize - 1;
+            for (var i = 0; i < this.buffer.length; i++) {
+                var currentChar = this.buffer.charAt(i);
+                startX -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, currentChar);
+            }
+            _DrawingContext.clearRect(startX, startY, this.currentXPosition, this.currentYPosition);
+            this.currentXPosition = startX;
+        };
         Console.prototype.resetXY = function () {
             this.currentXPosition = 0;
             this.currentYPosition = this.currentFontSize;
@@ -54,6 +64,11 @@ var DOGES;
                 }
                 console.log(this.buffer);
             }
+        };
+        Console.prototype.handleBufferHistory = function (CURRENT_BUFFER_INDEX) {
+            this.clearLine();
+            this.buffer = _KernelBuffers[CURRENT_BUFFER_INDEX];
+            this.putText(_Console.buffer);
         };
         Console.prototype.handleBackspace = function (chr) {
             var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);

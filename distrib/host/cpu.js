@@ -43,6 +43,15 @@ var DOGES;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
         };
+        // Load the accumlator with a constant
+        Cpu.prototype.ldaConstant = function () {
+        };
+        // Load the accumulator from memory
+        Cpu.prototype.ldaMemory = function () {
+        };
+        // Store the accumulator in memory
+        Cpu.prototype.staMemory = function () {
+        };
         return Cpu;
     })();
     DOGES.Cpu = Cpu;

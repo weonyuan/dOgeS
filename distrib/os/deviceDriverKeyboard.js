@@ -117,6 +117,8 @@ var DOGES;
                 }
             }
         };
+        // The two symbol tables below are mapped to the appropriate key
+        // ASCII values (U.S. QWERTY).
         DeviceDriverKeyboard.prototype.handleShiftedSymbols = function (keyCode) {
             var shiftedSymbols = {
                 '48': ')',

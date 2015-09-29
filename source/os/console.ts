@@ -27,6 +27,8 @@ module DOGES {
 
         private clearScreen(): void {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
+            _Canvas.height = 472;
+            _HistoryCanvas.height = _Canvas.height;
         }
 
         private clearLine(): void {

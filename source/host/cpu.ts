@@ -42,5 +42,20 @@ module DOGES {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
         }
+
+        // Load the accumlator with a constant
+        public ldaConstant(): void {
+
+        }
+
+        // Load the accumulator from memory
+        public ldaMemory(): void {
+
+        }
+
+        // Store the accumulator in memory
+        public staMemory(): void {
+          
+        }
     }
 }

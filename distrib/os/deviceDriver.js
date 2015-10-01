@@ -11,7 +11,7 @@ var DOGES;
             if (isr === void 0) { isr = null; }
             this.driverEntry = driverEntry;
             this.isr = isr;
-            this.version = '0.10';
+            this.version = '0.2';
             this.status = 'unloaded';
             this.preemptable = false;
         }

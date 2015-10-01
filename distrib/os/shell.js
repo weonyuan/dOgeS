@@ -366,7 +366,7 @@ var DOGES;
                     _StdOut.putText("Wat. Such invalid code.");
                 }
                 else {
-                    _StdOut.putText("Very validated.");
+                    _StdOut.putText("Much loading. Very appreciate.");
                 }
             }
             else {

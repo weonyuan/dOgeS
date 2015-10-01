@@ -106,6 +106,25 @@ h3 {
   overflow-y: auto;
 }
 
+#divMemoryManager {
+  float: right;
+  height: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 33%;
+}
+
+#divMemoryManager table {
+  width: 100%;
+}
+
+#divMemoryManager table, tr, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+  text-align: center;
+}
+
 #display {
   background-color:#DFDBC3;
   border: 2px solid red;

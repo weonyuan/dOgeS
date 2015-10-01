@@ -50,6 +50,31 @@ var DOGES;
                 _GLaDOS.init();
             }
         };
+        Control.memoryManagerLog = function (memArray) {
+            console.log("memoryManagerLog()");
+            // create HTML table
+            for (var i = 0; i < memArray.length; i++) {
+                if (i % 8 === 0) {
+                    // Create a new row if current row has 8 cells
+                    var row = document.createElement("tr");
+                    document.getElementById("memoryTable").appendChild(row);
+                    var cell = document.createElement("td");
+                    var hexString = i.toString(16);
+                    while (hexString.length < 3) {
+                        hexString = "0" + hexString;
+                    }
+                    var data = document.createTextNode("0x" + hexString);
+                    cell.appendChild(data);
+                    row.appendChild(cell);
+                }
+                var cell = document.createElement("td");
+                var data = document.createTextNode(memArray[i]);
+                var rows = document.getElementById("memoryTable").getElementsByTagName("tr");
+                var lastRow = rows[rows.length - 1];
+                cell.appendChild(data);
+                lastRow.appendChild(cell);
+            }
+        };
         Control.hostLog = function (msg, source) {
             if (source === void 0) { source = "?"; }
             // Note the OS CLOCK.
@@ -76,6 +101,9 @@ var DOGES;
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new DOGES.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            _Memory = new DOGES.Memory();
+            _Memory.init();
+            this.memoryManagerLog(_Memory.memArray);
             // ... then set the host and taskbar clocks pulse ...
             _hardwareClockID = setInterval(DOGES.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             _taskbarClockID = setInterval(DOGES.Devices.taskbarClockPulse, 100);

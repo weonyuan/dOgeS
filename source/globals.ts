@@ -28,6 +28,7 @@ const KEYBOARD_IRQ: number = 1;
 //
 var _CPU: DOGES.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 
+var _MemoryManager: DOGES.MemoryManager;
 var _Memory: DOGES.Memory;
 
 var _OSclock: number = 0;  // Page 23.

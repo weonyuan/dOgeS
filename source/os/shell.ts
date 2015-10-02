@@ -432,7 +432,7 @@ module DOGES {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {
                     _StdOut.putText("Much loading. Very appreciate.");
-                    
+                    MemoryManager.loadToMemory(programInput);
                 }
             } else {
                 _StdOut.putText("Need code input. Much appreciate.");

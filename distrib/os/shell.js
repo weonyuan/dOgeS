@@ -367,6 +367,7 @@ var DOGES;
                 }
                 else {
                     _StdOut.putText("Much loading. Very appreciate.");
+                    DOGES.MemoryManager.loadToMemory(programInput);
                 }
             }
             else {

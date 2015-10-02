@@ -164,3 +164,33 @@ h3 {
   font-size: 8pt;
   text-align: center;
 }
+
+/* For individual logs in host log */
+.log {
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 3px;
+  padding-bottom: 3px;
+}
+
+.now {
+  color: #888;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.source {
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-right: 10px;
+}
+
+.msg {
+  font-size: 0.8em;
+  margin-right: 10px;
+}
+
+.clock {
+  float: right;
+  font-size: 0.8em;
+  font-weight: bold;
+}

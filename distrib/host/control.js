@@ -51,7 +51,6 @@ var DOGES;
             }
         };
         Control.memoryManagerLog = function (memArray) {
-            console.log("memoryManagerLog()");
             // create HTML table
             for (var i = 0; i < memArray.length; i++) {
                 if (i % 8 === 0) {
@@ -81,14 +80,32 @@ var DOGES;
             var clock = _OSclock;
             // The current locale time.
             var now = new Date().toLocaleString();
-            // Build the log string.
-            var str = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
-            // Update the log console.
+            // Build the log HTML string.
+            var str;
+            str = '<div class="log">';
+            str += '<div class="now">' + now + '</div>';
+            str += '<div>';
+            str += '<span class="source">' + source + '</span>';
+            str += '<span class="msg">' + msg + '</span>';
+            str += '<span class="clock">' + clock + '</span>';
+            str += '</div>';
+            str += '</div>';
             var taLog = document.getElementById("taHostLog");
-            var logElement = document.createElement("div");
-            var logData = document.createTextNode(str);
-            logElement.appendChild(logData);
-            taLog.innerHTML = logElement.outerHTML + taLog.innerHTML;
+            var lastMsg = document.getElementsByClassName("msg")[0];
+            if (lastMsg) {
+                // Just update the last log's clock value.
+                if (lastMsg.firstChild.nodeValue === msg) {
+                    document.getElementsByClassName("clock")[0].textContent = clock.toString();
+                }
+                else {
+                    // Create a new log.
+                    taLog.innerHTML = str + taLog.innerHTML;
+                }
+            }
+            else {
+                // Create a new log.
+                taLog.innerHTML = str + taLog.innerHTML;
+            }
         };
         //
         // Host Events

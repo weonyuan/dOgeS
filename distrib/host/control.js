@@ -79,13 +79,16 @@ var DOGES;
             if (source === void 0) { source = "?"; }
             // Note the OS CLOCK.
             var clock = _OSclock;
-            // Note the REAL clock in milliseconds since January 1, 1970.
-            var now = new Date().getTime();
+            // The current locale time.
+            var now = new Date().toLocaleString();
             // Build the log string.
             var str = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
             // Update the log console.
             var taLog = document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            var logElement = document.createElement("div");
+            var logData = document.createTextNode(str);
+            logElement.appendChild(logData);
+            taLog.innerHTML = logElement.outerHTML + taLog.innerHTML;
         };
         //
         // Host Events
@@ -114,6 +117,8 @@ var DOGES;
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
             Control.hostLog("Attempting Kernel shutdown.", "host");
+            // Disable the Halt button.
+            btn.disabled = true;
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

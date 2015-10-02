@@ -4,6 +4,7 @@
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
    <meta name="author"             content="Weon Yuan" />
    <link rel="stylesheet" href="doges.css" type="text/css" media="screen" />
+   <link rel="stylesheet" href="bootstrap.css" type="text/css" />
    <title>
       dOgeS
    </title>
@@ -11,6 +12,7 @@
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="distrib/globals.js"></script>
    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+   <script type="text/javascript" src="bootstrap.js"></script>
 
    <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
    <script type="text/javascript" src="distrib/host/control.js"></script>
@@ -37,40 +39,30 @@
 </head>
 
 <body onload="onDocumentLoad()">
-<div id="header">
+<nav id="header" class="navbar-default">
   <div id="taskbar">
     <div id="clock">Welcome!</div>
     <div id="status"></div>
   </div>
-  <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: 5px;" width="40px" height="40px"> dOgeS ></div>
+  <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: -4px;" width="40px" height="40px"> dOgeS ></div>
   <div id="divButtonBar" style="margin:4px;">
-     <input type="button"
-            id = "btnStartOS"
-            name="brnStartOS"
-            class="normal_button"
-            value="Start"
-            tabindex="0"
-            onclick="DOGES.Control.hostBtnStartOS_click(this);">
+     <button id="btnStartOS"
+             class="btn btn-success glyphicon glyphicon-play"
+             tabindex="0"
+             onclick="DOGES.Control.hostBtnStartOS_click(this);" />
 
-     <input type="button"
-            id = "btnHaltOS"
-            name="brnHaltOS"
-            class="normal_button"
-            disabled="disabled"
-            value="Halt"
-            tabindex="1"
-            onclick="DOGES.Control.hostBtnHaltOS_click(this);">
+     <button id="btnHaltOS"
+             class="btn btn-danger glyphicon glyphicon-stop"
+             disabled="true"
+             tabindex="1"
+             onclick="DOGES.Control.hostBtnHaltOS_click(this);" />
 
-     <input type="button"
-            id = "btnReset"
-            name="brnReset"
-            class="normal_button"
-            disabled="disabled"
-            value="Reset"
-            tabindex="2"
-            onclick="DOGES.Control.hostBtnReset_click(this);">
+     <button id="btnReset"
+             class="btn btn-info glyphicon glyphicon-repeat"
+             tabindex="2"
+             onclick="DOGES.Control.hostBtnReset_click(this);" />
   </div>
-</div>
+</nav>
 <div id="divMain">
    <div id="divConsole" style="margin:4px; width:500px; height:480px; float:left;">
       <canvas id="display"
@@ -81,36 +73,23 @@
       <canvas id="history"></canvas>
    </div>
 
-   <div id="divLog" style="margin-left:520px;">
-      <label>
-         Host Log
-         <br>
-         <textarea name="taHostLog"
-                   id  ="taHostLog"
-                   rows="20"
-                   cols="43"
-         ></textarea>
-      </label>
+   <div id="divLog" class="panel panel-default">
+       <div class="panel-heading"><label>Host Log</label></div>
+       <div id ="taHostLog" class="panel-body"></div>
    </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
-      <label>
-         User Program Input
-         <br>
+   <div id="divUserProgramInput" class="panel panel-default">
+      <div class="panel-heading"><label>User Program Input</label></div>
          <textarea name="taProgramInput"
                    id  ="taProgramInput"
-                   rows="8"
-                   cols="43"
          ></textarea>
-      </label>
    </div>
 
-   <div id="divMemoryManager" style="margin-left:520px;">
-      <label>
-         Memory Manager
-         <br>
-         <table id="memoryTable"><tr></tr></table>
-      </label>
+   <div id="divMemoryManager" class="panel panel-default">
+      <div class="panel-heading"><label>Memory Manager</label></div>
+      <div class="panel-body">
+        <table id="memoryTable" class="table"></table>
+      </div>
    </div>
 </div>
 

@@ -92,15 +92,19 @@ module DOGES {
             // Note the OS CLOCK.
             var clock: number = _OSclock;
 
-            // Note the REAL clock in milliseconds since January 1, 1970.
-            var now: number = new Date().getTime();
+            // The current locale time.
+            var now: string = new Date().toLocaleString();
 
             // Build the log string.
             var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
 
             // Update the log console.
-            var taLog = <HTMLInputElement> document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            var taLog = <HTMLDivElement> document.getElementById("taHostLog");
+            var logElement = document.createElement("div");
+            var logData = document.createTextNode(str);
+            logElement.appendChild(logData);
+
+            taLog.innerHTML = logElement.outerHTML + taLog.innerHTML;
         }
 
 
@@ -139,6 +143,10 @@ module DOGES {
         public static hostBtnHaltOS_click(btn): void {
             Control.hostLog("Emergency halt", "host");
             Control.hostLog("Attempting Kernel shutdown.", "host");
+
+            // Disable the Halt button.
+            btn.disabled = true;
+
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

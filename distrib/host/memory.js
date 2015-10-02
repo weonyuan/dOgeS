@@ -11,7 +11,6 @@ var DOGES;
             for (var i = 0; i < this.memArray.length; i++) {
                 this.memArray[i] = "00";
             }
-            console.log(this.memArray);
         };
         return Memory;
     })();

@@ -36,10 +36,8 @@ h3 {
 
 #header {
   background-color: rgba(0, 0, 0, 0.6);
-  margin: -8px;
   position: fixed;
   width: 100%;
-  height: 54px;
   z-index: 99;
 }
 
@@ -70,6 +68,7 @@ h3 {
   font-size: 24pt;
   font-weight: bold;
   margin-right: auto;
+  margin-top: 5px;
 }
 
 @keyframes spinRight {
@@ -89,15 +88,19 @@ h3 {
 
 #divButtonBar {
   position: absolute;
-  top: 13px;
+  top: 2px;
   right: 5px;
+}
+
+#divButtonBar button {
+  margin: 5px;
 }
 
 #divMain {
   display: block;
   margin: 0 auto;
   position: relative;
-  width: 850px;
+  width: 900px;
   padding-top: 60px;
 }
 
@@ -106,23 +109,43 @@ h3 {
   overflow-y: auto;
 }
 
-#divMemoryManager {
+#divLog, #divUserProgramInput, #divMemoryManager {
+  display: inline-block;
   float: right;
+  width: 43%;
+}
+
+#taHostLog {
   height: 200px;
   overflow-x: hidden;
   overflow-y: auto;
-  width: 33%;
+}
+
+#divUserProgramInput textarea {
+  box-sizing: border-box;
+  height: 100px;
+  width: 100%;
+}
+
+#divMemoryManager .panel-body {
+  height: 150px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #divMemoryManager table {
+  background-color: white;
   width: 100%;
 }
 
 #divMemoryManager table, tr, td {
   border: 1px solid black;
   border-collapse: collapse;
-  padding: 5px;
   text-align: center;
+}
+
+#divMemoryManager td {
+  padding: 5px;
 }
 
 #display {
@@ -133,10 +156,6 @@ h3 {
 
 #history {
   display: none;
-}
-
-.normal_button {
-  width: 100px;
 }
 
 .footerText {

@@ -2,7 +2,7 @@ module DOGES {
   
     export class Memory {
 
-        constructor(public bytes: number = 256,
+        constructor(public bytes: number = MEMORY_SIZE,
                     public memArray: Array<string> = new Array(bytes)) {
 
         }

@@ -52,6 +52,7 @@ var DOGES;
         };
         Control.memoryManagerLog = function (memArray) {
             // create HTML table
+            document.getElementById("memoryTable").innerHTML = "";
             for (var i = 0; i < memArray.length; i++) {
                 if (i % 8 === 0) {
                     // Create a new row if current row has 8 cells
@@ -62,7 +63,7 @@ var DOGES;
                     while (hexString.length < 3) {
                         hexString = "0" + hexString;
                     }
-                    var data = document.createTextNode("0x" + hexString);
+                    var data = document.createTextNode("0x" + hexString.toUpperCase());
                     cell.appendChild(data);
                     row.appendChild(cell);
                 }

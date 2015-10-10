@@ -3,16 +3,22 @@ var DOGES;
     var MemoryManager = (function () {
         function MemoryManager() {
         }
-        MemoryManager.loadToMemory = function (userInput) {
-            for (var i = 0; i < _Memory.memArray.length; i++) {
+        MemoryManager.loadProgram = function (programInput) {
+            var newPcb = new DOGES.Pcb();
+            this.loadToMemory(programInput);
+            return newPcb.pid;
+        };
+        MemoryManager.loadToMemory = function (programInput) {
+            programInput = programInput.replace(/\s/g, "").toUpperCase();
+            for (var i = 0; i < programInput.length / 2; i++) {
                 if (i === 0) {
                     var currentCode = 0;
                 }
                 else {
-                    currentCode += 3;
+                    currentCode = currentCode + 2;
                 }
-                _Memory.memArray[i] = userInput.substring(currentCode, currentCode + 2);
-                console.log(_Memory.memArray[i]);
+                _Memory.memArray[i] = programInput.substring(currentCode, currentCode + 2);
+                DOGES.Control.memoryManagerLog(_Memory.memArray);
             }
         };
         return MemoryManager;

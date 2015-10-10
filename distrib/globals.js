@@ -11,16 +11,20 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 var APP_NAME = "dOgeS"; // such app
-var APP_VERSION = "0.2"; // very alpha
+var APP_VERSION = "0.2"; // very post-alpha
 var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
+var PROGRAM_LIMIT = 1; // at least for project 2...
+var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
+var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _PID = 0;
 var _MemoryManager;
 var _Memory;
 var _OSclock = 0; // Page 23.

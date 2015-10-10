@@ -2,7 +2,7 @@ var DOGES;
 (function (DOGES) {
     var Memory = (function () {
         function Memory(bytes, memArray) {
-            if (bytes === void 0) { bytes = 256; }
+            if (bytes === void 0) { bytes = MEMORY_SIZE; }
             if (memArray === void 0) { memArray = new Array(bytes); }
             this.bytes = bytes;
             this.memArray = memArray;

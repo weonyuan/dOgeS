@@ -366,8 +366,10 @@ var DOGES;
                     _StdOut.putText("Wat. Such invalid code.");
                 }
                 else {
+                    var pid = DOGES.MemoryManager.loadProgram(programInput);
                     _StdOut.putText("Much loading. Very appreciate.");
-                    DOGES.MemoryManager.loadToMemory(programInput);
+                    _Console.advanceLine();
+                    _StdOut.putText("Assigned Process ID: " + pid);
                 }
             }
             else {

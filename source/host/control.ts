@@ -60,6 +60,8 @@ module DOGES {
 
         public static memoryManagerLog(memArray): void {
             // create HTML table
+          document.getElementById("memoryTable").innerHTML = "";
+
             for (var i = 0; i < memArray.length; i++) {
               if (i % 8 === 0) {
                 // Create a new row if current row has 8 cells
@@ -73,7 +75,7 @@ module DOGES {
                   hexString = "0" + hexString;
                 }
 
-                var data = document.createTextNode("0x" + hexString);
+                var data = document.createTextNode("0x" + hexString.toUpperCase());
                 cell.appendChild(data);
                 row.appendChild(cell);
               }

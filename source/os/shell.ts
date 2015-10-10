@@ -431,8 +431,10 @@ module DOGES {
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {
+                    var pid: number = MemoryManager.loadProgram(programInput);
                     _StdOut.putText("Much loading. Very appreciate.");
-                    MemoryManager.loadToMemory(programInput);
+                    _Console.advanceLine();
+                    _StdOut.putText("Assigned Process ID: " + pid);
                 }
             } else {
                 _StdOut.putText("Need code input. Much appreciate.");

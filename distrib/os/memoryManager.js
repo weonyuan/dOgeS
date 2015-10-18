@@ -6,7 +6,7 @@ var DOGES;
         MemoryManager.loadProgram = function (programInput) {
             var newPcb = new DOGES.Pcb();
             this.loadToMemory(programInput);
-            return newPcb.pid;
+            return newPcb.PID;
         };
         MemoryManager.loadToMemory = function (programInput) {
             programInput = programInput.replace(/\s/g, "").toUpperCase();
@@ -20,6 +20,9 @@ var DOGES;
                 _Memory.memArray[i] = programInput.substring(currentCode, currentCode + 2);
                 DOGES.Control.memoryManagerLog(_Memory.memArray);
             }
+        };
+        MemoryManager.fetchMemory = function (address) {
+            return _Memory.memArray[address];
         };
         return MemoryManager;
     })();

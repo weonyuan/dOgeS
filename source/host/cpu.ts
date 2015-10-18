@@ -41,21 +41,137 @@ module DOGES {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            this.execute(this.fetch());
+            Control.cpuLog();
+        }
+
+        public fetch(): string {
+            console.log("fetch()");
+            return MemoryManager.fetchMemory(this.PC);
+        }
+
+        public execute(opcode): void {
+            console.log("execute(" + opcode + ")");
+            if (opcode === "A9") {
+                this.ldaConstant();
+            } else if (opcode === "AD") {
+                this.ldaMemory();
+            } else if (opcode === "8D") {
+                this.staMemory();
+            } else if (opcode === "6D") {
+                this.adcAccumulator();
+            } else if (opcode === "A2") {
+                this.ldxConstant();
+            } else if (opcode === "AE") {
+                this.ldxMemory();
+            } else if (opcode === "A0") {
+                this.ldyConstant();
+            } else if (opcode === "AC") {
+                this.ldyMemory();
+            } else if (opcode === "EA") {
+                this.nop();
+            } else if (opcode === "00") {
+                this.brk();
+            } else if (opcode === "EC") {
+                this.cpxMemory();
+            } else if (opcode === "D0") {
+                this.bneBytes();
+            } else if (opcode === "EE") {
+                this.incByte();
+            } else if (opcode === "FF") {
+                this.syscall();
+            }
+
+            // Increment program counter for every opcode executed
+            this.PC++;
         }
 
         // Load the accumlator with a constant
         public ldaConstant(): void {
-
+            // Grab the next two param bytes
+            var constant = this.base10Translate(MemoryManager.fetchMemory(++this.PC));
+            this.Acc = constant;
+            console.log("ldaConstant()");
         }
 
         // Load the accumulator from memory
         public ldaMemory(): void {
+            // This is the accumulator value will be pulled from
+            
+            // grab the next two bytes (this will be the address)
 
+            // var sourceAddress = MemoryManager.fetchMemory()
         }
 
         // Store the accumulator in memory
         public staMemory(): void {
           
+        }
+
+        // Adds address content to accumulator contents
+        public adcAccumulator(): void {
+
+        }
+
+        // Load X register with constant
+        public ldxConstant(): void {
+
+        }
+
+        // Load X register from memory
+        public ldxMemory(): void {
+
+        }
+
+        // Load Y register with constant
+        public ldyConstant(): void {
+
+        }
+
+        // Load Y register from memory
+        public ldyMemory(): void {
+
+        }        
+
+        // No operation...literally
+        public nop(): void {
+
+        }
+
+        // Break
+        public brk(): void {
+            _CPU.PC = this.PC;
+            _CPU.Acc = this.Acc;
+            _CPU.Xreg = this.Xreg;
+            _CPU.Yreg = this.Yreg;
+            _CPU.Zflag = this.Zflag;
+            _KernelInterruptQueue.enqueue(new Interrupt(CPU_BREAK_IRQ, ""));
+        }
+
+        // Compare a byte in memory to X register
+        public cpxMemory(): void {
+
+        }
+
+        // Branch n bytes
+        public bneBytes(): void {
+
+        }
+
+        // Increment byte value
+        public incByte(): void {
+
+        }
+
+        // Syscall
+        public syscall(): void {
+            _KernelInterruptQueue.enqueue(new Interrupt(SYS_OPCODE_IRQ, ""));
+        }
+
+
+
+        public base10Translate(hexCode): number {
+            return parseInt(hexCode, 16);
         }
     }
 }

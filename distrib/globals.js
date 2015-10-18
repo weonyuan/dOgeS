@@ -16,6 +16,10 @@ var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
+var SYS_OPCODE_IRQ = 2;
+var UNKNOWN_OPCODE_IRQ = 3;
+var CPU_BREAK_IRQ = 4;
+var RUN_PROGRAM_IRQ = 5;
 var PROGRAM_LIMIT = 1; // at least for project 2...
 var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
 var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
@@ -25,6 +29,7 @@ var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID = 0;
+var _CurrentProgram;
 var _MemoryManager;
 var _Memory;
 var _OSclock = 0; // Page 23.

@@ -42,15 +42,118 @@ var DOGES;
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            this.execute(this.fetch());
+            DOGES.Control.cpuLog();
+        };
+        Cpu.prototype.fetch = function () {
+            console.log("fetch()");
+            return DOGES.MemoryManager.fetchMemory(this.PC);
+        };
+        Cpu.prototype.execute = function (opcode) {
+            console.log("execute(" + opcode + ")");
+            if (opcode === "A9") {
+                this.ldaConstant();
+            }
+            else if (opcode === "AD") {
+                this.ldaMemory();
+            }
+            else if (opcode === "8D") {
+                this.staMemory();
+            }
+            else if (opcode === "6D") {
+                this.adcAccumulator();
+            }
+            else if (opcode === "A2") {
+                this.ldxConstant();
+            }
+            else if (opcode === "AE") {
+                this.ldxMemory();
+            }
+            else if (opcode === "A0") {
+                this.ldyConstant();
+            }
+            else if (opcode === "AC") {
+                this.ldyMemory();
+            }
+            else if (opcode === "EA") {
+                this.nop();
+            }
+            else if (opcode === "00") {
+                this.brk();
+            }
+            else if (opcode === "EC") {
+                this.cpxMemory();
+            }
+            else if (opcode === "D0") {
+                this.bneBytes();
+            }
+            else if (opcode === "EE") {
+                this.incByte();
+            }
+            else if (opcode === "FF") {
+                this.syscall();
+            }
+            // Increment program counter for every opcode executed
+            this.PC++;
         };
         // Load the accumlator with a constant
         Cpu.prototype.ldaConstant = function () {
+            // Grab the next two param bytes
+            var constant = this.base10Translate(DOGES.MemoryManager.fetchMemory(++this.PC));
+            this.Acc = constant;
+            console.log("ldaConstant()");
         };
         // Load the accumulator from memory
         Cpu.prototype.ldaMemory = function () {
+            // This is the accumulator value will be pulled from
+            // grab the next two bytes (this will be the address)
+            // var sourceAddress = MemoryManager.fetchMemory()
         };
         // Store the accumulator in memory
         Cpu.prototype.staMemory = function () {
+        };
+        // Adds address content to accumulator contents
+        Cpu.prototype.adcAccumulator = function () {
+        };
+        // Load X register with constant
+        Cpu.prototype.ldxConstant = function () {
+        };
+        // Load X register from memory
+        Cpu.prototype.ldxMemory = function () {
+        };
+        // Load Y register with constant
+        Cpu.prototype.ldyConstant = function () {
+        };
+        // Load Y register from memory
+        Cpu.prototype.ldyMemory = function () {
+        };
+        // No operation...literally
+        Cpu.prototype.nop = function () {
+        };
+        // Break
+        Cpu.prototype.brk = function () {
+            _CPU.PC = this.PC;
+            _CPU.Acc = this.Acc;
+            _CPU.Xreg = this.Xreg;
+            _CPU.Yreg = this.Yreg;
+            _CPU.Zflag = this.Zflag;
+            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(CPU_BREAK_IRQ, ""));
+        };
+        // Compare a byte in memory to X register
+        Cpu.prototype.cpxMemory = function () {
+        };
+        // Branch n bytes
+        Cpu.prototype.bneBytes = function () {
+        };
+        // Increment byte value
+        Cpu.prototype.incByte = function () {
+        };
+        // Syscall
+        Cpu.prototype.syscall = function () {
+            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(SYS_OPCODE_IRQ, ""));
+        };
+        Cpu.prototype.base10Translate = function (hexCode) {
+            return parseInt(hexCode, 16);
         };
         return Cpu;
     })();

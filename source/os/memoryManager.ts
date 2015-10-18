@@ -7,7 +7,7 @@ module DOGES {
 
       this.loadToMemory(programInput);
 
-      return newPcb.pid;
+      return newPcb.PID;
     }
 
     public static loadToMemory(programInput): void {
@@ -23,6 +23,10 @@ module DOGES {
         
         DOGES.Control.memoryManagerLog(_Memory.memArray);
       }
+    }
+
+    public static fetchMemory(address): string {
+      return _Memory.memArray[address];
     }
   }
 }

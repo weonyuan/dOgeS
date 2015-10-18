@@ -109,6 +109,12 @@ module DOGES {
                                   "- Loads the code in the User Program Input.");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new ShellCommand(this.shellRun,
+              "run",
+              "<pid> - Runs a program already in memory");
+            this.commandList[this.commandList.length] = sc;
+
             // suchspin
             sc = new ShellCommand(this.shellSpin,
                 "suchspin",
@@ -318,7 +324,10 @@ module DOGES {
                         _StdOut.putText("Status updates the status message on the taskbar.");
                         break;
                     case "load":
-                        _StdOut.putText("Load executes the user code in the User Program Input text box.");
+                        _StdOut.putText("Load allocates the appropriate space amount in the main memory and loads the user program there.");
+                        break;
+                    case "run":
+                      _StdOut.putText("Run executes the user program already allocated in the main memory.");
                         break;
                     case "suchspin":
                         _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
@@ -438,6 +447,15 @@ module DOGES {
                 }
             } else {
                 _StdOut.putText("Need code input. Much appreciate.");
+            }
+        }
+
+        public shellRun(args) {
+            if (args.length > 0) {
+               // Run the program
+              _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
+            } else {
+              _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
             }
         }
 

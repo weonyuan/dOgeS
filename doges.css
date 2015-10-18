@@ -109,7 +109,15 @@ h3 {
   overflow-y: auto;
 }
 
-#divLog, #divUserProgramInput, #divMemoryManager {
+#divCpu {
+  display: inline-block;
+  float: left;
+  width: 54%;
+}
+
+#divLog,
+#divUserProgramInput,
+#divMemoryManager {
   display: inline-block;
   float: right;
   width: 43%;
@@ -133,12 +141,17 @@ h3 {
   overflow-y: auto;
 }
 
+#divCpu table,
 #divMemoryManager table {
   background-color: white;
   width: 100%;
 }
 
-#divMemoryManager table, tr, td {
+#divCpu table,
+#divMemoryManager table,
+td,
+th,
+tr {
   border: 1px solid black;
   border-collapse: collapse;
   text-align: center;
@@ -149,7 +162,7 @@ h3 {
 }
 
 #display {
-  background-color:#DFDBC3;
+  background-color: #DFDBC3;
   border: 2px solid red;
   cursor: default;
 }

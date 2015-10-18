@@ -125,6 +125,14 @@ module DOGES {
             }
         }
 
+        public static cpuLog(): void {
+          document.getElementById("pc").innerHTML = _CPU.PC.toString();
+          document.getElementById("accumulator").innerHTML = _CPU.Acc.toString();
+          document.getElementById("xRegister").innerHTML = _CPU.Xreg.toString();
+          document.getElementById("yRegister").innerHTML = _CPU.Yreg.toString();
+          document.getElementById("zFlag").innerHTML = _CPU.Zflag.toString();
+        }
+
 
         //
         // Host Events
@@ -143,6 +151,7 @@ module DOGES {
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            this.cpuLog();
 
             _Memory = new Memory();
             _Memory.init();

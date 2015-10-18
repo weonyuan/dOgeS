@@ -36,6 +36,12 @@
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment this line below to enable GLaDOS testing -->
    <!--<script type="text/javascript" src="glados.js"></script>-->
+
+   <style>
+      .table > tbody > tr > th {
+        border-top: 1px solid black;
+      }
+   </style>
 </head>
 
 <body onload="onDocumentLoad()">
@@ -85,10 +91,32 @@
          ></textarea>
    </div>
 
-   <div id="divMemoryManager" class="panel panel-default">
+   <div id="divMemoryManager" class="panel panel-default" style="margin-bottom: 0">
       <div class="panel-heading"><label>Memory Manager</label></div>
       <div class="panel-body">
         <table id="memoryTable" class="table"></table>
+      </div>
+   </div>
+
+   <div id="divCpu" class="panel panel-default">
+      <div class="panel-heading"><label>CPU</label></div>
+      <div class="panel-body">
+        <table id="cpuTable" class="table">
+          <tr>
+            <th>PC</th>
+            <th>Acc</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+          </tr>
+          <tr>
+            <td id="pc"></td>
+            <td id="accumulator"></td>
+            <td id="xRegister"></td>
+            <td id="yRegister"></td>
+            <td id="zFlag"></td>
+          </tr>
+        </table>
       </div>
    </div>
 </div>

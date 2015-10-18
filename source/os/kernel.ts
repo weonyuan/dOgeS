@@ -89,6 +89,7 @@ module DOGES {
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+              console.log("cycle");
                 _CPU.cycle();
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
@@ -120,6 +121,8 @@ module DOGES {
             // TODO: Consider using an Interrupt Vector in the future.
             // Note: There is no need to "dismiss" or acknowledge the interrupts in our design here.
             //       Maybe the hardware simulation will grow to support/require that in the future.
+            console.log(irq);
+
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR();              // Kernel built-in routine for timers (not the clock).
@@ -127,6 +130,18 @@ module DOGES {
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case SYS_OPCODE_IRQ:
+                    break;
+                case UNKNOWN_OPCODE_IRQ:
+                    this.krnTrace("Unknown opcode: " + MemoryManager.fetchMemory(_CPU.PC - 1));
+                    break;
+                case CPU_BREAK_IRQ:
+                    _CPU.isExecuting = false;
+                    break;
+                case RUN_PROGRAM_IRQ:
+                    console.log("RUN_PROGRAM_IRQ");
+                    _CPU.isExecuting = true;
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

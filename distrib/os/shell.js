@@ -376,6 +376,7 @@ var DOGES;
                     _StdOut.putText("Much loading. Very appreciate.");
                     _Console.advanceLine();
                     _StdOut.putText("Assigned Process ID: " + pid);
+                    _CPU.isExecuting = false;
                 }
             }
             else {

@@ -99,18 +99,26 @@ var DOGES;
         // Load the accumlator with a constant
         Cpu.prototype.ldaConstant = function () {
             // Grab the next two param bytes
-            var constant = this.base10Translate(DOGES.MemoryManager.fetchMemory(++this.PC));
+            var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
             this.Acc = constant;
             console.log("ldaConstant()");
         };
         // Load the accumulator from memory
         Cpu.prototype.ldaMemory = function () {
-            // This is the accumulator value will be pulled from
-            // grab the next two bytes (this will be the address)
-            // var sourceAddress = MemoryManager.fetchMemory()
+            // Grab the next two bytes (this will be the address)
+            var addressBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            // Set the accumulator from the memory block value (base 10)
+            this.Acc = this.base10Translate(source);
+            console.log(addressBase10);
+            console.log(source);
         };
         // Store the accumulator in memory
         Cpu.prototype.staMemory = function () {
+            console.log("staMemory()");
+            var destinationBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            DOGES.MemoryManager.storeToMemory(this.Acc.toString(16), destinationBase10);
+            console.log(this.Acc.toString(16));
         };
         // Adds address content to accumulator contents
         Cpu.prototype.adcAccumulator = function () {
@@ -151,6 +159,10 @@ var DOGES;
         // Syscall
         Cpu.prototype.syscall = function () {
             _KernelInterruptQueue.enqueue(new DOGES.Interrupt(SYS_OPCODE_IRQ, ""));
+        };
+        Cpu.prototype.fetchNextTwoBytes = function (startAddress) {
+            var nextTwoBytes = DOGES.MemoryManager.fetchMemory(++this.PC);
+            return nextTwoBytes;
         };
         Cpu.prototype.base10Translate = function (hexCode) {
             return parseInt(hexCode, 16);

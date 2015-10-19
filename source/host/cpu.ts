@@ -89,23 +89,31 @@ module DOGES {
         // Load the accumlator with a constant
         public ldaConstant(): void {
             // Grab the next two param bytes
-            var constant = this.base10Translate(MemoryManager.fetchMemory(++this.PC));
+            var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
             this.Acc = constant;
             console.log("ldaConstant()");
         }
 
         // Load the accumulator from memory
-        public ldaMemory(): void {
-            // This is the accumulator value will be pulled from
+        public ldaMemory(): void {            
+            // Grab the next two bytes (this will be the address)
+            var addressBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            var source = MemoryManager.fetchMemory(addressBase10);
             
-            // grab the next two bytes (this will be the address)
+            // Set the accumulator from the memory block value (base 10)
+            this.Acc = this.base10Translate(source);
 
-            // var sourceAddress = MemoryManager.fetchMemory()
+            console.log(addressBase10);
+            console.log(source);
         }
 
         // Store the accumulator in memory
         public staMemory(): void {
-          
+            console.log("staMemory()");
+            var destinationBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            MemoryManager.storeToMemory(this.Acc.toString(16), destinationBase10);
+        
+            console.log(this.Acc.toString(16));
         }
 
         // Adds address content to accumulator contents
@@ -168,7 +176,11 @@ module DOGES {
             _KernelInterruptQueue.enqueue(new Interrupt(SYS_OPCODE_IRQ, ""));
         }
 
+        public fetchNextTwoBytes(startAddress): string {
+            var nextTwoBytes = MemoryManager.fetchMemory(++this.PC);
 
+            return nextTwoBytes;
+        }
 
         public base10Translate(hexCode): number {
             return parseInt(hexCode, 16);

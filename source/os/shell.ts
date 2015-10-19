@@ -444,6 +444,7 @@ module DOGES {
                     _StdOut.putText("Much loading. Very appreciate.");
                     _Console.advanceLine();
                     _StdOut.putText("Assigned Process ID: " + pid);
+                    _CPU.isExecuting = false;
                 }
             } else {
                 _StdOut.putText("Need code input. Much appreciate.");
@@ -452,10 +453,10 @@ module DOGES {
 
         public shellRun(args) {
             if (args.length > 0) {
-               // Run the program
-              _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                // Run the program
+                _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
             } else {
-              _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
+                _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
             }
         }
 

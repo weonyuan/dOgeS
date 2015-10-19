@@ -25,6 +25,14 @@ module DOGES {
       }
     }
 
+    // This function is fundamentally different than loadToMemory
+    // since this is used for values, not the entire program input
+    public static storeToMemory(value, targetAddress): void {
+      _Memory.memArray[targetAddress] = value.toUpperCase();
+      DOGES.Control.memoryManagerLog(_Memory.memArray);
+    }
+
+    // Returns two bytes already allocated in memory
     public static fetchMemory(address): string {
       return _Memory.memArray[address];
     }

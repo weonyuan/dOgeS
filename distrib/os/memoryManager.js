@@ -24,7 +24,7 @@ var DOGES;
         // This function is fundamentally different than loadToMemory
         // since this is used for values, not the entire program input
         MemoryManager.storeToMemory = function (value, targetAddress) {
-            _Memory.memArray[targetAddress] = value.toUpperCase();
+            _Memory.memArray[targetAddress] = value;
             DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         // Returns two bytes already allocated in memory

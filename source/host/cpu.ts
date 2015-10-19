@@ -194,7 +194,20 @@ module DOGES {
 
         // Compare a byte in memory to X register
         public cpxMemory(): void {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
+            console.log(memoryAddress);
+
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = MemoryManager.fetchMemory(addressBase10);
+
+            if (parseInt(source, 16) === this.Xreg) {
+                this.Zflag = 0;
+            } else {
+                this.Zflag = 1;
+            }
         }
 
         // Branch n bytes
@@ -204,7 +217,17 @@ module DOGES {
 
         // Increment byte value
         public incByte(): void {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
+            console.log(memoryAddress);
+
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = MemoryManager.fetchMemory(addressBase10);
+
+            var sourceInt = parseInt(source, 16) + 1;
+            MemoryManager.storeToMemory(sourceInt, addressBase10);
         }
 
         // Syscall

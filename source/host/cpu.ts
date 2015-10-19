@@ -91,54 +91,90 @@ module DOGES {
             // Grab the next two param bytes
             var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
             this.Acc = constant;
-            console.log("ldaConstant()");
         }
 
         // Load the accumulator from memory
         public ldaMemory(): void {            
             // Grab the next two bytes (this will be the address)
-            var addressBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+
+            console.log(memoryAddress);
+
+            var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
             
             // Set the accumulator from the memory block value (base 10)
             this.Acc = this.base10Translate(source);
-
-            console.log(addressBase10);
-            console.log(source);
         }
 
         // Store the accumulator in memory
         public staMemory(): void {
             console.log("staMemory()");
-            var destinationBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
-            MemoryManager.storeToMemory(this.Acc.toString(16), destinationBase10);
-        
-            console.log(this.Acc.toString(16));
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+
+            console.log(memoryAddress);
+
+            var destination = this.base10Translate(memoryAddress);
+            MemoryManager.storeToMemory(this.Acc.toString(16), destination);        
         }
 
         // Adds address content to accumulator contents
         public adcAccumulator(): void {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
+            console.log(memoryAddress);
+
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = MemoryManager.fetchMemory(addressBase10);
+
+            this.Acc += this.base10Translate(source);
+            console.log("adc: " + this.Acc);
         }
 
         // Load X register with constant
         public ldxConstant(): void {
-
+            var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            this.Xreg = constant;
         }
 
         // Load X register from memory
         public ldxMemory(): void {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
+            console.log(memoryAddress);
+
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = MemoryManager.fetchMemory(addressBase10);
+            
+            // Set the X register from the memory block value (base 10)
+            this.Xreg = this.base10Translate(source);
         }
 
         // Load Y register with constant
         public ldyConstant(): void {
-
+            var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            this.Yreg = constant;
         }
 
         // Load Y register from memory
         public ldyMemory(): void {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
+            console.log(memoryAddress);
+
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = MemoryManager.fetchMemory(addressBase10);
+            
+            // Set the Y register from the memory block value (base 10)
+            this.Yreg = this.base10Translate(source);
         }        
 
         // No operation...literally

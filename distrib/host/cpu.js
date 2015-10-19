@@ -101,39 +101,69 @@ var DOGES;
             // Grab the next two param bytes
             var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
             this.Acc = constant;
-            console.log("ldaConstant()");
         };
         // Load the accumulator from memory
         Cpu.prototype.ldaMemory = function () {
             // Grab the next two bytes (this will be the address)
-            var addressBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            console.log(memoryAddress);
+            var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             // Set the accumulator from the memory block value (base 10)
             this.Acc = this.base10Translate(source);
-            console.log(addressBase10);
-            console.log(source);
         };
         // Store the accumulator in memory
         Cpu.prototype.staMemory = function () {
             console.log("staMemory()");
-            var destinationBase10 = this.base10Translate(this.fetchNextTwoBytes(this.PC));
-            DOGES.MemoryManager.storeToMemory(this.Acc.toString(16), destinationBase10);
-            console.log(this.Acc.toString(16));
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            console.log(memoryAddress);
+            var destination = this.base10Translate(memoryAddress);
+            DOGES.MemoryManager.storeToMemory(this.Acc.toString(16), destination);
         };
         // Adds address content to accumulator contents
         Cpu.prototype.adcAccumulator = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            console.log(memoryAddress);
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            this.Acc += this.base10Translate(source);
+            console.log("adc: " + this.Acc);
         };
         // Load X register with constant
         Cpu.prototype.ldxConstant = function () {
+            var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            this.Xreg = constant;
         };
         // Load X register from memory
         Cpu.prototype.ldxMemory = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            console.log(memoryAddress);
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            // Set the X register from the memory block value (base 10)
+            this.Xreg = this.base10Translate(source);
         };
         // Load Y register with constant
         Cpu.prototype.ldyConstant = function () {
+            var constant = this.base10Translate(this.fetchNextTwoBytes(this.PC));
+            this.Yreg = constant;
         };
         // Load Y register from memory
         Cpu.prototype.ldyMemory = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            console.log(memoryAddress);
+            var addressBase10 = this.base10Translate(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            // Set the Y register from the memory block value (base 10)
+            this.Yreg = this.base10Translate(source);
         };
         // No operation...literally
         Cpu.prototype.nop = function () {

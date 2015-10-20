@@ -137,12 +137,14 @@ module DOGES {
                     break;
                 case CPU_BREAK_IRQ:
                     _CPU.isExecuting = false;
-                    
+
                     // Once executed, the current program can't be run again
-                    _CurrentProgram.PID = -1;
+                    _CurrentProgram.PID = null;
                     ProcessManager.clearLog();
+                    _Console.advanceLine();
                     break;
                 case RUN_PROGRAM_IRQ:
+                console.log("RUNNING PROGRAM");
                     _CPU.init();
                     _CPU.isExecuting = true;
                     break;

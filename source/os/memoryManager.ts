@@ -4,7 +4,8 @@ module DOGES {
 
     public static loadProgram(programInput): number {
       var newPcb = new Pcb();
-
+      _CurrentProgram = newPcb;
+      
       this.loadToMemory(programInput);
 
       return newPcb.PID;
@@ -28,7 +29,14 @@ module DOGES {
     // This function is fundamentally different than loadToMemory
     // since this is used for values, not the entire program input
     public static storeToMemory(value, targetAddress): void {
-      _Memory.memArray[targetAddress] = value;
+      value += "";
+
+      // Pad the value with leading 0
+      if (value.length === 1) {
+        value = "0" + value;
+      }
+
+      _Memory.memArray[targetAddress] = value.toUpperCase();
       DOGES.Control.memoryManagerLog(_Memory.memArray);
     }
 

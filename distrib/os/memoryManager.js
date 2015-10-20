@@ -5,6 +5,7 @@ var DOGES;
         }
         MemoryManager.loadProgram = function (programInput) {
             var newPcb = new DOGES.Pcb();
+            _CurrentProgram = newPcb;
             this.loadToMemory(programInput);
             return newPcb.PID;
         };
@@ -24,7 +25,12 @@ var DOGES;
         // This function is fundamentally different than loadToMemory
         // since this is used for values, not the entire program input
         MemoryManager.storeToMemory = function (value, targetAddress) {
-            _Memory.memArray[targetAddress] = value;
+            value += "";
+            // Pad the value with leading 0
+            if (value.length === 1) {
+                value = "0" + value;
+            }
+            _Memory.memArray[targetAddress] = value.toUpperCase();
             DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         // Returns two bytes already allocated in memory

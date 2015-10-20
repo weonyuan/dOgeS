@@ -453,8 +453,12 @@ module DOGES {
 
         public shellRun(args) {
             if (args.length > 0) {
-                // Run the program
-                _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                if (args[0] === _CurrentProgram.PID.toString()) {
+                  // Run the program
+                  _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                } else {
+                  _StdOut.putText("Please supply a valid PID.");
+                }
             } else {
                 _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
             }

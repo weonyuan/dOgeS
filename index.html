@@ -26,6 +26,7 @@
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
    <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
    <script type="text/javascript" src="distrib/os/pcb.js"></script>
+   <script type="text/javascript" src="distrib/os/processManager.js"></script>
    <script type="text/javascript" src="distrib/os/queue.js"></script>
    <script type="text/javascript" src="distrib/os/shell.js"></script>
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
@@ -35,11 +36,19 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment this line below to enable GLaDOS testing -->
-   <!--<script type="text/javascript" src="glados.js"></script>-->
+   <script type="text/javascript" src="glados.js"></script>
 
    <style>
-      .table > tbody > tr > th {
-        border-top: 1px solid black;
+      .panel-body {
+        padding: 0px;
+      }
+
+      .table {
+        margin-bottom: 0px;
+      }
+
+      th {
+        text-align: center;
       }
    </style>
 </head>
@@ -70,7 +79,7 @@
   </div>
 </nav>
 <div id="divMain">
-   <div id="divConsole" style="width:500px; height:480px; float:left;">
+   <div id="divConsole" style="width:500px; height:470px; float:left; margin-bottom: 10px">
       <canvas id="display"
               width="479px"
               height="460px"
@@ -94,7 +103,7 @@
    <div id="divMemoryManager" class="panel panel-default" style="margin-bottom: 0">
       <div class="panel-heading"><label>Memory Manager</label></div>
       <div class="panel-body">
-        <table id="memoryTable" class="table"></table>
+        <table id="memoryTable" class="table table-bordered"></table>
       </div>
    </div>
 
@@ -110,11 +119,35 @@
             <th>Z</th>
           </tr>
           <tr>
-            <td id="pc"></td>
-            <td id="accumulator"></td>
-            <td id="xRegister"></td>
-            <td id="yRegister"></td>
-            <td id="zFlag"></td>
+            <td id="cpu-pc"></td>
+            <td id="cpu-accumulator"></td>
+            <td id="cpu-xRegister"></td>
+            <td id="cpu-yRegister"></td>
+            <td id="cpu-zFlag"></td>
+          </tr>
+        </table>
+      </div>
+   </div>
+
+   <div id="divPcb" class="panel panel-default">
+      <div class="panel-heading"><label>Current Process</label></div>
+      <div class="panel-body">
+        <table id="pcbTable" class="table">
+          <tr>
+            <th>PID</th>
+            <th>PC</th>
+            <th>Acc</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+          </tr>
+          <tr>
+            <td id="pcb-pid"></td>
+            <td id="pcb-pc"></td>
+            <td id="pcb-accumulator"></td>
+            <td id="pcb-xRegister"></td>
+            <td id="pcb-yRegister"></td>
+            <td id="pcb-zFlag"></td>
           </tr>
         </table>
       </div>

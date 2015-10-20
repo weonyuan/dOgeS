@@ -96,8 +96,6 @@ module DOGES {
         }
 
         public handleSyscall(Xreg): void {
-          console.log("handleSyscall(" + Xreg + ")");
-          console.log(Xreg);
             if (Xreg === 1) {
                 // Print the integer stored in Y register
                 this.putText(_CPU.Yreg.toString());
@@ -108,7 +106,7 @@ module DOGES {
                 
                 // Terminate at "00"
                 while (MemoryManager.fetchMemory(currentAddress) !== "00") {
-                  var charAscii = _CPU.base10Translate(MemoryManager.fetchMemory(currentAddress));
+                  var charAscii = _CPU.translateBase16(MemoryManager.fetchMemory(currentAddress));
                   string += String.fromCharCode(charAscii);
 
                   currentAddress++;

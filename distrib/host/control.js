@@ -108,12 +108,13 @@ var DOGES;
                 taLog.innerHTML = str + taLog.innerHTML;
             }
         };
+        // Updates the CPU panel
         Control.cpuLog = function () {
-            document.getElementById("pc").innerHTML = _CPU.PC.toString();
-            document.getElementById("accumulator").innerHTML = _CPU.Acc.toString();
-            document.getElementById("xRegister").innerHTML = _CPU.Xreg.toString();
-            document.getElementById("yRegister").innerHTML = _CPU.Yreg.toString();
-            document.getElementById("zFlag").innerHTML = _CPU.Zflag.toString();
+            document.getElementById("cpu-pc").innerHTML = _CPU.PC.toString();
+            document.getElementById("cpu-accumulator").innerHTML = _CPU.Acc.toString();
+            document.getElementById("cpu-xRegister").innerHTML = _CPU.Xreg.toString();
+            document.getElementById("cpu-yRegister").innerHTML = _CPU.Yreg.toString();
+            document.getElementById("cpu-zFlag").innerHTML = _CPU.Zflag.toString();
         };
         //
         // Host Events

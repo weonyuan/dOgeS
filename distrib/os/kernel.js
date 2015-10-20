@@ -78,8 +78,8 @@ var DOGES;
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
             else if (_CPU.isExecuting) {
-                console.log("cycle");
                 _CPU.cycle();
+                DOGES.ProcessManager.pcbLog();
             }
             else {
                 this.krnTrace("Idle");
@@ -106,7 +106,6 @@ var DOGES;
             // TODO: Consider using an Interrupt Vector in the future.
             // Note: There is no need to "dismiss" or acknowledge the interrupts in our design here.
             //       Maybe the hardware simulation will grow to support/require that in the future.
-            console.log(irq);
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR(); // Kernel built-in routine for timers (not the clock).
@@ -123,9 +122,12 @@ var DOGES;
                     break;
                 case CPU_BREAK_IRQ:
                     _CPU.isExecuting = false;
+                    // Once executed, the current program can't be run again
+                    _CurrentProgram.PID = -1;
+                    DOGES.ProcessManager.clearLog();
                     break;
                 case RUN_PROGRAM_IRQ:
-                    console.log("RUN_PROGRAM_IRQ");
+                    _CPU.init();
                     _CPU.isExecuting = true;
                     break;
                 default:

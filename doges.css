@@ -112,7 +112,14 @@ h3 {
 #divCpu {
   display: inline-block;
   float: left;
-  width: 54%;
+  margin-right: 20px;
+  width: 21%;
+}
+
+#divPcb {
+  display: inline-block;
+  float: left;
+  width: 30%;
 }
 
 #divLog,
@@ -127,6 +134,7 @@ h3 {
   height: 200px;
   overflow-x: hidden;
   overflow-y: auto;
+  padding: 10px;
 }
 
 #divUserProgramInput textarea {
@@ -141,19 +149,21 @@ h3 {
   overflow-y: auto;
 }
 
-#divCpu table,
-#divMemoryManager table {
-  background-color: white;
-  width: 100%;
+#divMemoryManager tr {
+  border-bottom: 1px solid #ddd;
 }
 
 #divCpu table,
 #divMemoryManager table,
-td,
+#divPcb table {
+  background-color: white;
+  width: 100%;
+}
+
+table,
 th,
+td,
 tr {
-  border: 1px solid black;
-  border-collapse: collapse;
   text-align: center;
 }
 

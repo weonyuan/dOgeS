@@ -85,8 +85,6 @@ var DOGES;
             this.currentXPosition -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
         };
         Console.prototype.handleSyscall = function (Xreg) {
-            console.log("handleSyscall(" + Xreg + ")");
-            console.log(Xreg);
             if (Xreg === 1) {
                 // Print the integer stored in Y register
                 this.putText(_CPU.Yreg.toString());
@@ -97,7 +95,7 @@ var DOGES;
                 var string = "";
                 // Terminate at "00"
                 while (DOGES.MemoryManager.fetchMemory(currentAddress) !== "00") {
-                    var charAscii = _CPU.base10Translate(DOGES.MemoryManager.fetchMemory(currentAddress));
+                    var charAscii = _CPU.translateBase16(DOGES.MemoryManager.fetchMemory(currentAddress));
                     string += String.fromCharCode(charAscii);
                     currentAddress++;
                 }

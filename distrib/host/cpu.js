@@ -46,7 +46,6 @@ var DOGES;
             DOGES.Control.cpuLog();
         };
         Cpu.prototype.fetch = function () {
-            console.log("fetch()");
             return DOGES.MemoryManager.fetchMemory(this.PC);
         };
         Cpu.prototype.execute = function (opcode) {
@@ -107,7 +106,6 @@ var DOGES;
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             // Set the accumulator from the memory block value (base 10)
@@ -115,10 +113,8 @@ var DOGES;
         };
         // Store the accumulator in memory
         Cpu.prototype.staMemory = function () {
-            console.log("staMemory()");
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var destination = this.base10Translate(memoryAddress);
             DOGES.MemoryManager.storeToMemory(this.Acc.toString(16), destination);
         };
@@ -127,7 +123,6 @@ var DOGES;
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             this.Acc += this.base10Translate(source);
@@ -143,7 +138,6 @@ var DOGES;
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             // Set the X register from the memory block value (base 10)
@@ -159,7 +153,6 @@ var DOGES;
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             // Set the Y register from the memory block value (base 10)
@@ -182,25 +175,34 @@ var DOGES;
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             if (parseInt(source, 16) === this.Xreg) {
-                this.Zflag = 0;
+                this.Zflag = 1;
             }
             else {
-                this.Zflag = 1;
+                this.Zflag = 0;
             }
         };
         // Branch n bytes
         Cpu.prototype.bneBytes = function () {
+            if (this.Zflag === 0) {
+                console.log("BNE: zFlag = 0");
+                // Fetch the next two bytes and branch by that amount
+                this.PC += this.base10Translate(DOGES.MemoryManager.fetchMemory(++this.PC)) + 1;
+                if (this.PC >= PROGRAM_SIZE) {
+                    this.PC -= PROGRAM_SIZE;
+                }
+            }
+            else {
+                this.PC++;
+            }
         };
         // Increment byte value
         Cpu.prototype.incByte = function () {
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-            console.log(memoryAddress);
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = DOGES.MemoryManager.fetchMemory(addressBase10);
             var sourceInt = parseInt(source, 16) + 1;
@@ -208,7 +210,7 @@ var DOGES;
         };
         // Syscall
         Cpu.prototype.syscall = function () {
-            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(SYS_OPCODE_IRQ, ""));
+            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(SYSCALL_IRQ, this.Xreg));
         };
         Cpu.prototype.fetchNextTwoBytes = function (startAddress) {
             var nextTwoBytes = DOGES.MemoryManager.fetchMemory(++this.PC);

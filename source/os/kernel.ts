@@ -131,7 +131,8 @@ module DOGES {
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
-                case SYS_OPCODE_IRQ:
+                case SYSCALL_IRQ:
+                    _StdIn.handleSyscall(params);
                     break;
                 case UNKNOWN_OPCODE_IRQ:
                     this.krnTrace("Unknown opcode: " + MemoryManager.fetchMemory(_CPU.PC - 1));

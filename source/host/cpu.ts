@@ -46,7 +46,6 @@ module DOGES {
         }
 
         public fetch(): string {
-            console.log("fetch()");
             return MemoryManager.fetchMemory(this.PC);
         }
 
@@ -99,8 +98,6 @@ module DOGES {
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
-            console.log(memoryAddress);
-
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
             
@@ -110,11 +107,8 @@ module DOGES {
 
         // Store the accumulator in memory
         public staMemory(): void {
-            console.log("staMemory()");
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-
-            console.log(memoryAddress);
 
             var destination = this.base10Translate(memoryAddress);
             MemoryManager.storeToMemory(this.Acc.toString(16), destination);        
@@ -125,8 +119,6 @@ module DOGES {
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-
-            console.log(memoryAddress);
 
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
@@ -147,8 +139,6 @@ module DOGES {
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
-            console.log(memoryAddress);
-
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
             
@@ -167,8 +157,6 @@ module DOGES {
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-
-            console.log(memoryAddress);
 
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
@@ -198,21 +186,28 @@ module DOGES {
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
-            console.log(memoryAddress);
-
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
 
             if (parseInt(source, 16) === this.Xreg) {
-                this.Zflag = 0;
-            } else {
                 this.Zflag = 1;
+            } else {
+                this.Zflag = 0;
             }
         }
 
         // Branch n bytes
         public bneBytes(): void {
-
+            if (this.Zflag === 0) {
+                console.log("BNE: zFlag = 0");
+                // Fetch the next two bytes and branch by that amount
+                this.PC += this.base10Translate(MemoryManager.fetchMemory(++this.PC)) + 1;
+                if (this.PC >= PROGRAM_SIZE) {
+                    this.PC -= PROGRAM_SIZE;
+                }
+            } else {
+                this.PC++;
+            }
         }
 
         // Increment byte value
@@ -220,8 +215,6 @@ module DOGES {
             // Grab the next two bytes (this will be the address)
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
-
-            console.log(memoryAddress);
 
             var addressBase10 = this.base10Translate(memoryAddress);
             var source = MemoryManager.fetchMemory(addressBase10);
@@ -232,7 +225,7 @@ module DOGES {
 
         // Syscall
         public syscall(): void {
-            _KernelInterruptQueue.enqueue(new Interrupt(SYS_OPCODE_IRQ, ""));
+            _KernelInterruptQueue.enqueue(new Interrupt(SYSCALL_IRQ, this.Xreg));
         }
 
         public fetchNextTwoBytes(startAddress): string {

@@ -16,7 +16,7 @@ var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
-var SYS_OPCODE_IRQ = 2;
+var SYSCALL_IRQ = 2;
 var UNKNOWN_OPCODE_IRQ = 3;
 var CPU_BREAK_IRQ = 4;
 var RUN_PROGRAM_IRQ = 5;

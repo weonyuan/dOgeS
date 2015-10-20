@@ -27,7 +27,7 @@ module DOGES {
 
         private clearScreen(): void {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
-            _Canvas.height = 472;
+            _Canvas.height = 460;
             _HistoryCanvas.height = _Canvas.height;
         }
 
@@ -93,6 +93,28 @@ module DOGES {
             this.buffer = this.buffer.substring(0, this.buffer.length - 1);
             _DrawingContext.clearRect(startX, startY, this.currentXPosition, this.currentYPosition + 4);
             this.currentXPosition -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
+        }
+
+        public handleSyscall(Xreg): void {
+          console.log("handleSyscall(" + Xreg + ")");
+          console.log(Xreg);
+            if (Xreg === 1) {
+                // Print the integer stored in Y register
+                this.putText(_CPU.Yreg.toString());
+            } else if (Xreg === 2) {
+                // Initialize starting point
+                var currentAddress = _CPU.Yreg;
+                var string = "";
+                
+                // Terminate at "00"
+                while (MemoryManager.fetchMemory(currentAddress) !== "00") {
+                  var charAscii = _CPU.base10Translate(MemoryManager.fetchMemory(currentAddress));
+                  string += String.fromCharCode(charAscii);
+
+                  currentAddress++;
+                }
+                this.putText(string);
+            }
         }
 
         public putText(text): void {

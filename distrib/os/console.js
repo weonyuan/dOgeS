@@ -28,7 +28,7 @@ var DOGES;
         };
         Console.prototype.clearScreen = function () {
             _DrawingContext.clearRect(0, 0, _Canvas.width, _Canvas.height);
-            _Canvas.height = 472;
+            _Canvas.height = 460;
             _HistoryCanvas.height = _Canvas.height;
         };
         Console.prototype.clearLine = function () {
@@ -83,6 +83,26 @@ var DOGES;
             this.buffer = this.buffer.substring(0, this.buffer.length - 1);
             _DrawingContext.clearRect(startX, startY, this.currentXPosition, this.currentYPosition + 4);
             this.currentXPosition -= _DrawingContext.measureText(this.currentFont, this.currentFontSize, chr);
+        };
+        Console.prototype.handleSyscall = function (Xreg) {
+            console.log("handleSyscall(" + Xreg + ")");
+            console.log(Xreg);
+            if (Xreg === 1) {
+                // Print the integer stored in Y register
+                this.putText(_CPU.Yreg.toString());
+            }
+            else if (Xreg === 2) {
+                // Initialize starting point
+                var currentAddress = _CPU.Yreg;
+                var string = "";
+                // Terminate at "00"
+                while (DOGES.MemoryManager.fetchMemory(currentAddress) !== "00") {
+                    var charAscii = _CPU.base10Translate(DOGES.MemoryManager.fetchMemory(currentAddress));
+                    string += String.fromCharCode(charAscii);
+                    currentAddress++;
+                }
+                this.putText(string);
+            }
         };
         Console.prototype.putText = function (text) {
             // My first inclination here was to write two functions: putChar() and putString().

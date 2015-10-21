@@ -4,18 +4,21 @@
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
    <meta name="author"             content="Weon Yuan" />
    <link rel="stylesheet" href="doges.css" type="text/css" media="screen" />
-   <title>
-      dOgeS
-   </title>
+   <link rel="stylesheet" href="bootstrap.css" type="text/css" />
+   <link rel="stylesheet" href="bootstrap-switch.css" type="text/css" />
+   <title>dOgeS</title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="distrib/globals.js"></script>
    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+   <script type="text/javascript" src="bootstrap.js"></script>
+   <script type="text/javascript" src="bootstrap-switch.js"></script>
 
    <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -23,6 +26,9 @@
    <script type="text/javascript" src="distrib/os/console.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+   <script type="text/javascript" src="distrib/os/pcb.js"></script>
+   <script type="text/javascript" src="distrib/os/processManager.js"></script>
    <script type="text/javascript" src="distrib/os/queue.js"></script>
    <script type="text/javascript" src="distrib/os/shell.js"></script>
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
@@ -33,75 +39,133 @@
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment this line below to enable GLaDOS testing -->
    <script type="text/javascript" src="glados.js"></script>
+
+   <style>
+      .panel-body {
+        padding: 0px;
+      }
+
+      .table {
+        margin-bottom: 0px;
+      }
+
+      th {
+        text-align: center;
+      }
+   </style>
 </head>
 
 <body onload="onDocumentLoad()">
-<div id="header">
+<nav id="header" class="navbar-default">
   <div id="taskbar">
     <div id="clock">Welcome!</div>
     <div id="status"></div>
   </div>
-  <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: 5px;" width="40px" height="40px"> dOgeS ></div>
+  <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: -4px;" width="40px" height="40px"> dOgeS ></div>
   <div id="divButtonBar" style="margin:4px;">
-     <input type="button"
-            id = "btnStartOS"
-            name="brnStartOS"
-            class="normal_button"
-            value="Start"
-            tabindex="0"
-            onclick="DOGES.Control.hostBtnStartOS_click(this);">
+     <div id="stepPanel">
+        <span style="margin-right: 5px">Step Mode</span>
+        <input id="stepModeSwitch"
+            type="checkbox"
+            name="step-mode"
+            data-size="small"
+            disabled />
+        <button id="btnStep"
+             class="btn btn-primary glyphicon glyphicon-forward"
+             onclick="DOGES.Control.hostBtnStep_click();"
+             disabled="true" />
+     </div>
 
-     <input type="button"
-            id = "btnHaltOS"
-            name="brnHaltOS"
-            class="normal_button"
-            disabled="disabled"
-            value="Halt"
-            tabindex="1"
-            onclick="DOGES.Control.hostBtnHaltOS_click(this);">
+     <button id="btnStartOS"
+             class="btn btn-success glyphicon glyphicon-play"
+             tabindex="0"
+             onclick="DOGES.Control.hostBtnStartOS_click(this);" data-switch-toggle="disabled" />
 
-     <input type="button"
-            id = "btnReset"
-            name="brnReset"
-            class="normal_button"
-            disabled="disabled"
-            value="Reset"
-            tabindex="2"
-            onclick="DOGES.Control.hostBtnReset_click(this);">
+     <button id="btnHaltOS"
+             class="btn btn-danger glyphicon glyphicon-stop"
+             disabled="true"
+             tabindex="1"
+             onclick="DOGES.Control.hostBtnHaltOS_click(this);" />
+
+     <button id="btnReset"
+             class="btn btn-info glyphicon glyphicon-repeat"
+             tabindex="2"
+             onclick="DOGES.Control.hostBtnReset_click(this);" />
   </div>
-</div>
+</nav>
 <div id="divMain">
-   <div id="divConsole" style="margin:4px; width:500px; height:480px; float:left;">
+   <div id="divConsole" style="width:500px; height:470px; float:left; margin-bottom: 10px">
       <canvas id="display"
               width="479px"
-              height="472px"
+              height="460px"
               tabindex="3">
       </canvas>
       <canvas id="history"></canvas>
    </div>
 
-   <div id="divLog" style="margin-left:520px;">
-      <label>
-         Host Log
-         <br>
-         <textarea name="taHostLog"
-                   id  ="taHostLog"
-                   rows="20"
-                   cols="43"
-         ></textarea>
-      </label>
+   <div id="divLog" class="panel panel-default">
+       <div class="panel-heading"><label>Host Log</label></div>
+       <div id ="taHostLog" class="panel-body"></div>
    </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
-      <label>
-         User Program Input
-         <br>
+   <div id="divUserProgramInput" class="panel panel-default">
+      <div class="panel-heading"><label>User Program Input</label></div>
          <textarea name="taProgramInput"
                    id  ="taProgramInput"
-                   rows="8"
-                   cols="43"
          ></textarea>
-      </label>
+   </div>
+
+   <div id="divMemoryManager" class="panel panel-default" style="margin-bottom: 0">
+      <div class="panel-heading"><label>Memory Manager</label></div>
+      <div class="panel-body">
+        <table id="memoryTable" class="table table-bordered"></table>
+      </div>
+   </div>
+
+   <div id="divCpu" class="panel panel-default">
+      <div class="panel-heading"><label>CPU</label></div>
+      <div class="panel-body">
+        <table id="cpuTable" class="table">
+          <tr>
+            <th>PC</th>
+            <th>Acc</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+          </tr>
+          <tr>
+            <td id="cpu-pc"></td>
+            <td id="cpu-accumulator"></td>
+            <td id="cpu-xRegister"></td>
+            <td id="cpu-yRegister"></td>
+            <td id="cpu-zFlag"></td>
+          </tr>
+        </table>
+      </div>
+   </div>
+
+   <div id="divPcb" class="panel panel-default">
+      <div class="panel-heading"><label>Current Process</label></div>
+      <div class="panel-body">
+        <table id="pcbTable" class="table">
+          <tr>
+            <th>PID</th>
+            <th>PC</th>
+            <th>Acc</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+          </tr>
+          <tr>
+            <td id="pcb-pid"></td>
+            <td id="pcb-pc"></td>
+            <td id="pcb-accumulator"></td>
+            <td id="pcb-xRegister"></td>
+            <td id="pcb-yRegister"></td>
+            <td id="pcb-zFlag"></td>
+          </tr>
+        </table>
+      </div>
    </div>
 </div>
 

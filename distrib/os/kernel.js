@@ -77,8 +77,10 @@ var DOGES;
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
-            else if (_CPU.isExecuting) {
+            else if (_CPU.isExecuting && !_StepMode) {
+                DOGES.Control.hostBtnStep_disable();
                 _CPU.cycle();
+                DOGES.ProcessManager.pcbLog();
             }
             else {
                 this.krnTrace("Idle");
@@ -113,6 +115,32 @@ var DOGES;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case SYSCALL_IRQ:
+                    _StdIn.handleSyscall(params);
+                    break;
+                case UNKNOWN_OPCODE_IRQ:
+                    this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchMemory(_CPU.PC - 1));
+                    break;
+                case CPU_BREAK_IRQ:
+                    _CPU.isExecuting = false;
+                    _CPU.init();
+                    // Once executed, the current program can't be run again
+                    _CurrentProgram.PID = null;
+                    DOGES.Control.cpuLog();
+                    DOGES.ProcessManager.clearLog();
+                    _Console.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case RUN_PROGRAM_IRQ:
+                    _CPU.init();
+                    _CPU.isExecuting = true;
+                    break;
+                case STEP_IRQ:
+                    this.krnStep();
+                    break;
+                case STEP_MODE_IRQ:
+                    this.handleStepMode();
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -120,6 +148,20 @@ var DOGES;
         Kernel.prototype.krnTimerISR = function () {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+        };
+        // Every step will cycle the CPU and update the PCB log
+        Kernel.prototype.krnStep = function () {
+            _CPU.cycle();
+            DOGES.ProcessManager.pcbLog();
+        };
+        // Responsible for enabling/disabling step button
+        Kernel.prototype.handleStepMode = function () {
+            if (_StepMode) {
+                DOGES.Control.hostBtnStep_enable();
+            }
+            else {
+                DOGES.Control.hostBtnStep_disable();
+            }
         };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.

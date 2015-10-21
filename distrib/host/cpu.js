@@ -42,6 +42,185 @@ var DOGES;
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            this.execute(this.fetch());
+            _CurrentProgram.PC = this.PC;
+            _CurrentProgram.Acc = this.Acc;
+            _CurrentProgram.Xreg = this.Xreg;
+            _CurrentProgram.Yreg = this.Yreg;
+            _CurrentProgram.Zflag = this.Zflag;
+            DOGES.Control.cpuLog();
+        };
+        Cpu.prototype.fetch = function () {
+            return DOGES.MemoryManager.fetchMemory(this.PC);
+        };
+        Cpu.prototype.execute = function (opcode) {
+            if (opcode === "A9") {
+                this.ldaConstant();
+            }
+            else if (opcode === "AD") {
+                this.ldaMemory();
+            }
+            else if (opcode === "8D") {
+                this.staMemory();
+            }
+            else if (opcode === "6D") {
+                this.adcAccumulator();
+            }
+            else if (opcode === "A2") {
+                this.ldxConstant();
+            }
+            else if (opcode === "AE") {
+                this.ldxMemory();
+            }
+            else if (opcode === "A0") {
+                this.ldyConstant();
+            }
+            else if (opcode === "AC") {
+                this.ldyMemory();
+            }
+            else if (opcode === "EA") {
+                this.nop();
+            }
+            else if (opcode === "00") {
+                this.brk();
+            }
+            else if (opcode === "EC") {
+                this.cpxMemory();
+            }
+            else if (opcode === "D0") {
+                this.bneBytes();
+            }
+            else if (opcode === "EE") {
+                this.incByte();
+            }
+            else if (opcode === "FF") {
+                this.syscall();
+            }
+            // Increment program counter for every opcode executed
+            this.PC++;
+        };
+        // Load the accumlator with a constant
+        Cpu.prototype.ldaConstant = function () {
+            // Grab the next two param bytes
+            var constant = this.translateBase16(this.fetchNextTwoBytes(this.PC));
+            this.Acc = constant;
+        };
+        // Load the accumulator from memory
+        Cpu.prototype.ldaMemory = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var addressBase10 = this.translateBase16(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            // Set the accumulator from the memory block value (base 10)
+            this.Acc = this.translateBase16(source);
+        };
+        // Store the accumulator in memory
+        Cpu.prototype.staMemory = function () {
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var destination = this.translateBase16(memoryAddress);
+            DOGES.MemoryManager.storeToMemory(this.Acc.toString(16), destination);
+        };
+        // Adds address content to accumulator contents
+        Cpu.prototype.adcAccumulator = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var addressBase10 = this.translateBase16(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            this.Acc += this.translateBase16(source);
+        };
+        // Load X register with constant
+        Cpu.prototype.ldxConstant = function () {
+            var constant = this.translateBase16(this.fetchNextTwoBytes(this.PC));
+            this.Xreg = constant;
+        };
+        // Load X register from memory
+        Cpu.prototype.ldxMemory = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var addressBase10 = this.translateBase16(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            // Set the X register from the memory block value (base 10)
+            this.Xreg = this.translateBase16(source);
+        };
+        // Load Y register with constant
+        Cpu.prototype.ldyConstant = function () {
+            var constant = this.translateBase16(this.fetchNextTwoBytes(this.PC));
+            this.Yreg = constant;
+        };
+        // Load Y register from memory
+        Cpu.prototype.ldyMemory = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var addressBase10 = this.translateBase16(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            // Set the Y register from the memory block value (base 10)
+            this.Yreg = this.translateBase16(source);
+        };
+        // No operation...literally
+        Cpu.prototype.nop = function () {
+        };
+        // Break
+        Cpu.prototype.brk = function () {
+            _CPU.PC = this.PC;
+            _CPU.Acc = this.Acc;
+            _CPU.Xreg = this.Xreg;
+            _CPU.Yreg = this.Yreg;
+            _CPU.Zflag = this.Zflag;
+            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(CPU_BREAK_IRQ, ""));
+        };
+        // Compare a byte in memory to X register
+        Cpu.prototype.cpxMemory = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var addressBase10 = this.translateBase16(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            if (parseInt(source, 16) === this.Xreg) {
+                this.Zflag = 1;
+            }
+            else {
+                this.Zflag = 0;
+            }
+        };
+        // Branch n bytes
+        Cpu.prototype.bneBytes = function () {
+            if (this.Zflag === 0) {
+                // Fetch the next two bytes and branch by that amount
+                this.PC += this.translateBase16(DOGES.MemoryManager.fetchMemory(++this.PC)) + 1;
+                if (this.PC >= PROGRAM_SIZE) {
+                    this.PC -= PROGRAM_SIZE;
+                }
+            }
+            else {
+                this.PC++;
+            }
+        };
+        // Increment byte value
+        Cpu.prototype.incByte = function () {
+            // Grab the next two bytes (this will be the address)
+            var memoryAddress = this.fetchNextTwoBytes(this.PC);
+            memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
+            var addressBase10 = this.translateBase16(memoryAddress);
+            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var sourceInt = parseInt(source, 16) + 1;
+            DOGES.MemoryManager.storeToMemory(sourceInt.toString(16), addressBase10);
+        };
+        // Syscall
+        Cpu.prototype.syscall = function () {
+            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(SYSCALL_IRQ, this.Xreg));
+        };
+        Cpu.prototype.fetchNextTwoBytes = function (startAddress) {
+            var nextTwoBytes = DOGES.MemoryManager.fetchMemory(++this.PC);
+            return nextTwoBytes;
+        };
+        // Translate from base 16 to base 10
+        Cpu.prototype.translateBase16 = function (hexCode) {
+            return parseInt(hexCode, 16);
         };
         return Cpu;
     })();

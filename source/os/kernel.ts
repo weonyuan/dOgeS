@@ -88,14 +88,14 @@ module DOGES {
                 // TODO: Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
-            } else if (_CPU.isExecuting) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+            } else if (_CPU.isExecuting && !_StepMode) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+                Control.hostBtnStep_disable();
                 _CPU.cycle();
                 ProcessManager.pcbLog();
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
         }
-
 
         //
         // Interrupt Handling
@@ -137,16 +137,24 @@ module DOGES {
                     break;
                 case CPU_BREAK_IRQ:
                     _CPU.isExecuting = false;
+                    _CPU.init();
 
                     // Once executed, the current program can't be run again
                     _CurrentProgram.PID = null;
+                    Control.cpuLog();
                     ProcessManager.clearLog();
                     _Console.advanceLine();
+                    _OsShell.putPrompt();
                     break;
                 case RUN_PROGRAM_IRQ:
-                console.log("RUNNING PROGRAM");
                     _CPU.init();
                     _CPU.isExecuting = true;
+                    break;
+                case STEP_IRQ:
+                    this.krnStep();
+                    break;
+                case STEP_MODE_IRQ:
+                    this.handleStepMode();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -156,6 +164,21 @@ module DOGES {
         public krnTimerISR() {
             // The built-in TIMER (not clock) Interrupt Service Routine (as opposed to an ISR coming from a device driver). {
             // Check multiprogramming parameters and enforce quanta here. Call the scheduler / context switch here if necessary.
+        }
+
+        // Every step will cycle the CPU and update the PCB log
+        public krnStep() {
+            _CPU.cycle();
+            ProcessManager.pcbLog();
+        }
+
+        // Responsible for enabling/disabling step button
+        public handleStepMode() {
+            if (_StepMode) {
+                Control.hostBtnStep_enable();
+            } else {
+                Control.hostBtnStep_disable();
+            }
         }
 
         //

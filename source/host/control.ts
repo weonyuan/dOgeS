@@ -30,6 +30,18 @@ module DOGES {
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
 
+            // Activate pretty Step Mode switch and set interrupt for toggling
+            $("#stepModeSwitch").bootstrapSwitch();
+            $("#stepModeSwitch").on("switchChange.bootstrapSwitch", function(event, state) {
+              if (state) {
+                _StepMode = true;
+              } else {
+                _StepMode = false;
+              }
+
+              _Kernel.krnInterruptHandler(STEP_MODE_IRQ, "");
+            });
+
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
             _Canvas = <HTMLCanvasElement> document.getElementById("display");
             _HistoryCanvas = <HTMLCanvasElement> document.getElementById("history");
@@ -137,9 +149,24 @@ module DOGES {
         //
         // Host Events
         //
+        public static hostBtnStep_click(): void {
+          _Kernel.krnInterruptHandler(STEP_IRQ, "");
+        }
+
+        public static hostBtnStep_enable(): void {
+          (<HTMLButtonElement>document.getElementById("btnStep")).disabled = false;
+        }
+
+        public static hostBtnStep_disable(): void {
+          (<HTMLButtonElement>document.getElementById("btnStep")).disabled = true;
+        }
+
         public static hostBtnStartOS_click(btn): void {
             // Disable the (passed-in) start button...
             btn.disabled = true;
+
+            // .. enable the Step Mode switch ...
+            $("#stepModeSwitch").bootstrapSwitch("toggleDisabled");
 
             // .. enable the Halt and Reset buttons ...
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
@@ -155,7 +182,6 @@ module DOGES {
 
             _Memory = new Memory();
             _Memory.init();
-
             this.memoryManagerLog(_Memory.memArray);
 
             // ... then set the host and taskbar clocks pulse ...
@@ -164,7 +190,7 @@ module DOGES {
 
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
-            _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+            _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.            
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -173,6 +199,9 @@ module DOGES {
 
             // Disable the Halt button.
             btn.disabled = true;
+
+            // Disable the Step Mode switch.
+            $("#stepModeSwitch").bootstrapSwitch("toggleDisabled");
 
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();

@@ -86,10 +86,21 @@ h3 {
   100%{ -webkit-transform:rotate(360deg); }
 }
 
+#stepPanel {
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  display: inline-block;
+  margin-right: 35px;
+  padding-left: 10px;
+  width: 54%;
+  height: 33%;
+}
+
 #divButtonBar {
   position: absolute;
   top: 2px;
   right: 5px;
+  width: 27%;
 }
 
 #divButtonBar button {

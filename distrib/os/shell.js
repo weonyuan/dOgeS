@@ -385,9 +385,11 @@ var DOGES;
         };
         Shell.prototype.shellRun = function (args) {
             if (args.length > 0) {
-                if (args[0] === _CurrentProgram.PID.toString()) {
-                    // Run the program
-                    _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                if (_CurrentProgram.PID !== null) {
+                    if (args[0] === _CurrentProgram.PID.toString()) {
+                        // Run the program
+                        _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                    }
                 }
                 else {
                     _StdOut.putText("Please supply a valid PID.");

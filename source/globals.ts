@@ -23,6 +23,8 @@ const SYSCALL_IRQ: number = 2;
 const UNKNOWN_OPCODE_IRQ: number = 3;
 const CPU_BREAK_IRQ: number = 4;
 const RUN_PROGRAM_IRQ: number = 5;
+const STEP_IRQ: number = 6;
+const STEP_MODE_IRQ: number = 7;
 
 const PROGRAM_LIMIT: number = 1; // at least for project 2...
 const PROGRAM_SIZE: number = 256; // every program is allocated 256 bytes
@@ -34,6 +36,8 @@ const MEMORY_SIZE: number = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
 var _CPU: DOGES.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID: number = 0;
+
+var _StepMode: boolean = false;
 
 var _CurrentProgram;
 

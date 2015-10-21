@@ -5,12 +5,14 @@
    <meta name="author"             content="Weon Yuan" />
    <link rel="stylesheet" href="doges.css" type="text/css" media="screen" />
    <link rel="stylesheet" href="bootstrap.css" type="text/css" />
+   <link rel="stylesheet" href="bootstrap-switch.css" type="text/css" />
    <title>dOgeS</title>
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="distrib/globals.js"></script>
    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
    <script type="text/javascript" src="bootstrap.js"></script>
+   <script type="text/javascript" src="bootstrap-switch.js"></script>
 
    <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
    <script type="text/javascript" src="distrib/host/control.js"></script>
@@ -61,10 +63,23 @@
   </div>
   <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: -4px;" width="40px" height="40px"> dOgeS ></div>
   <div id="divButtonBar" style="margin:4px;">
+     <div id="stepPanel">
+        <span style="margin-right: 5px">Step Mode</span>
+        <input id="stepModeSwitch"
+            type="checkbox"
+            name="step-mode"
+            data-size="small"
+            disabled />
+        <button id="btnStep"
+             class="btn btn-primary glyphicon glyphicon-forward"
+             onclick="DOGES.Control.hostBtnStep_click();"
+             disabled="true" />
+     </div>
+
      <button id="btnStartOS"
              class="btn btn-success glyphicon glyphicon-play"
              tabindex="0"
-             onclick="DOGES.Control.hostBtnStartOS_click(this);" />
+             onclick="DOGES.Control.hostBtnStartOS_click(this);" data-switch-toggle="disabled" />
 
      <button id="btnHaltOS"
              class="btn btn-danger glyphicon glyphicon-stop"

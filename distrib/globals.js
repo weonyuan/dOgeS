@@ -20,6 +20,8 @@ var SYSCALL_IRQ = 2;
 var UNKNOWN_OPCODE_IRQ = 3;
 var CPU_BREAK_IRQ = 4;
 var RUN_PROGRAM_IRQ = 5;
+var STEP_IRQ = 6;
+var STEP_MODE_IRQ = 7;
 var PROGRAM_LIMIT = 1; // at least for project 2...
 var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
 var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
@@ -29,6 +31,7 @@ var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID = 0;
+var _StepMode = false;
 var _CurrentProgram;
 var _MemoryManager;
 var _Memory;

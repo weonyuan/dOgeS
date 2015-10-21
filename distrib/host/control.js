@@ -28,6 +28,17 @@ var DOGES;
         }
         Control.hostInit = function () {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+            // Activate pretty Step Mode switch and set interrupt for toggling
+            $("#stepModeSwitch").bootstrapSwitch();
+            $("#stepModeSwitch").on("switchChange.bootstrapSwitch", function (event, state) {
+                if (state) {
+                    _StepMode = true;
+                }
+                else {
+                    _StepMode = false;
+                }
+                _Kernel.krnInterruptHandler(STEP_MODE_IRQ, "");
+            });
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
             _Canvas = document.getElementById("display");
             _HistoryCanvas = document.getElementById("history");
@@ -119,9 +130,20 @@ var DOGES;
         //
         // Host Events
         //
+        Control.hostBtnStep_click = function () {
+            _Kernel.krnInterruptHandler(STEP_IRQ, "");
+        };
+        Control.hostBtnStep_enable = function () {
+            document.getElementById("btnStep").disabled = false;
+        };
+        Control.hostBtnStep_disable = function () {
+            document.getElementById("btnStep").disabled = true;
+        };
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
+            // .. enable the Step Mode switch ...
+            $("#stepModeSwitch").bootstrapSwitch("toggleDisabled");
             // .. enable the Halt and Reset buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
@@ -139,13 +161,15 @@ var DOGES;
             _taskbarClockID = setInterval(DOGES.Devices.taskbarClockPulse, 100);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new DOGES.Kernel();
-            _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
+            _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.            
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
             Control.hostLog("Attempting Kernel shutdown.", "host");
             // Disable the Halt button.
             btn.disabled = true;
+            // Disable the Step Mode switch.
+            $("#stepModeSwitch").bootstrapSwitch("toggleDisabled");
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

@@ -54,7 +54,6 @@ var DOGES;
             return DOGES.MemoryManager.fetchMemory(this.PC);
         };
         Cpu.prototype.execute = function (opcode) {
-            console.log("opcode: " + opcode);
             if (opcode === "A9") {
                 this.ldaConstant();
             }
@@ -219,6 +218,7 @@ var DOGES;
             var nextTwoBytes = DOGES.MemoryManager.fetchMemory(++this.PC);
             return nextTwoBytes;
         };
+        // Translate from base 16 to base 10
         Cpu.prototype.translateBase16 = function (hexCode) {
             return parseInt(hexCode, 16);
         };

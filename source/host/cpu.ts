@@ -57,7 +57,6 @@ module DOGES {
         }
 
         public execute(opcode): void {
-            console.log("opcode: " + opcode);
             if (opcode === "A9") {
                 this.ldaConstant();
             } else if (opcode === "AD") {
@@ -239,6 +238,7 @@ module DOGES {
             return nextTwoBytes;
         }
 
+        // Translate from base 16 to base 10
         public translateBase16(hexCode): number {
             return parseInt(hexCode, 16);
         }

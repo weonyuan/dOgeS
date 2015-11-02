@@ -26,6 +26,8 @@ var DOGES;
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new DOGES.Queue(); // Where device input lands before being processed out somewhere.
             _KernelBuffers.push("");
+            _ResidentQueue = new DOGES.Queue();
+            _ReadyQueue = new DOGES.Queue();
             // Initialize the console.
             _Console = new DOGES.Console(); // The command line interface / console I/O device.
             _Console.init();

@@ -6,7 +6,9 @@ module DOGES {
                 public Xreg: number = 0,
                 public Yreg: number = 0,
                 public Zflag: number = 0,
-                public PID: number = _PID++) {
+                public PID: number = _PID++,
+                public Basereg: number = 0,
+                public Limitreg: number = 0) {
     }
   }
 }

@@ -91,13 +91,13 @@ module DOGES {
                                   "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
 
-            // bsod
+            // bsodwow
             sc = new ShellCommand(this.shellBsod,
                                   "bsodwow",
                                   "- Initiates the Blue Screen of Death.");
             this.commandList[this.commandList.length] = sc;
 
-            // status
+            // status <string>
             sc = new ShellCommand(this.shellStatus,
                                  "status",
                                  "<string> - Sets the status on the graphical taskbar.");
@@ -109,7 +109,7 @@ module DOGES {
                                   "- Loads the code in the User Program Input.");
             this.commandList[this.commandList.length] = sc;
 
-            // run
+            // run <pid>
             sc = new ShellCommand(this.shellRun,
               "run",
               "<pid> - Runs a program already in memory");
@@ -119,6 +119,18 @@ module DOGES {
             sc = new ShellCommand(this.shellSpin,
                 "suchspin",
                 "- Dogey the Shiba will spin. Just for you.");
+            this.commandList[this.commandList.length] = sc;
+
+            // clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "- Clears all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
+
+            // quantum <int>
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "<int> - Sets the Round Robin quantum value.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -327,10 +339,16 @@ module DOGES {
                         _StdOut.putText("Load allocates the appropriate space amount in the main memory and loads the user program there.");
                         break;
                     case "run":
-                      _StdOut.putText("Run executes the user program already allocated in the main memory.");
+                        _StdOut.putText("Run executes the user program already allocated in the main memory.");
                         break;
                     case "suchspin":
                         _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
+                        break;
+                    case "clearmem":
+                        _StdOut.putText("Clearmem clears all memory partitions and resets the memory table.");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("Quantum sets the quantum value for Round Robin scheduling.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -469,6 +487,19 @@ module DOGES {
         public shellSpin(args) {
             document.getElementById("dogey").style.animation = "2s spinRight infinite linear";
             document.getElementById("dogey").style.webkitAnimation = "2s spinRight infinite linear";
+        }
+
+        public shellClearMem(args) {
+            MemoryManager.clearAll();
+        }
+
+        public shellQuantum(args) {
+            if (args.length > 0) {
+                _Quantum = parseInt(args[0]);
+                console.log(_Quantum);
+            } else {
+                _StdOut.putText("Usage: quantum <int>  Please supply a valid quantum value.");
+            }
         }
     }
 }

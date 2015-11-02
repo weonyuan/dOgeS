@@ -2,11 +2,14 @@ module DOGES {
   export class MemoryManager {
     constructor() {}
 
+    // Loads the program into memory, assigns a PID for the new PCB,
+    // and pushes the new process into the resident queue.
     public static loadProgram(programInput): number {
       var newPcb = new Pcb();
       _CurrentProgram = newPcb;
       
       this.loadToMemory(programInput);
+      _ResidentQueue.enqueue(newPcb);
 
       return newPcb.PID;
     }
@@ -22,7 +25,7 @@ module DOGES {
         }
         _Memory.memArray[i] = programInput.substring(currentCode, currentCode + 2);
         
-        DOGES.Control.memoryManagerLog(_Memory.memArray);
+        Control.memoryManagerLog(_Memory.memArray);
       }
     }
 
@@ -37,12 +40,18 @@ module DOGES {
       }
 
       _Memory.memArray[targetAddress] = value.toUpperCase();
-      DOGES.Control.memoryManagerLog(_Memory.memArray);
+      Control.memoryManagerLog(_Memory.memArray);
     }
 
     // Returns two bytes already allocated in memory
     public static fetchMemory(address): string {
       return _Memory.memArray[address];
+    }
+
+    // Clears all memory partitions
+    public static clearAll(): void {
+        _Memory.init();
+        Control.memoryManagerLog(_Memory.memArray);
     }
   }
 }

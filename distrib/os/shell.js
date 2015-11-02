@@ -55,20 +55,26 @@ var DOGES;
             // whereami
             sc = new DOGES.ShellCommand(this.shellWhere, "whereami", "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
-            // bsod
+            // bsodwow
             sc = new DOGES.ShellCommand(this.shellBsod, "bsodwow", "- Initiates the Blue Screen of Death.");
             this.commandList[this.commandList.length] = sc;
-            // status
+            // status <string>
             sc = new DOGES.ShellCommand(this.shellStatus, "status", "<string> - Sets the status on the graphical taskbar.");
             this.commandList[this.commandList.length] = sc;
             // load
             sc = new DOGES.ShellCommand(this.shellLoad, "load", "- Loads the code in the User Program Input.");
             this.commandList[this.commandList.length] = sc;
-            // run
+            // run <pid>
             sc = new DOGES.ShellCommand(this.shellRun, "run", "<pid> - Runs a program already in memory");
             this.commandList[this.commandList.length] = sc;
             // suchspin
             sc = new DOGES.ShellCommand(this.shellSpin, "suchspin", "- Dogey the Shiba will spin. Just for you.");
+            this.commandList[this.commandList.length] = sc;
+            // clearmem
+            sc = new DOGES.ShellCommand(this.shellClearMem, "clearmem", "- Clears all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
+            // quantum <int>
+            sc = new DOGES.ShellCommand(this.shellQuantum, "quantum", "<int> - Sets the Round Robin quantum value.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -268,6 +274,12 @@ var DOGES;
                     case "suchspin":
                         _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
                         break;
+                    case "clearmem":
+                        _StdOut.putText("Clearmem clears all memory partitions and resets the memory table.");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("Quantum sets the quantum value for Round Robin scheduling.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -402,6 +414,18 @@ var DOGES;
         Shell.prototype.shellSpin = function (args) {
             document.getElementById("dogey").style.animation = "2s spinRight infinite linear";
             document.getElementById("dogey").style.webkitAnimation = "2s spinRight infinite linear";
+        };
+        Shell.prototype.shellClearMem = function (args) {
+            DOGES.MemoryManager.clearAll();
+        };
+        Shell.prototype.shellQuantum = function (args) {
+            if (args.length > 0) {
+                _Quantum = parseInt(args[0]);
+                console.log(_Quantum);
+            }
+            else {
+                _StdOut.putText("Usage: quantum <int>  Please supply a valid quantum value.");
+            }
         };
         return Shell;
     })();

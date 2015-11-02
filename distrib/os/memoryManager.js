@@ -3,10 +3,13 @@ var DOGES;
     var MemoryManager = (function () {
         function MemoryManager() {
         }
+        // Loads the program into memory, assigns a PID for the new PCB,
+        // and pushes the new process into the resident queue.
         MemoryManager.loadProgram = function (programInput) {
             var newPcb = new DOGES.Pcb();
             _CurrentProgram = newPcb;
             this.loadToMemory(programInput);
+            _ResidentQueue.enqueue(newPcb);
             return newPcb.PID;
         };
         MemoryManager.loadToMemory = function (programInput) {
@@ -36,6 +39,11 @@ var DOGES;
         // Returns two bytes already allocated in memory
         MemoryManager.fetchMemory = function (address) {
             return _Memory.memArray[address];
+        };
+        // Clears all memory partitions
+        MemoryManager.clearAll = function () {
+            _Memory.init();
+            DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         return MemoryManager;
     })();

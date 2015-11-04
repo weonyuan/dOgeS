@@ -38,7 +38,7 @@ var _CPU: DOGES.Cpu;  // Utilize TypeScript's type annotation system to ensure t
 var _PID: number = 0;
 var _ProcessManager: DOGES.ProcessManager;
 
-var _ResidentQueue: any = null;
+var _ResidentList: any = null;
 var _ReadyQueue: any = null;
 var _Quantum: number = 6; // Quantum for Round Robin scheduling
 

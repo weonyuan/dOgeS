@@ -51,7 +51,7 @@ var DOGES;
             DOGES.Control.cpuLog();
         };
         Cpu.prototype.fetch = function () {
-            return DOGES.MemoryManager.fetchMemory(this.PC);
+            return DOGES.MemoryManager.fetchTwoBytes(this.PC);
         };
         Cpu.prototype.execute = function (opcode) {
             if (opcode === "A9") {
@@ -111,7 +111,7 @@ var DOGES;
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
             // Set the accumulator from the memory block value (base 10)
             this.Acc = this.translateBase16(source);
         };
@@ -128,7 +128,7 @@ var DOGES;
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
             this.Acc += this.translateBase16(source);
         };
         // Load X register with constant
@@ -142,7 +142,7 @@ var DOGES;
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
             // Set the X register from the memory block value (base 10)
             this.Xreg = this.translateBase16(source);
         };
@@ -157,7 +157,7 @@ var DOGES;
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
             // Set the Y register from the memory block value (base 10)
             this.Yreg = this.translateBase16(source);
         };
@@ -179,7 +179,7 @@ var DOGES;
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
             if (parseInt(source, 16) === this.Xreg) {
                 this.Zflag = 1;
             }
@@ -191,7 +191,7 @@ var DOGES;
         Cpu.prototype.bneBytes = function () {
             if (this.Zflag === 0) {
                 // Fetch the next two bytes and branch by that amount
-                this.PC += this.translateBase16(DOGES.MemoryManager.fetchMemory(++this.PC)) + 1;
+                this.PC += this.translateBase16(DOGES.MemoryManager.fetchTwoBytes(++this.PC)) + 1;
                 if (this.PC >= PROGRAM_SIZE) {
                     this.PC -= PROGRAM_SIZE;
                 }
@@ -206,7 +206,7 @@ var DOGES;
             var memoryAddress = this.fetchNextTwoBytes(this.PC);
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = DOGES.MemoryManager.fetchMemory(addressBase10);
+            var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
             var sourceInt = parseInt(source, 16) + 1;
             DOGES.MemoryManager.storeToMemory(sourceInt.toString(16), addressBase10);
         };
@@ -215,7 +215,7 @@ var DOGES;
             _KernelInterruptQueue.enqueue(new DOGES.Interrupt(SYSCALL_IRQ, this.Xreg));
         };
         Cpu.prototype.fetchNextTwoBytes = function (startAddress) {
-            var nextTwoBytes = DOGES.MemoryManager.fetchMemory(++this.PC);
+            var nextTwoBytes = DOGES.MemoryManager.fetchTwoBytes(++this.PC);
             return nextTwoBytes;
         };
         // Translate from base 16 to base 10

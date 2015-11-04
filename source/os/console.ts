@@ -105,8 +105,8 @@ module DOGES {
                 var string = "";
                 
                 // Terminate at "00"
-                while (MemoryManager.fetchMemory(currentAddress) !== "00") {
-                  var charAscii = _CPU.translateBase16(MemoryManager.fetchMemory(currentAddress));
+                while (MemoryManager.fetchTwoBytes(currentAddress) !== "00") {
+                  var charAscii = _CPU.translateBase16(MemoryManager.fetchTwoBytes(currentAddress));
                   string += String.fromCharCode(charAscii);
 
                   currentAddress++;

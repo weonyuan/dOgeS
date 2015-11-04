@@ -26,7 +26,7 @@ var DOGES;
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new DOGES.Queue(); // Where device input lands before being processed out somewhere.
             _KernelBuffers.push("");
-            _ResidentQueue = new DOGES.Queue();
+            _ResidentList = new Array();
             _ReadyQueue = new DOGES.Queue();
             // Initialize the console.
             _Console = new DOGES.Console(); // The command line interface / console I/O device.
@@ -121,7 +121,7 @@ var DOGES;
                     _StdIn.handleSyscall(params);
                     break;
                 case UNKNOWN_OPCODE_IRQ:
-                    this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchMemory(_CPU.PC - 1));
+                    this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchTwoBytes(_CPU.PC - 1));
                     break;
                 case CPU_BREAK_IRQ:
                     _CPU.isExecuting = false;

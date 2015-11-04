@@ -94,8 +94,8 @@ var DOGES;
                 var currentAddress = _CPU.Yreg;
                 var string = "";
                 // Terminate at "00"
-                while (DOGES.MemoryManager.fetchMemory(currentAddress) !== "00") {
-                    var charAscii = _CPU.translateBase16(DOGES.MemoryManager.fetchMemory(currentAddress));
+                while (DOGES.MemoryManager.fetchTwoBytes(currentAddress) !== "00") {
+                    var charAscii = _CPU.translateBase16(DOGES.MemoryManager.fetchTwoBytes(currentAddress));
                     string += String.fromCharCode(charAscii);
                     currentAddress++;
                 }

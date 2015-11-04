@@ -32,7 +32,7 @@ var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID = 0;
 var _ProcessManager;
-var _ResidentQueue = null;
+var _ResidentList = null;
 var _ReadyQueue = null;
 var _Quantum = 6; // Quantum for Round Robin scheduling
 var _StepMode = false;

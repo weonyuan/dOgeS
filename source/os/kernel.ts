@@ -27,7 +27,7 @@ module DOGES {
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
             _KernelBuffers.push("");
-            _ResidentQueue = new Queue();
+            _ResidentList = new Array();
             _ReadyQueue = new Queue();
                    
             // Initialize the console.
@@ -135,7 +135,7 @@ module DOGES {
                     _StdIn.handleSyscall(params);
                     break;
                 case UNKNOWN_OPCODE_IRQ:
-                    this.krnTrace("Unknown opcode: " + MemoryManager.fetchMemory(_CPU.PC - 1));
+                    this.krnTrace("Unknown opcode: " + MemoryManager.fetchTwoBytes(_CPU.PC - 1));
                     break;
                 case CPU_BREAK_IRQ:
                     _CPU.isExecuting = false;

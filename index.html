@@ -64,34 +64,34 @@
   </div>
   <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: -4px;" width="40px" height="40px"> dOgeS ></div>
   <div id="divButtonBar" style="margin:4px;">
-     <div id="stepPanel">
-        <span style="margin-right: 5px">Step Mode</span>
-        <input id="stepModeSwitch"
-            type="checkbox"
-            name="step-mode"
-            data-size="small"
-            disabled />
-        <button id="btnStep"
-             class="btn btn-primary glyphicon glyphicon-forward"
-             onclick="DOGES.Control.hostBtnStep_click();"
-             disabled="true" />
-     </div>
-
-     <button id="btnStartOS"
-             class="btn btn-success glyphicon glyphicon-play"
-             tabindex="0"
-             onclick="DOGES.Control.hostBtnStartOS_click(this);" data-switch-toggle="disabled" />
+     <button id="btnReset"
+             class="btn btn-info glyphicon glyphicon-repeat"
+             tabindex="2"
+             onclick="DOGES.Control.hostBtnReset_click(this);"></button>
 
      <button id="btnHaltOS"
              class="btn btn-danger glyphicon glyphicon-stop"
              disabled="true"
              tabindex="1"
-             onclick="DOGES.Control.hostBtnHaltOS_click(this);" />
+             onclick="DOGES.Control.hostBtnHaltOS_click(this);"></button>
 
-     <button id="btnReset"
-             class="btn btn-info glyphicon glyphicon-repeat"
-             tabindex="2"
-             onclick="DOGES.Control.hostBtnReset_click(this);" />
+     <button id="btnStartOS"
+             class="btn btn-success glyphicon glyphicon-play"
+             tabindex="0"
+             onclick="DOGES.Control.hostBtnStartOS_click(this);" data-switch-toggle="disabled"></button>
+
+     <div id="stepPanel">
+        <input id="stepModeSwitch"
+               type="checkbox"
+               name="step-mode"
+               data-label-text="STEP"
+               data-size="small"
+               disabled />
+        <button id="btnStep"
+                class="btn btn-primary glyphicon glyphicon-forward"
+                onclick="DOGES.Control.hostBtnStep_click();"
+                disabled="true" />
+     </div>
   </div>
 </nav>
 <div id="divMain">

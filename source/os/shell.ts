@@ -458,11 +458,9 @@ module DOGES {
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {
-                    var pid: number = MemoryManager.loadProgram(programInput);
                     _StdOut.putText("Much loading. Very appreciate.");
                     _Console.advanceLine();
-                    _StdOut.putText("Assigned Process ID: " + pid);
-                    _CPU.isExecuting = false;
+                    MemoryManager.loadProgram(programInput);
                 }
             } else {
                 _StdOut.putText("Need code input. Much appreciate.");
@@ -471,11 +469,11 @@ module DOGES {
 
         public shellRun(args) {
             if (args.length > 0) {
-                if (_CurrentProgram.PID !== null) {
-                  if (args[0] === _CurrentProgram.PID.toString()) {
-                    // Run the program
-                    _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
-                  }
+                if (_ResidentList[args[0]] !== null) {
+                  // Run the program
+                  _ReadyQueue.enqueue(_ResidentList[args[0]]);
+                  console.log(_ReadyQueue);
+                  _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
                 } else {
                   _StdOut.putText("Please supply a valid PID.");
                 }

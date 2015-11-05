@@ -5,17 +5,23 @@ var DOGES;
         }
         // Loads the program into memory
         MemoryManager.loadProgram = function (programInput) {
-            // Create a PCB
-            var newPcb = new DOGES.Pcb();
-            // Find free memory to assign the base and limit registers
-            newPcb.base = this.fetchFreeBlock();
-            newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
-            // Push the new PCB into the Resident list
-            _ResidentList.push(newPcb);
-            console.log(_ResidentList);
-            _CurrentProgram = newPcb;
-            this.loadToMemory(programInput, newPcb.base);
-            return newPcb.PID;
+            // Return a memory bound violation if Resident List is full
+            if (_ResidentList.length === PROGRAM_LIMIT) {
+                _StdOut.putText("Memory very full. Cannot load. Much sadness.");
+                _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ);
+            }
+            else {
+                // Create a PCB
+                var newPcb = new DOGES.Pcb();
+                // Find free memory to assign the base and limit registers
+                newPcb.base = this.fetchFreeBlock();
+                newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
+                // Push the new PCB into the Resident list
+                _ResidentList.push(newPcb);
+                // Then load the program into memory
+                this.loadToMemory(programInput, newPcb.base);
+                _StdOut.putText("Assigned Process ID: " + newPcb.PID);
+            }
         };
         MemoryManager.loadToMemory = function (programInput, startPoint) {
             programInput = programInput.replace(/\s/g, "").toUpperCase();
@@ -60,6 +66,8 @@ var DOGES;
         // Clears all memory partitions
         MemoryManager.clearAll = function () {
             _Memory.init();
+            _ResidentList = [];
+            //TODO: should clear the ready queue as well
             DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         return MemoryManager;

@@ -15,6 +15,7 @@ var APP_VERSION = "0.3"; // very post-alpha
 var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
+// Interrupts
 var KEYBOARD_IRQ = 1;
 var SYSCALL_IRQ = 2;
 var UNKNOWN_OPCODE_IRQ = 3;
@@ -22,6 +23,13 @@ var CPU_BREAK_IRQ = 4;
 var RUN_PROGRAM_IRQ = 5;
 var STEP_IRQ = 6;
 var STEP_MODE_IRQ = 7;
+var MEMORY_VIOLATION_IRQ = 8;
+// Process States (used for context switching)
+var PS_NEW = 0;
+var PS_READY = 1;
+var PS_RUNNING = 2;
+var PS_WAITING = 3;
+var PS_TERMINATED = 4;
 var PROGRAM_LIMIT = 3;
 var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
 var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;

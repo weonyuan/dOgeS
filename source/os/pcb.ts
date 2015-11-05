@@ -8,7 +8,8 @@ module DOGES {
                 public Zflag: number = 0,
                 public PID: number = _PID++,
                 public base: number = 0,
-                public Limit: number = 0) {
+                public Limit: number = 0,
+                public state: number = PS_NEW) {
     }
   }
 }

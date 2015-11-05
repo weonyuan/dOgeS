@@ -143,6 +143,9 @@ var DOGES;
                 case STEP_MODE_IRQ:
                     this.handleStepMode();
                     break;
+                case MEMORY_VIOLATION_IRQ:
+                    // Terminate program
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }

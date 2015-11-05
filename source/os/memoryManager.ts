@@ -3,24 +3,27 @@ module DOGES {
     constructor() {}
 
     // Loads the program into memory
-    public static loadProgram(programInput): number {
-      // Create a PCB
-      var newPcb = new Pcb();
+    public static loadProgram(programInput): void {
+      // Return a memory bound violation if Resident List is full
+      if (_ResidentList.length === PROGRAM_LIMIT) {
+        _StdOut.putText("Memory very full. Cannot load. Much sadness.");
+        _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ);
+      } else {
+        // Create a PCB
+        var newPcb = new Pcb();
 
-      // Find free memory to assign the base and limit registers
-      newPcb.base = this.fetchFreeBlock();
-      newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
+        // Find free memory to assign the base and limit registers
+        newPcb.base = this.fetchFreeBlock();
+        newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
 
-      // Push the new PCB into the Resident list
-      _ResidentList.push(newPcb);
+        // Push the new PCB into the Resident list
+        _ResidentList.push(newPcb);
+    
+        // Then load the program into memory
+        this.loadToMemory(programInput, newPcb.base);
 
-      console.log(_ResidentList);
-
-      _CurrentProgram = newPcb;
-      
-      this.loadToMemory(programInput, newPcb.base);
-
-      return newPcb.PID;
+        _StdOut.putText("Assigned Process ID: " + newPcb.PID);
+      }
     }
 
     public static loadToMemory(programInput, startPoint): void {
@@ -74,6 +77,8 @@ module DOGES {
     // Clears all memory partitions
     public static clearAll(): void {
         _Memory.init();
+        _ResidentList = [];
+        //TODO: should clear the ready queue as well
         Control.memoryManagerLog(_Memory.memArray);
     }
   }

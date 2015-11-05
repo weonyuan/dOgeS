@@ -1,7 +1,7 @@
 var DOGES;
 (function (DOGES) {
     var Pcb = (function () {
-        function Pcb(PC, Acc, Xreg, Yreg, Zflag, PID, base, Limit) {
+        function Pcb(PC, Acc, Xreg, Yreg, Zflag, PID, base, Limit, state) {
             if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = 0; }
             if (Xreg === void 0) { Xreg = 0; }
@@ -10,6 +10,7 @@ var DOGES;
             if (PID === void 0) { PID = _PID++; }
             if (base === void 0) { base = 0; }
             if (Limit === void 0) { Limit = 0; }
+            if (state === void 0) { state = PS_NEW; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -18,6 +19,7 @@ var DOGES;
             this.PID = PID;
             this.base = base;
             this.Limit = Limit;
+            this.state = state;
         }
         return Pcb;
     })();

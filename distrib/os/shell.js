@@ -395,7 +395,8 @@ var DOGES;
         };
         Shell.prototype.shellRun = function (args) {
             if (args.length > 0) {
-                if (_ResidentList[args[0]] !== null) {
+                if (_ResidentList[args[0]] !== undefined
+                    && _ResidentList[args[0]].state != PS_TERMINATED) {
                     // Run the program
                     _ReadyQueue.enqueue(_ResidentList[args[0]]);
                     console.log(_ReadyQueue);

@@ -7,7 +7,6 @@ module DOGES {
       // Return a memory bound violation if Resident List is full
       if (_ResidentList.length === PROGRAM_LIMIT) {
         _StdOut.putText("Memory very full. Cannot load. Much sadness.");
-        _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ);
       } else {
         // Create a PCB
         var newPcb = new Pcb();
@@ -19,6 +18,8 @@ module DOGES {
         // Push the new PCB into the Resident list
         _ResidentList.push(newPcb);
     
+        console.log(_ResidentList);
+
         // Then load the program into memory
         this.loadToMemory(programInput, newPcb.base);
 
@@ -60,7 +61,8 @@ module DOGES {
       var freeAddress = 0;
       if (_ResidentList.length > 0) {
         for (var i = 0; i < _ResidentList.length; i++) {
-          if (_ResidentList[i].base === freeAddress) {
+          if (_ResidentList[i].base === freeAddress
+            && _ResidentList[i].state != PS_TERMINATED) {
             freeAddress += PROGRAM_SIZE;
           }
         }

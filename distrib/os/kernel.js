@@ -82,7 +82,7 @@ var DOGES;
             else if (_CPU.isExecuting && !_StepMode) {
                 DOGES.Control.hostBtnStep_disable();
                 _CPU.cycle();
-                DOGES.ProcessManager.pcbLog();
+                DOGES.ProcessManager.pcbLog(_CurrentProgram);
             }
             else {
                 this.krnTrace("Idle");
@@ -122,20 +122,21 @@ var DOGES;
                     break;
                 case UNKNOWN_OPCODE_IRQ:
                     this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchTwoBytes(_CPU.PC - 1));
+                    _CurrentProgram.state = PS_TERMINATED;
+                    DOGES.ProcessManager.performContextSwitch();
                     break;
                 case CPU_BREAK_IRQ:
-                    _CPU.isExecuting = false;
-                    _CPU.init();
-                    // Once executed, the current program can't be run again
-                    _CurrentProgram.PID = null;
-                    DOGES.Control.cpuLog();
-                    DOGES.ProcessManager.clearLog();
-                    _Console.advanceLine();
-                    _OsShell.putPrompt();
+                    _CurrentProgram.state = PS_TERMINATED;
+                    DOGES.ProcessManager.performContextSwitch();
                     break;
                 case RUN_PROGRAM_IRQ:
-                    _CPU.init();
-                    _CPU.isExecuting = true;
+                    if (_CPU.isExecuting
+                        && DOGES.ProcessManager.determineContextSwitch()) {
+                        DOGES.ProcessManager.performContextSwitch();
+                    }
+                    else {
+                        DOGES.ProcessManager.runProcess();
+                    }
                     break;
                 case STEP_IRQ:
                     this.krnStep();
@@ -145,6 +146,11 @@ var DOGES;
                     break;
                 case MEMORY_VIOLATION_IRQ:
                     // Terminate program
+                    _CurrentProgram.state = PS_TERMINATED;
+                    DOGES.ProcessManager.performContextSwitch();
+                    break;
+                case CONTEXT_SWITCH_IRQ:
+                    DOGES.ProcessManager.performContextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -157,7 +163,7 @@ var DOGES;
         // Every step will cycle the CPU and update the PCB log
         Kernel.prototype.krnStep = function () {
             _CPU.cycle();
-            DOGES.ProcessManager.pcbLog();
+            DOGES.ProcessManager.pcbLog(_CurrentProgram);
         };
         // Responsible for enabling/disabling step button
         Kernel.prototype.handleStepMode = function () {
@@ -203,7 +209,6 @@ var DOGES;
         };
         Kernel.prototype.krnTrapError = function (msg) {
             DOGES.Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console
             _Console.showBsod(msg);
             this.krnShutdown();
         };

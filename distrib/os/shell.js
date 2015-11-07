@@ -67,6 +67,9 @@ var DOGES;
             // run <pid>
             sc = new DOGES.ShellCommand(this.shellRun, "run", "<pid> - Runs a program already in memory");
             this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new DOGES.ShellCommand(this.shellRunAll, "runall", "- Runs all programs in memory");
+            this.commandList[this.commandList.length] = sc;
             // suchspin
             sc = new DOGES.ShellCommand(this.shellSpin, "suchspin", "- Dogey the Shiba will spin. Just for you.");
             this.commandList[this.commandList.length] = sc;
@@ -271,6 +274,9 @@ var DOGES;
                     case "run":
                         _StdOut.putText("Run executes the user program already allocated in the main memory.");
                         break;
+                    case "runall":
+                        _StdOut.putText("Runall executes all user programs already loaded in the main memory.");
+                        break;
                     case "suchspin":
                         _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
                         break;
@@ -409,6 +415,17 @@ var DOGES;
             else {
                 _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
             }
+        };
+        Shell.prototype.shellRunAll = function (args) {
+            for (var i = 0; i < _ResidentList.length; i++) {
+                if (_ResidentList[i] !== undefined
+                    && _ResidentList[i].state !== PS_TERMINATED) {
+                    _ReadyQueue.enqueue(_ResidentList[i]);
+                }
+            }
+            console.log(_ResidentList);
+            console.log(_ReadyQueue);
+            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, ""));
         };
         Shell.prototype.shellSpin = function (args) {
             document.getElementById("dogey").style.animation = "2s spinRight infinite linear";

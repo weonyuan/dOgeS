@@ -93,7 +93,7 @@ module DOGES {
             } else if (_CPU.isExecuting && !_StepMode) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 Control.hostBtnStep_disable();
                 _CPU.cycle();
-                ProcessManager.pcbLog();
+                ProcessManager.pcbLog(_CurrentProgram);
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
@@ -136,21 +136,20 @@ module DOGES {
                     break;
                 case UNKNOWN_OPCODE_IRQ:
                     this.krnTrace("Unknown opcode: " + MemoryManager.fetchTwoBytes(_CPU.PC - 1));
+                    _CurrentProgram.state = PS_TERMINATED;
+                    ProcessManager.performContextSwitch();
                     break;
                 case CPU_BREAK_IRQ:
-                    _CPU.isExecuting = false;
-                    _CPU.init();
-
-                    // Once executed, the current program can't be run again
-                    _CurrentProgram.PID = null;
-                    Control.cpuLog();
-                    ProcessManager.clearLog();
-                    _Console.advanceLine();
-                    _OsShell.putPrompt();
+                    _CurrentProgram.state = PS_TERMINATED;
+                    ProcessManager.performContextSwitch();
                     break;
                 case RUN_PROGRAM_IRQ:
-                    _CPU.init();
-                    _CPU.isExecuting = true;
+                    if (_CPU.isExecuting
+                        && ProcessManager.determineContextSwitch()) {
+                        ProcessManager.performContextSwitch();
+                    } else {
+                        ProcessManager.runProcess();
+                    }
                     break;
                 case STEP_IRQ:
                     this.krnStep();
@@ -160,7 +159,11 @@ module DOGES {
                     break;
                 case MEMORY_VIOLATION_IRQ:
                     // Terminate program
-                    
+                    _CurrentProgram.state = PS_TERMINATED;
+                    ProcessManager.performContextSwitch();
+                    break;
+                case CONTEXT_SWITCH_IRQ:
+                    ProcessManager.performContextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -175,7 +178,7 @@ module DOGES {
         // Every step will cycle the CPU and update the PCB log
         public krnStep() {
             _CPU.cycle();
-            ProcessManager.pcbLog();
+            ProcessManager.pcbLog(_CurrentProgram);
         }
 
         // Responsible for enabling/disabling step button
@@ -224,7 +227,6 @@ module DOGES {
 
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console
             _Console.showBsod(msg);
             this.krnShutdown();
         }

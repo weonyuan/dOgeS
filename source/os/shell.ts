@@ -115,6 +115,12 @@ module DOGES {
               "<pid> - Runs a program already in memory");
             this.commandList[this.commandList.length] = sc;
 
+            // runall
+            sc = new ShellCommand(this.shellRunAll,
+                "runall",
+                "- Runs all programs in memory");
+            this.commandList[this.commandList.length] = sc;            
+
             // suchspin
             sc = new ShellCommand(this.shellSpin,
                 "suchspin",
@@ -341,6 +347,9 @@ module DOGES {
                     case "run":
                         _StdOut.putText("Run executes the user program already allocated in the main memory.");
                         break;
+                    case "runall":
+                        _StdOut.putText("Runall executes all user programs already loaded in the main memory.");
+                        break;
                     case "suchspin":
                         _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
                         break;
@@ -481,6 +490,18 @@ module DOGES {
             } else {
                 _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
             }
+        }
+
+        public shellRunAll(args) {
+            for (var i = 0; i < _ResidentList.length; i++) {
+                if (_ResidentList[i] !== undefined
+                    && _ResidentList[i].state !== PS_TERMINATED) {
+                    _ReadyQueue.enqueue(_ResidentList[i]);
+                }
+            }
+            console.log(_ResidentList);
+            console.log(_ReadyQueue);
+            _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, ""));
         }
 
         public shellSpin(args) {

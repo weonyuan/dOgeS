@@ -62,7 +62,7 @@ var DOGES;
             }
         };
         Control.memoryManagerLog = function (memArray) {
-            // create HTML table
+            // Create HTML table
             document.getElementById("memoryTable").innerHTML = "";
             for (var i = 0; i < memArray.length; i++) {
                 if (i % 8 === 0) {

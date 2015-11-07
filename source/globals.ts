@@ -28,6 +28,7 @@ const RUN_PROGRAM_IRQ: number = 5;
 const STEP_IRQ: number = 6;
 const STEP_MODE_IRQ: number = 7;
 const MEMORY_VIOLATION_IRQ: number = 8;
+const CONTEXT_SWITCH_IRQ: number = 9;
 
 // Process States (used for context switching)
 const PS_NEW: number = 0;
@@ -35,6 +36,9 @@ const PS_READY: number = 1;
 const PS_RUNNING: number = 2;
 const PS_WAITING: number = 3;
 const PS_TERMINATED: number = 4;
+
+// Scheduling routines
+const RR_SCH: number = 0;
 
 const PROGRAM_LIMIT: number = 3;
 const PROGRAM_SIZE: number = 256; // every program is allocated 256 bytes
@@ -47,6 +51,8 @@ const MEMORY_SIZE: number = PROGRAM_SIZE * PROGRAM_LIMIT;
 var _CPU: DOGES.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID: number = 0;
 var _ProcessManager: DOGES.ProcessManager;
+var _CpuScheduler: DOGES.CpuScheduler;
+var _CycleCount: number = 0;
 
 var _ResidentList: any = null;
 var _ReadyQueue: any = null;
@@ -55,6 +61,7 @@ var _Quantum: number = 6; // Quantum for Round Robin scheduling
 var _StepMode: boolean = false;
 
 var _CurrentProgram;
+var _CurrentScheduler: number = 0; // Default to Round Robin
 
 var _MemoryManager: DOGES.MemoryManager;
 var _Memory: DOGES.Memory;

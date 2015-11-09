@@ -38,10 +38,28 @@ var DOGES;
             this.Zflag = 0;
             this.isExecuting = false;
         };
+        Cpu.prototype.start = function (currentProgram) {
+            if (currentProgram !== null) {
+                this.PC = currentProgram.PC;
+                this.Acc = currentProgram.Acc;
+                this.Xreg = currentProgram.Xreg;
+                this.Yreg = currentProgram.Yreg;
+                this.Zflag = currentProgram.Zflag;
+            }
+            else {
+                this.PC = 0;
+                this.Acc = 0;
+                this.Xreg = 0;
+                this.Yreg = 0;
+                this.Zflag = 0;
+            }
+            this.isExecuting = true;
+        };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            _CycleCount++;
             this.execute(this.fetch());
             _CurrentProgram.PC = this.PC;
             _CurrentProgram.Acc = this.Acc;
@@ -98,6 +116,7 @@ var DOGES;
             }
             // Increment program counter for every opcode executed
             this.PC++;
+            console.log(opcode);
         };
         // Load the accumlator with a constant
         Cpu.prototype.ldaConstant = function () {
@@ -180,6 +199,8 @@ var DOGES;
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
             var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
+            console.log(memoryAddress);
+            console.log(addressBase10);
             if (parseInt(source, 16) === this.Xreg) {
                 this.Zflag = 1;
             }

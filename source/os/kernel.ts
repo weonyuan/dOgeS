@@ -92,8 +92,7 @@ module DOGES {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting && !_StepMode) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 Control.hostBtnStep_disable();
-                _CPU.cycle();
-                ProcessManager.pcbLog(_CurrentProgram);
+                this.handleCPUClockPulse();
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
@@ -177,8 +176,7 @@ module DOGES {
 
         // Every step will cycle the CPU and update the PCB log
         public krnStep() {
-            _CPU.cycle();
-            ProcessManager.pcbLog(_CurrentProgram);
+            this.handleCPUClockPulse();
         }
 
         // Responsible for enabling/disabling step button
@@ -188,6 +186,15 @@ module DOGES {
             } else {
                 Control.hostBtnStep_disable();
             }
+        }
+
+        public handleCPUClockPulse() {
+            if (ProcessManager.determineContextSwitch()) {
+                ProcessManager.performContextSwitch();
+            }
+
+            _CPU.cycle();
+            ProcessManager.pcbLog(_CurrentProgram);
         }
 
         //

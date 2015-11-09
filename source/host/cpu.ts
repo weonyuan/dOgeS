@@ -37,10 +37,29 @@ module DOGES {
             this.isExecuting = false;
         }
 
+        public start(currentProgram): void {
+            if (currentProgram !== null) {
+                this.PC = currentProgram.PC;
+                this.Acc = currentProgram.Acc;
+                this.Xreg = currentProgram.Xreg;
+                this.Yreg = currentProgram.Yreg;
+                this.Zflag = currentProgram.Zflag;
+            } else {
+                this.PC = 0;
+                this.Acc = 0;
+                this.Xreg = 0;
+                this.Yreg = 0;
+                this.Zflag = 0;
+            }
+            this.isExecuting = true;
+        }
+
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            _CycleCount++;
+
             this.execute(this.fetch());
 
             _CurrentProgram.PC = this.PC;
@@ -89,6 +108,9 @@ module DOGES {
 
             // Increment program counter for every opcode executed
             this.PC++;
+
+
+            console.log(opcode);
         }
 
         // Load the accumlator with a constant
@@ -146,7 +168,7 @@ module DOGES {
 
             var addressBase10 = this.translateBase16(memoryAddress);
             var source = MemoryManager.fetchTwoBytes(addressBase10);
-            
+
             // Set the X register from the memory block value (base 10)
             this.Xreg = this.translateBase16(source);
         }
@@ -193,6 +215,11 @@ module DOGES {
 
             var addressBase10 = this.translateBase16(memoryAddress);
             var source = MemoryManager.fetchTwoBytes(addressBase10);
+
+            console.log(memoryAddress);
+            console.log(addressBase10);
+            
+
 
             if (parseInt(source, 16) === this.Xreg) {
                 this.Zflag = 1;

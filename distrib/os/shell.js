@@ -400,12 +400,17 @@ var DOGES;
             }
         };
         Shell.prototype.shellRun = function (args) {
+            var validPID;
             if (args.length > 0) {
-                if (_ResidentList[args[0]] !== undefined
-                    && _ResidentList[args[0]].state != PS_TERMINATED) {
+                // Loop through the resident list if there is a PCB with the appropriate PID
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (args[0] === _ResidentList[i].PID.toString()) {
+                        validPID = i;
+                    }
+                }
+                if (validPID != null) {
                     // Run the program
-                    _ReadyQueue.enqueue(_ResidentList[args[0]]);
-                    console.log(_ReadyQueue);
+                    _ReadyQueue.enqueue(_ResidentList[validPID]);
                     _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, args[0]));
                 }
                 else {
@@ -417,15 +422,20 @@ var DOGES;
             }
         };
         Shell.prototype.shellRunAll = function (args) {
-            for (var i = 0; i < _ResidentList.length; i++) {
-                if (_ResidentList[i] !== undefined
-                    && _ResidentList[i].state !== PS_TERMINATED) {
-                    _ReadyQueue.enqueue(_ResidentList[i]);
+            if (_ResidentList.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (_ResidentList[i] !== undefined
+                        && _ResidentList[i].state !== PS_TERMINATED) {
+                        _ResidentList[i].state = PS_READY;
+                        _ReadyQueue.enqueue(_ResidentList[i]);
+                        DOGES.ProcessManager.pcbLog(_ResidentList[i]);
+                    }
                 }
+                _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, ""));
             }
-            console.log(_ResidentList);
-            console.log(_ReadyQueue);
-            _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, ""));
+            else {
+                _StdOut.putText("Please load in a process to initiate runall.");
+            }
         };
         Shell.prototype.shellSpin = function (args) {
             document.getElementById("dogey").style.animation = "2s spinRight infinite linear";

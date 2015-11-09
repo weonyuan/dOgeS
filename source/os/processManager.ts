@@ -5,8 +5,9 @@ module DOGES {
 
     public static determineContextSwitch(): boolean {
       // Figure out the scheduling method
+        console.log(_CycleCount);
       if (_CurrentScheduler === RR_SCH) {
-        if (_CycleCount > _Quantum) {
+        if (_CycleCount >= _Quantum) {
           return true;
         }
       }
@@ -15,43 +16,58 @@ module DOGES {
     }
 
     public static performContextSwitch(): void {
-        console.log('performContextSwitch()');
-        if (_CurrentProgram.state !== PS_TERMINATED) {
-            _CurrentProgram.state = PS_READY;
-            _ReadyQueue.push(_CurrentProgram);
-        } else if (_CurrentProgram.state === PS_TERMINATED) {
-            _CPU.isExecuting = false;
-            for (var i = 0; i < _ResidentList.length; i++) {
-              if (_CurrentProgram.PID === _ResidentList[i].PID) {
-                  _ResidentList.splice(i, 1);
-              }
+        // Grab the next program once context switch is
+        // done on the current program
+        var nextProgram = _ReadyQueue.dequeue();
+        if (nextProgram !== null) {
+            if (_CurrentProgram.state !== PS_TERMINATED) {
+                console.log('context switch!');
+                _CurrentProgram.state = PS_READY;
+                _ReadyQueue.enqueue(_CurrentProgram);
+            } else if (_CurrentProgram.state === PS_TERMINATED) {
+                this.stopProcess();
             }
-            this.pcbLog(_CurrentProgram);
+
+            _CurrentProgram = nextProgram;
+            _CurrentProgram.state = PS_RUNNING;
+            _CPU.start(_CurrentProgram);
+        } else if (_CurrentProgram.state === PS_TERMINATED) {
+            // CPU is finished running
+            this.stopProcess();
+
+            _CPU.init();
+            Control.cpuLog();
+
+            _Console.advanceLine();
+            _OsShell.putPrompt();
+
+            _CurrentProgram = null;
         }
-        console.log(_ResidentList);
+
+        _CycleCount = 0;
     }
 
     //TODO: rename process
     public static runProcess(): void {
       _CurrentProgram = _ReadyQueue.dequeue();
-      var nextProgram = _ReadyQueue.dequeue();
 
       _CurrentProgram.state = PS_RUNNING;
-      _CPU.init();
-      _CPU.isExecuting = true;
+      _CPU.start(_CurrentProgram);
     }
 
     public static stopProcess(): void {
       _CPU.isExecuting = false;
-      _CPU.init();
 
-      // Set the current program to null
-      _CurrentProgram = null;
-      Control.cpuLog();
+      for (var i = 0; i < _ResidentList.length; i++) {
+          if (_CurrentProgram.PID === _ResidentList[i].PID) {
+              _ResidentList.splice(i, 1);
+          }
+      }
+
       this.pcbLog(_CurrentProgram);
       this.clearLog(_CurrentProgram);
-      _Console.advanceLine();
-      _OsShell.putPrompt();
+
+      _CycleCount = 0;
     }
 
     // Updates the processes in the PCB panel
@@ -66,6 +82,8 @@ module DOGES {
         pcbHTML.getElementsByClassName("yRegister")[0].textContent = pcb.Yreg.toString();
         pcbHTML.getElementsByClassName("zFlag")[0].textContent = pcb.Zflag.toString();
         pcbHTML.getElementsByClassName("state")[0].textContent = this.getProcessStateString(pcb.state);
+      
+        console.log("PID: " + pcb.PID + ", PC: " + pcb.PC);
       } else {
         this.createPcbRow(pcb);
       }

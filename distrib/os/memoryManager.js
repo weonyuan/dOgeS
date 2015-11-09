@@ -6,7 +6,7 @@ var DOGES;
         // Loads the program into memory
         MemoryManager.loadProgram = function (programInput) {
             // Return a memory bound violation if Resident List is full
-            if (_ResidentList.length === PROGRAM_LIMIT) {
+            if (_ResidentList.length >= PROGRAM_LIMIT) {
                 _StdOut.putText("Memory very full. Cannot load. Much sadness.");
             }
             else {
@@ -44,7 +44,7 @@ var DOGES;
             if (value.length === 1) {
                 value = "0" + value;
             }
-            _Memory.memArray[targetAddress] = value.toUpperCase();
+            _Memory.memArray[targetAddress + _CurrentProgram.base] = value.toUpperCase();
             DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         // Finds the next available memory block and returns the appropriate address
@@ -52,8 +52,8 @@ var DOGES;
             var freeAddress = 0;
             if (_ResidentList.length > 0) {
                 for (var i = 0; i < _ResidentList.length; i++) {
-                    if (_ResidentList[i].base === freeAddress
-                        && _ResidentList[i].state != PS_TERMINATED) {
+                    if (_ResidentList[i] !== undefined
+                        && _ResidentList[i].base === freeAddress) {
                         freeAddress += PROGRAM_SIZE;
                     }
                 }
@@ -62,7 +62,7 @@ var DOGES;
         };
         // Returns two bytes already allocated in memory
         MemoryManager.fetchTwoBytes = function (address) {
-            return _Memory.memArray[address];
+            return _Memory.memArray[_CurrentProgram.base + address];
         };
         // Clears all memory partitions
         MemoryManager.clearAll = function () {

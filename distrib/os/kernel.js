@@ -81,8 +81,7 @@ var DOGES;
             }
             else if (_CPU.isExecuting && !_StepMode) {
                 DOGES.Control.hostBtnStep_disable();
-                _CPU.cycle();
-                DOGES.ProcessManager.pcbLog(_CurrentProgram);
+                this.handleCPUClockPulse();
             }
             else {
                 this.krnTrace("Idle");
@@ -162,8 +161,7 @@ var DOGES;
         };
         // Every step will cycle the CPU and update the PCB log
         Kernel.prototype.krnStep = function () {
-            _CPU.cycle();
-            DOGES.ProcessManager.pcbLog(_CurrentProgram);
+            this.handleCPUClockPulse();
         };
         // Responsible for enabling/disabling step button
         Kernel.prototype.handleStepMode = function () {
@@ -173,6 +171,13 @@ var DOGES;
             else {
                 DOGES.Control.hostBtnStep_disable();
             }
+        };
+        Kernel.prototype.handleCPUClockPulse = function () {
+            if (DOGES.ProcessManager.determineContextSwitch()) {
+                DOGES.ProcessManager.performContextSwitch();
+            }
+            _CPU.cycle();
+            DOGES.ProcessManager.pcbLog(_CurrentProgram);
         };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.

@@ -5,7 +5,7 @@ module DOGES {
     // Loads the program into memory
     public static loadProgram(programInput): void {
       // Return a memory bound violation if Resident List is full
-      if (_ResidentList.length === PROGRAM_LIMIT) {
+      if (_ResidentList.length >= PROGRAM_LIMIT) {
         _StdOut.putText("Memory very full. Cannot load. Much sadness.");
       } else {
         // Create a PCB
@@ -52,7 +52,7 @@ module DOGES {
         value = "0" + value;
       }
 
-      _Memory.memArray[targetAddress] = value.toUpperCase();
+      _Memory.memArray[targetAddress + _CurrentProgram.base] = value.toUpperCase();
       Control.memoryManagerLog(_Memory.memArray);
     }
 
@@ -61,8 +61,8 @@ module DOGES {
       var freeAddress = 0;
       if (_ResidentList.length > 0) {
         for (var i = 0; i < _ResidentList.length; i++) {
-          if (_ResidentList[i].base === freeAddress
-            && _ResidentList[i].state != PS_TERMINATED) {
+          if ( _ResidentList[i] !== undefined
+            && _ResidentList[i].base === freeAddress) {
             freeAddress += PROGRAM_SIZE;
           }
         }
@@ -73,7 +73,7 @@ module DOGES {
 
     // Returns two bytes already allocated in memory
     public static fetchTwoBytes(address): string {
-      return _Memory.memArray[address];
+      return _Memory.memArray[_CurrentProgram.base + address];
     }
 
     // Clears all memory partitions

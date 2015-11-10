@@ -50,8 +50,13 @@ module DOGES {
         value = "0" + value;
       }
 
-      _Memory.memArray[targetAddress + _CurrentProgram.base] = value.toUpperCase();
-      Control.memoryManagerLog(_Memory.memArray);
+      if ((targetAddress + _CurrentProgram.base) <= _CurrentProgram.limit) {
+        _Memory.memArray[targetAddress + _CurrentProgram.base] = value.toUpperCase();
+        Control.memoryManagerLog(_Memory.memArray);
+      } else {
+        // Memory out of bounds
+        _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ, "");
+      }
     }
 
     // Finds the next available memory block and returns the appropriate address

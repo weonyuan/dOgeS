@@ -388,7 +388,8 @@ var DOGES;
             programInput = DOGES.Utils.trim(programInput);
             var currentChar = "";
             var isValid;
-            if (programInput.length > 0 && programInput.length <= PROGRAM_LIMIT) {
+            console.log(programInput.length);
+            if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE) {
                 if (!programInput.match(/^[0-9\s*A-F\s*]+$/ig)) {
                     isValid = false;
                 }

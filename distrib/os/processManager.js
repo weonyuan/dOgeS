@@ -5,7 +5,6 @@ var DOGES;
         }
         ProcessManager.determineContextSwitch = function () {
             // Figure out the scheduling method
-            console.log(_CycleCount);
             if (_CurrentScheduler === RR_SCH) {
                 if (_CycleCount >= _Quantum) {
                     return true;
@@ -54,7 +53,8 @@ var DOGES;
                     _ResidentList.splice(i, 1);
                 }
             }
-            this.pcbLog(_CurrentProgram);
+            DOGES.MemoryManager.clearBlock(_CurrentProgram.base);
+            DOGES.Control.memoryManagerLog(_Memory.memArray);
             this.clearLog(_CurrentProgram);
             _CycleCount = 0;
         };
@@ -62,17 +62,15 @@ var DOGES;
         ProcessManager.pcbLog = function (pcb) {
             var pcbHTML = document.getElementById("pcb-" + pcb.PID);
             if (pcbHTML !== null) {
-                // console.log(pcbHTML.getElementsByClassName("pid")[0].textContent);
                 pcbHTML.getElementsByClassName("pid")[0].textContent = pcb.PID.toString();
                 pcbHTML.getElementsByClassName("pc")[0].textContent = pcb.PC.toString();
-                pcbHTML.getElementsByClassName("accumulator")[0].textContent = pcb.Acc.toString();
+                pcbHTML.getElementsByClassName("accumulator")[0].textContent = pcb.Acc.toString(16).toUpperCase();
                 pcbHTML.getElementsByClassName("xRegister")[0].textContent = pcb.Xreg.toString();
                 pcbHTML.getElementsByClassName("yRegister")[0].textContent = pcb.Yreg.toString();
                 pcbHTML.getElementsByClassName("zFlag")[0].textContent = pcb.Zflag.toString();
                 pcbHTML.getElementsByClassName("state")[0].textContent = this.getProcessStateString(pcb.state);
                 pcbHTML.getElementsByClassName("turnaround")[0].textContent = pcb.turnaround.toString();
                 pcbHTML.getElementsByClassName("waiting")[0].textContent = pcb.waiting.toString();
-                console.log("PID: " + pcb.PID + ", PC: " + pcb.PC);
             }
             else {
                 this.createPcbRow(pcb);

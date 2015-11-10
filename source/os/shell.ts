@@ -465,13 +465,11 @@ module DOGES {
         public shellLoad(args) {
             // Validate the input by allowing only hexadecimal numbers and spaces
             var programInput: string = (<HTMLTextAreaElement> document.getElementById("taProgramInput")).value;
-            programInput = Utils.trim(programInput);
+            programInput = Utils.trim(programInput).replace(/(?:\r\n|\r|\n)/g, " ").replace(/ /gm, "");
             var currentChar: string = "";
             var isValid: boolean;
 
-            console.log(programInput.length);
-
-            if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE) {
+            if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE * 2) {
                 if (!programInput.match(/^[0-9\s*A-F\s*]+$/ig)) {
                     isValid = false;
                 }
@@ -540,7 +538,6 @@ module DOGES {
         public shellQuantum(args) {
             if (args.length > 0) {
                 _Quantum = parseInt(args[0]);
-                console.log(_Quantum);
             } else {
                 _StdOut.putText("Usage: quantum <int>  Please supply a valid quantum value.");
             }

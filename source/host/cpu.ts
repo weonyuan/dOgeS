@@ -212,11 +212,6 @@ module DOGES {
             var addressBase10 = this.translateBase16(memoryAddress);
             var source = MemoryManager.fetchTwoBytes(addressBase10);
 
-            console.log(memoryAddress);
-            console.log(addressBase10);
-            
-
-
             if (parseInt(source, 16) === this.Xreg) {
                 this.Zflag = 1;
             } else {

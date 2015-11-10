@@ -132,6 +132,7 @@ h3 {
 #divUserProgramInput {
   display: inline-block;
   float: right;
+  margin-bottom: 10px;
   width: 43%;
 }
 

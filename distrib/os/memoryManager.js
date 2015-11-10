@@ -49,6 +49,7 @@ var DOGES;
             }
             else {
                 // Memory out of bounds
+                _Kernel.krnTrace("Memory target address out of bounds. Terminating program.");
                 _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ, "");
             }
         };
@@ -69,12 +70,18 @@ var DOGES;
         MemoryManager.fetchTwoBytes = function (address) {
             return _Memory.memArray[_CurrentProgram.base + address];
         };
+        MemoryManager.clearBlock = function (startPoint) {
+            if (startPoint === null || startPoint === undefined) {
+                startPoint = 0;
+            }
+            for (var i = startPoint; i < (startPoint + PROGRAM_SIZE); i++) {
+                _Memory.memArray[i] = "00";
+            }
+        };
         // Clears all memory partitions
         MemoryManager.clearAll = function () {
             _Memory.init();
             _ResidentList = [];
-            //TODO: should clear the ready queue as well
-            console.log(_ReadyQueue);
             DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         return MemoryManager;

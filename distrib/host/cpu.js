@@ -198,8 +198,6 @@ var DOGES;
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
             var addressBase10 = this.translateBase16(memoryAddress);
             var source = DOGES.MemoryManager.fetchTwoBytes(addressBase10);
-            console.log(memoryAddress);
-            console.log(addressBase10);
             if (parseInt(source, 16) === this.Xreg) {
                 this.Zflag = 1;
             }

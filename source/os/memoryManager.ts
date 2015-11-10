@@ -17,8 +17,6 @@ module DOGES {
 
         // Push the new PCB into the Resident list
         _ResidentList.push(newPcb);
-    
-        console.log(_ResidentList);
 
         // Then load the program into memory
         this.loadToMemory(programInput, newPcb.base);
@@ -81,6 +79,7 @@ module DOGES {
         _Memory.init();
         _ResidentList = [];
         //TODO: should clear the ready queue as well
+        console.log(_ReadyQueue);
         Control.memoryManagerLog(_Memory.memArray);
     }
   }

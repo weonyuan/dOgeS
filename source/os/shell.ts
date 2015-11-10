@@ -465,18 +465,13 @@ module DOGES {
         public shellLoad(args) {
             // Validate the input by allowing only hexadecimal numbers and spaces
             var programInput: string = (<HTMLTextAreaElement> document.getElementById("taProgramInput")).value;
+            programInput = Utils.trim(programInput);
             var currentChar: string = "";
             var isValid: boolean;
 
-            if (programInput.length > 0) {
-                for (var j = 0; j < programInput.length; j++) {
-                    // We want to read one character at a time
-                    currentChar = programInput.substring(j, j + 1);
-
-                    // If any character in user input is invalid, the entire input is invalid.
-                    if (!currentChar.match(/([a-fA-F0-9\s])/g)) {
-                        isValid = false;
-                    }
+            if (programInput.length > 0 && programInput.length <= PROGRAM_LIMIT) {
+                if (!programInput.match(/^[0-9\s*A-F\s*]+$/ig)) {
+                    isValid = false;
                 }
 
                 if (isValid === false) {
@@ -486,7 +481,9 @@ module DOGES {
                     _Console.advanceLine();
                     MemoryManager.loadProgram(programInput);
                 }
-            } else {
+            } else if (programInput.length > PROGRAM_LIMIT) {
+                _StdOut.putText("Wat. Dat program. So big. Cannot load.");
+            } else if (programInput.length === 0) {
                 _StdOut.putText("Need code input. Much appreciate.");
             }
         }

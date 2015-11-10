@@ -17,7 +17,6 @@ var DOGES;
                 newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
                 // Push the new PCB into the Resident list
                 _ResidentList.push(newPcb);
-                console.log(_ResidentList);
                 // Then load the program into memory
                 this.loadToMemory(programInput, newPcb.base);
                 _StdOut.putText("Assigned Process ID: " + newPcb.PID);
@@ -69,6 +68,7 @@ var DOGES;
             _Memory.init();
             _ResidentList = [];
             //TODO: should clear the ready queue as well
+            console.log(_ReadyQueue);
             DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         return MemoryManager;

@@ -132,17 +132,17 @@ h3 {
   display: inline-block;
   float: left;
   margin-right: 20px;
-  width: 19%;
+  width: 21%;
 }
 
-#divPcb {
+#divUserProgramInput {
   display: inline-block;
   float: left;
-  width: 32.2%;
+  width: 30.2%;
 }
 
 #divLog,
-#divUserProgramInput,
+#divPcb,
 #divMemoryManager {
   display: inline-block;
   float: right;

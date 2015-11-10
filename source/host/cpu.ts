@@ -67,7 +67,6 @@ module DOGES {
             _CurrentProgram.Xreg = this.Xreg;
             _CurrentProgram.Yreg = this.Yreg;
             _CurrentProgram.Zflag = this.Zflag;
-            
             Control.cpuLog();
         }
 
@@ -108,9 +107,6 @@ module DOGES {
 
             // Increment program counter for every opcode executed
             this.PC++;
-
-
-            console.log(opcode);
         }
 
         // Load the accumlator with a constant

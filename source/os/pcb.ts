@@ -9,7 +9,9 @@ module DOGES {
                 public PID: number = _PID++,
                 public base: number = 0,
                 public Limit: number = 0,
-                public state: number = PS_NEW) {
+                public state: number = PS_NEW,
+                public turnaround: number = 0,
+                public waiting: number = 0) {
     }
   }
 }

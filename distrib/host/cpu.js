@@ -116,7 +116,6 @@ var DOGES;
             }
             // Increment program counter for every opcode executed
             this.PC++;
-            console.log(opcode);
         };
         // Load the accumlator with a constant
         Cpu.prototype.ldaConstant = function () {

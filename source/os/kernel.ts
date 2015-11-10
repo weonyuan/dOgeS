@@ -193,6 +193,17 @@ module DOGES {
                 ProcessManager.performContextSwitch();
             }
 
+            for (var i = 0; i < _ResidentList.length; i++) {
+                if (_ResidentList[i].state === PS_READY) {
+                    _ResidentList[i].waiting++;
+                    _ResidentList[i].turnaround++;
+
+                    ProcessManager.pcbLog(_ResidentList[i]);
+                }
+            }
+
+            _CurrentProgram.turnaround++;
+
             _CPU.cycle();
             ProcessManager.pcbLog(_CurrentProgram);
         }

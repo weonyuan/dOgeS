@@ -19,9 +19,9 @@ var DOGES;
             var nextProgram = _ReadyQueue.dequeue();
             if (nextProgram !== null) {
                 if (_CurrentProgram.state !== PS_TERMINATED) {
-                    console.log('context switch!');
                     _CurrentProgram.state = PS_READY;
                     _ReadyQueue.enqueue(_CurrentProgram);
+                    this.pcbLog(_CurrentProgram);
                 }
                 else if (_CurrentProgram.state === PS_TERMINATED) {
                     this.stopProcess();
@@ -70,6 +70,8 @@ var DOGES;
                 pcbHTML.getElementsByClassName("yRegister")[0].textContent = pcb.Yreg.toString();
                 pcbHTML.getElementsByClassName("zFlag")[0].textContent = pcb.Zflag.toString();
                 pcbHTML.getElementsByClassName("state")[0].textContent = this.getProcessStateString(pcb.state);
+                pcbHTML.getElementsByClassName("turnaround")[0].textContent = pcb.turnaround.toString();
+                pcbHTML.getElementsByClassName("waiting")[0].textContent = pcb.waiting.toString();
                 console.log("PID: " + pcb.PID + ", PC: " + pcb.PC);
             }
             else {
@@ -108,13 +110,29 @@ var DOGES;
             cell.textContent = pcb.zFlag;
             pcbHTML.appendChild(cell);
             cell = document.createElement("td");
+            cell.className = "base";
+            cell.textContent = pcb.base;
+            pcbHTML.appendChild(cell);
+            cell = document.createElement("td");
+            cell.className = "limit";
+            cell.textContent = pcb.limit;
+            pcbHTML.appendChild(cell);
+            cell = document.createElement("td");
             cell.className = "state";
             cell.textContent = this.getProcessStateString(pcb.state);
+            pcbHTML.appendChild(cell);
+            cell = document.createElement("td");
+            cell.className = "turnaround";
+            cell.textContent = pcb.turnaround;
+            pcbHTML.appendChild(cell);
+            cell = document.createElement("td");
+            cell.className = "waiting";
+            cell.textContent = pcb.waiting;
             pcbHTML.appendChild(cell);
         };
         ProcessManager.clearLog = function (pcb) {
             var pcbHTML = document.getElementById("pcb-" + pcb.PID);
-            // pcbHTML.remove();
+            pcbHTML.remove();
         };
         // Returns the appropriate state by its defined integer constant
         ProcessManager.getProcessStateString = function (stateInt) {

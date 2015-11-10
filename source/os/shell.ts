@@ -140,7 +140,16 @@ module DOGES {
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
+            sc = new ShellCommand(this.shellPs,
+                "ps",
+                "- Displays all active processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<pid> - Kills the active process.");
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -359,6 +368,12 @@ module DOGES {
                     case "quantum":
                         _StdOut.putText("Quantum sets the quantum value for Round Robin scheduling.");
                         break;
+                    case "ps":
+                        _StdOut.putText("PS displays the PIDs of all active processes.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kill removes an active process.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -520,6 +535,7 @@ module DOGES {
 
         public shellClearMem(args) {
             MemoryManager.clearAll();
+            _StdOut.putText("All memory partitions have been cleared.");
         }
 
         public shellQuantum(args) {
@@ -528,6 +544,30 @@ module DOGES {
                 console.log(_Quantum);
             } else {
                 _StdOut.putText("Usage: quantum <int>  Please supply a valid quantum value.");
+            }
+        }
+
+        public shellPs(args) {
+            if (_ResidentList.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (_ResidentList[i].state !== PS_TERMINATED) {
+                        _StdOut.putText("PID " + _ResidentList[i].PID + "; ");
+                    }
+                }    
+            } else {
+                _StdOut.putText("Wat. No active processes.");
+            }
+        }
+
+        public shellKill(args) {
+            if (args.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (args[0] !== _ResidentList[i].PID) {
+                        _ResidentList[i].state = PS_TERMINATED;
+                        _ResidentList.splice(i, 1);
+                        _StdOut.putText("Killed PID " + args[0]);
+                    }
+                }
             }
         }
     }

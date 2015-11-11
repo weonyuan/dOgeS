@@ -3,59 +3,37 @@ var DOGES;
     var ProcessManager = (function () {
         function ProcessManager() {
         }
-        ProcessManager.determineContextSwitch = function () {
-            // Figure out the scheduling method
-            if (_CurrentScheduler === RR_SCH) {
-                if (_CycleCount >= _Quantum) {
-                    return true;
+        // Called when run/runall command is entered
+        ProcessManager.startRun = function () {
+            if (_ReadyQueue.getSize() > 0) {
+                if (_CurrentProgram === null) {
+                    _CurrentProgram = _ReadyQueue.dequeue();
+                    _CurrentProgram.state = PS_RUNNING;
+                    _CPU.start(_CurrentProgram);
+                }
+                else {
+                    // A little bit of hacking...called when a new program is
+                    // called to run in the middle of program execution
+                    _ReadyQueue["q"][_ReadyQueue.getSize() - 1].state = PS_READY;
                 }
             }
-            return false;
         };
-        ProcessManager.performContextSwitch = function () {
-            // Grab the next program once context switch is
-            // done on the current program
-            var nextProgram = _ReadyQueue.dequeue();
-            if (nextProgram !== null) {
-                if (_CurrentProgram.state !== PS_TERMINATED) {
-                    _CurrentProgram.state = PS_READY;
-                    _ReadyQueue.enqueue(_CurrentProgram);
-                    this.pcbLog(_CurrentProgram);
-                }
-                else if (_CurrentProgram.state === PS_TERMINATED) {
-                    this.stopProcess();
-                }
-                _CurrentProgram = nextProgram;
-                _CurrentProgram.state = PS_RUNNING;
-                _CPU.start(_CurrentProgram);
-            }
-            else if (_CurrentProgram.state === PS_TERMINATED) {
-                // CPU is finished running
-                this.stopProcess();
-                _CPU.init();
-                DOGES.Control.cpuLog();
-                _Console.advanceLine();
-                _OsShell.putPrompt();
-                _CurrentProgram = null;
-            }
-            _CycleCount = 0;
-        };
-        //TODO: rename process
-        ProcessManager.runProcess = function () {
-            _CurrentProgram = _ReadyQueue.dequeue();
-            _CurrentProgram.state = PS_RUNNING;
-            _CPU.start(_CurrentProgram);
-        };
-        ProcessManager.stopProcess = function () {
-            _CPU.isExecuting = false;
+        // Removes the process from Resident list and memory
+        ProcessManager.stopProgram = function () {
             for (var i = 0; i < _ResidentList.length; i++) {
                 if (_CurrentProgram.PID === _ResidentList[i].PID) {
                     _ResidentList.splice(i, 1);
+                    break;
                 }
             }
-            DOGES.MemoryManager.clearBlock(_CurrentProgram.base);
+            _CPU.isExecuting = false;
+            // Clear the memory allocation and the logs
+            DOGES.MemoryManager.clearSegment(_CurrentProgram.base);
             DOGES.Control.memoryManagerLog(_Memory.memArray);
-            this.clearLog(_CurrentProgram);
+            _CPU.init();
+            DOGES.Control.cpuLog();
+            // Reset the cycle count and current program
+            _CurrentProgram = null;
             _CycleCount = 0;
         };
         // Updates the processes in the PCB panel
@@ -127,10 +105,6 @@ var DOGES;
             cell.className = "waiting";
             cell.textContent = pcb.waiting;
             pcbHTML.appendChild(cell);
-        };
-        ProcessManager.clearLog = function (pcb) {
-            var pcbHTML = document.getElementById("pcb-" + pcb.PID);
-            pcbHTML.remove();
         };
         // Returns the appropriate state by its defined integer constant
         ProcessManager.getProcessStateString = function (stateInt) {

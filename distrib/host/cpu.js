@@ -114,6 +114,9 @@ var DOGES;
             else if (opcode === "FF") {
                 this.syscall();
             }
+            else {
+                _KernelInterruptQueue.enqueue(new DOGES.Interrupt(UNKNOWN_OPCODE_IRQ, "UNKNOWN_OPCODE"));
+            }
             // Increment program counter for every opcode executed
             this.PC++;
         };

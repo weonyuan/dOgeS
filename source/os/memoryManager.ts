@@ -55,7 +55,6 @@ module DOGES {
         Control.memoryManagerLog(_Memory.memArray);
       } else {
         // Memory out of bounds
-         _Kernel.krnTrace("Memory target address out of bounds. Terminating program.");
         _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ, "");
       }
     }
@@ -80,7 +79,8 @@ module DOGES {
       return _Memory.memArray[_CurrentProgram.base + address];
     }
 
-    public static clearBlock(startPoint): void {
+    // Clears one memory segment in main memory
+    public static clearSegment(startPoint): void {
         if (startPoint === null || startPoint === undefined) {
             startPoint = 0;
         }

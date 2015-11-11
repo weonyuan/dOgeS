@@ -122,19 +122,19 @@ var DOGES;
                 case UNKNOWN_OPCODE_IRQ:
                     this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchTwoBytes(_CPU.PC - 1));
                     _CurrentProgram.state = PS_TERMINATED;
-                    DOGES.ProcessManager.performContextSwitch();
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 case CPU_BREAK_IRQ:
                     _CurrentProgram.state = PS_TERMINATED;
-                    DOGES.ProcessManager.performContextSwitch();
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 case RUN_PROGRAM_IRQ:
                     if (_CPU.isExecuting
-                        && DOGES.ProcessManager.determineContextSwitch()) {
-                        DOGES.ProcessManager.performContextSwitch();
+                        && DOGES.CpuScheduler.determineContextSwitch()) {
+                        DOGES.CpuScheduler.performContextSwitch();
                     }
                     else {
-                        DOGES.ProcessManager.runProcess();
+                        DOGES.ProcessManager.startRun();
                     }
                     break;
                 case STEP_IRQ:
@@ -145,11 +145,12 @@ var DOGES;
                     break;
                 case MEMORY_VIOLATION_IRQ:
                     // Terminate program
+                    this.krnTrace("Memory out of bounds. Terminating...");
                     _CurrentProgram.state = PS_TERMINATED;
-                    DOGES.ProcessManager.performContextSwitch();
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 case CONTEXT_SWITCH_IRQ:
-                    DOGES.ProcessManager.performContextSwitch();
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -161,7 +162,9 @@ var DOGES;
         };
         // Every step will cycle the CPU and update the PCB log
         Kernel.prototype.krnStep = function () {
-            this.handleCPUClockPulse();
+            if (_CurrentProgram !== null) {
+                this.handleCPUClockPulse();
+            }
         };
         // Responsible for enabling/disabling step button
         Kernel.prototype.handleStepMode = function () {
@@ -173,9 +176,10 @@ var DOGES;
             }
         };
         Kernel.prototype.handleCPUClockPulse = function () {
-            if (DOGES.ProcessManager.determineContextSwitch()) {
-                DOGES.ProcessManager.performContextSwitch();
+            if (DOGES.CpuScheduler.determineContextSwitch()) {
+                this.krnInterruptHandler(CONTEXT_SWITCH_IRQ, _CurrentProgram);
             }
+            _CPU.cycle();
             for (var i = 0; i < _ResidentList.length; i++) {
                 if (_ResidentList[i].state === PS_READY) {
                     _ResidentList[i].waiting++;
@@ -183,9 +187,10 @@ var DOGES;
                     DOGES.ProcessManager.pcbLog(_ResidentList[i]);
                 }
             }
-            _CurrentProgram.turnaround++;
-            _CPU.cycle();
-            DOGES.ProcessManager.pcbLog(_CurrentProgram);
+            if (_CurrentProgram !== null) {
+                _CurrentProgram.turnaround++;
+                DOGES.ProcessManager.pcbLog(_CurrentProgram);
+            }
         };
         //
         // System Calls... that generate software interrupts via tha Application Programming Interface library routines.

@@ -6,7 +6,7 @@ function Glados() {
    this.version = 2112;
 
    this.init = function() {
-      var msg = "Hello [subject name here]. Let's test project TWO.\n";
+      var msg = "Hello [subject name here]. Let's test project THREE.\n";
       alert(msg);
    };
 
@@ -48,41 +48,65 @@ function Glados() {
       _KernelInputQueue.enqueue('i');
       DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);
      
-      // Load some invalid user program code
-      document.getElementById("taProgramInput").value = "This is NOT hex.";
-      _KernelInputQueue.enqueue('l');
-      _KernelInputQueue.enqueue('o');
-      _KernelInputQueue.enqueue('a');
-      _KernelInputQueue.enqueue('d');
-      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);
-
-
-      // Use the 'status' command to give the expected output of the program below.
-            var str = "status output should be similar to 'counting0counting1hello worldcounting 2'.";
-            for (var i = 0; i < str.length; i++) {
-                  _KernelInputQueue.enqueue(str[i]);
-            }
-      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);                     
-            
-      // Load a valid user program code and run it.
-      var code = "A9 00 8D 00 00 A9 00 8D 4B 00 A9 00 8D 4B 00 A2 03 EC 4B 00 D0 07 A2 01 EC 00 00 D0 05 A2 00 EC 00 00 D0 26 A0 4C A2 02 FF AC 4B 00 A2 01 FF A9 01 6D 4B 00 8D 4B 00 A2 02 EC 4B 00 D0 05 A0 55 A2 02 FF A2 01 EC 00 00 D0 C5 00 00 63 6F 75 6E 74 69 6E 67 00 68 65 6C 6C 6F 20 77 6F 72 6C 64 00";
-      document.getElementById("taProgramInput").value = code;
-      _KernelInputQueue.enqueue('l');
-      _KernelInputQueue.enqueue('o');
-      _KernelInputQueue.enqueue('a');
-      _KernelInputQueue.enqueue('d');
-      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);
-
-      _KernelInputQueue.enqueue('r');
-      _KernelInputQueue.enqueue('u');
-      _KernelInputQueue.enqueue('n');
+      // Test the 'status' command.
+      _KernelInputQueue.enqueue('S');
+      _KernelInputQueue.enqueue('t');
+      _KernelInputQueue.enqueue('A');
+      _KernelInputQueue.enqueue('t');
+      _KernelInputQueue.enqueue('U');
+      _KernelInputQueue.enqueue('s');
       _KernelInputQueue.enqueue(' ');
-      _KernelInputQueue.enqueue('0');      
-      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);      
+      _KernelInputQueue.enqueue('C');
+      _KernelInputQueue.enqueue('a');
+      _KernelInputQueue.enqueue('k');
+      _KernelInputQueue.enqueue('e');
+      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);
+      
+      // Load some invalid user program code
+      document.getElementById("taProgramInput").value="This is NOT hex.";
+      _KernelInputQueue.enqueue('l');
+      _KernelInputQueue.enqueue('o');
+      _KernelInputQueue.enqueue('a');
+      _KernelInputQueue.enqueue('d');
+      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);
 
+      // Load THREE (slightly different) valid user programs code and run them. The differences are . . .                                          . . .                                        here                                                        . . .                                                                                                                                   . . . and here.
+      var code1 = "A9 00 8D 7B 00 A9 00 8D 7B 00 A9 00 8D 7C 00 A9 00 8D 7C 00 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 39 A0 7D A2 02 FF AC 7B 00 A2 01 FF AD 7B 00 8D 7A 00 A9 01 6D 7A 00 8D 7B 00 A9 03 AE 7B 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 01 EC 7A 00 D0 05 A9 01 8D 7C 00 A9 00 AE 7C 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 AC A0 7F A2 02 FF 00 00 00 00 61 00 61 64 6F 6E 65 00";
+      var code2 = "A9 00 8D 7B 00 A9 00 8D 7B 00 A9 00 8D 7C 00 A9 00 8D 7C 00 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 39 A0 7D A2 02 FF AC 7B 00 A2 01 FF AD 7B 00 8D 7A 00 A9 01 6D 7A 00 8D 7B 00 A9 06 AE 7B 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 01 EC 7A 00 D0 05 A9 01 8D 7C 00 A9 00 AE 7C 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 AC A0 7F A2 02 FF 00 00 00 00 62 00 62 64 6F 6E 65 00";
+      var code3 = "A9 00 8D 7B 00 A9 00 8D 7B 00 A9 00 8D 7C 00 A9 00 8D 7C 00 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 39 A0 7D A2 02 FF AC 7B 00 A2 01 FF AD 7B 00 8D 7A 00 A9 01 6D 7A 00 8D 7B 00 A9 09 AE 7B 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 01 EC 7A 00 D0 05 A9 01 8D 7C 00 A9 00 AE 7C 00 8D 7A 00 A9 00 EC 7A 00 D0 02 A9 01 8D 7A 00 A2 00 EC 7A 00 D0 AC A0 7F A2 02 FF 00 00 00 00 63 00 63 64 6F 6E 65 00";
 
-      // Load another valid user program.
-      var code = "A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00";
-      document.getElementById("taProgramInput").value = code;
+            setTimeout(function(){ document.getElementById("taProgramInput").value = code1;
+                                                     _KernelInputQueue.enqueue('l');
+                                                     _KernelInputQueue.enqueue('o');
+                                                     _KernelInputQueue.enqueue('a');
+                                                     _KernelInputQueue.enqueue('d');
+                                                     DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);                                        
+                                                      }, 1000);
+
+            setTimeout(function(){ document.getElementById("taProgramInput").value = code2;
+                                                     _KernelInputQueue.enqueue('l');
+                                                     _KernelInputQueue.enqueue('o');
+                                                     _KernelInputQueue.enqueue('a');
+                                                     _KernelInputQueue.enqueue('d');
+                                                     DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);                                        
+                                                      }, 2000);
+
+            setTimeout(function(){ document.getElementById("taProgramInput").value = code2;
+                                                     _KernelInputQueue.enqueue('l');
+                                                     _KernelInputQueue.enqueue('o');
+                                                     _KernelInputQueue.enqueue('a');
+                                                     _KernelInputQueue.enqueue('d');
+                                                     DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);                                        
+                                                      }, 3000);
+
+            setTimeout(function(){ _KernelInputQueue.enqueue('r');
+                                                     _KernelInputQueue.enqueue('u');
+                                                     _KernelInputQueue.enqueue('n');
+                                                     _KernelInputQueue.enqueue('a');
+                                                     _KernelInputQueue.enqueue('l');      
+                                                     _KernelInputQueue.enqueue('l');            
+                                                     DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);          
+                                                      }, 4000);
    };
+            
 }

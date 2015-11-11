@@ -49,7 +49,7 @@ var _ResidentList = null;
 var _ReadyQueue = null;
 var _Quantum = 6; // Quantum for Round Robin scheduling
 var _StepMode = false;
-var _CurrentProgram;
+var _CurrentProgram = null;
 var _CurrentScheduler = 0; // Default to Round Robin
 var _MemoryManager;
 var _Memory;

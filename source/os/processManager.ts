@@ -3,70 +3,41 @@ module DOGES {
   export class ProcessManager {
     constructor() {}
 
-    public static determineContextSwitch(): boolean {
-      // Figure out the scheduling method
-      if (_CurrentScheduler === RR_SCH) {
-        if (_CycleCount >= _Quantum) {
-          return true;
-        }
+    // Called when run/runall command is entered
+    public static startRun(): void {
+      if (_ReadyQueue.getSize() > 0) {
+          if (_CurrentProgram === null) {
+              _CurrentProgram = _ReadyQueue.dequeue();
+
+              _CurrentProgram.state = PS_RUNNING;
+              _CPU.start(_CurrentProgram);
+          } else {
+              // A little bit of hacking...called when a new program is
+              // called to run in the middle of program execution
+              _ReadyQueue["q"][_ReadyQueue.getSize() - 1].state = PS_READY;
+          }
       }
-
-      return false;
     }
 
-    public static performContextSwitch(): void {
-        // Grab the next program once context switch is
-        // done on the current program
-        var nextProgram = _ReadyQueue.dequeue();
-        if (nextProgram !== null) {
-            if (_CurrentProgram.state !== PS_TERMINATED) {
-                _CurrentProgram.state = PS_READY;
-                _ReadyQueue.enqueue(_CurrentProgram);
-                this.pcbLog(_CurrentProgram);
-            } else if (_CurrentProgram.state === PS_TERMINATED) {
-                this.stopProcess();
-            }
-
-            _CurrentProgram = nextProgram;
-            _CurrentProgram.state = PS_RUNNING;
-            _CPU.start(_CurrentProgram);
-        } else if (_CurrentProgram.state === PS_TERMINATED) {
-            // CPU is finished running
-            this.stopProcess();
-
-            _CPU.init();
-            Control.cpuLog();
-
-            _Console.advanceLine();
-            _OsShell.putPrompt();
-
-            _CurrentProgram = null;
-        }
-
-        _CycleCount = 0;
-    }
-
-    //TODO: rename process
-    public static runProcess(): void {
-      _CurrentProgram = _ReadyQueue.dequeue();
-
-      _CurrentProgram.state = PS_RUNNING;
-      _CPU.start(_CurrentProgram);
-    }
-
-    public static stopProcess(): void {
-      _CPU.isExecuting = false;
-
+    // Removes the process from Resident list and memory
+    public static stopProgram(): void {
       for (var i = 0; i < _ResidentList.length; i++) {
           if (_CurrentProgram.PID === _ResidentList[i].PID) {
               _ResidentList.splice(i, 1);
+              break;
           }
       }
 
-      MemoryManager.clearBlock(_CurrentProgram.base);
-      Control.memoryManagerLog(_Memory.memArray);
-      this.clearLog(_CurrentProgram);
+      _CPU.isExecuting = false;
 
+      // Clear the memory allocation and the logs
+      MemoryManager.clearSegment(_CurrentProgram.base);
+      Control.memoryManagerLog(_Memory.memArray);
+      _CPU.init();
+      Control.cpuLog();
+
+      // Reset the cycle count and current program
+      _CurrentProgram = null;
       _CycleCount = 0;
     }
 
@@ -151,11 +122,6 @@ module DOGES {
       cell.className = "waiting";
       cell.textContent = pcb.waiting;
       pcbHTML.appendChild(cell);
-    }
-
-    public static clearLog(pcb): void {
-      var pcbHTML = document.getElementById("pcb-" + pcb.PID);
-      pcbHTML.remove();
     }
 
     // Returns the appropriate state by its defined integer constant

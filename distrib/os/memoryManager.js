@@ -49,7 +49,6 @@ var DOGES;
             }
             else {
                 // Memory out of bounds
-                _Kernel.krnTrace("Memory target address out of bounds. Terminating program.");
                 _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ, "");
             }
         };
@@ -70,7 +69,8 @@ var DOGES;
         MemoryManager.fetchTwoBytes = function (address) {
             return _Memory.memArray[_CurrentProgram.base + address];
         };
-        MemoryManager.clearBlock = function (startPoint) {
+        // Clears one memory segment in main memory
+        MemoryManager.clearSegment = function (startPoint) {
             if (startPoint === null || startPoint === undefined) {
                 startPoint = 0;
             }

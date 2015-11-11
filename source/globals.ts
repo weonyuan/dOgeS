@@ -60,7 +60,7 @@ var _Quantum: number = 6; // Quantum for Round Robin scheduling
 
 var _StepMode: boolean = false;
 
-var _CurrentProgram;
+var _CurrentProgram: any = null;
 var _CurrentScheduler: number = 0; // Default to Round Robin
 
 var _MemoryManager: DOGES.MemoryManager;

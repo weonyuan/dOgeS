@@ -418,9 +418,12 @@ var DOGES;
                     }
                 }
                 if (validPID != null) {
-                    // Run the program
-                    _ReadyQueue.enqueue(_ResidentList[validPID]);
-                    _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                    if (_ResidentList[validPID].state !== PS_TERMINATED) {
+                        _ReadyQueue.enqueue(_ResidentList[validPID]);
+                        DOGES.ProcessManager.pcbLog(_ResidentList[validPID]);
+                        // Call the interrupt and run the program
+                        _KernelInterruptQueue.enqueue(new DOGES.Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                    }
                 }
                 else {
                     _StdOut.putText("Please supply a valid PID.");
@@ -465,8 +468,12 @@ var DOGES;
         Shell.prototype.shellPs = function (args) {
             if (_ResidentList.length > 0) {
                 for (var i = 0; i < _ResidentList.length; i++) {
-                    if (_ResidentList[i].state !== PS_TERMINATED) {
+                    if (_ResidentList[i].state !== PS_TERMINATED &&
+                        _ResidentList[i].state !== PS_NEW) {
                         _StdOut.putText("PID " + _ResidentList[i].PID + "; ");
+                    }
+                    else {
+                        _StdOut.putText("Wat. No active processes.");
                     }
                 }
             }
@@ -477,10 +484,14 @@ var DOGES;
         Shell.prototype.shellKill = function (args) {
             if (args.length > 0) {
                 for (var i = 0; i < _ResidentList.length; i++) {
-                    if (args[0] !== _ResidentList[i].PID) {
+                    if (args[0] === _ResidentList[i].PID.toString()) {
                         _ResidentList[i].state = PS_TERMINATED;
+                        DOGES.MemoryManager.clearSegment(_ResidentList[i].base);
+                        DOGES.Control.memoryManagerLog(_Memory.memArray);
+                        DOGES.ProcessManager.pcbLog(_ResidentList[i]);
                         _ResidentList.splice(i, 1);
                         _StdOut.putText("Killed PID " + args[0]);
+                        break;
                     }
                 }
             }

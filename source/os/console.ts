@@ -105,8 +105,8 @@ module DOGES {
                 var string = "";
                 
                 // Terminate at "00"
-                while (MemoryManager.fetchMemory(currentAddress) !== "00") {
-                  var charAscii = _CPU.translateBase16(MemoryManager.fetchMemory(currentAddress));
+                while (MemoryManager.fetchTwoBytes(currentAddress) !== "00") {
+                  var charAscii = _CPU.translateBase16(MemoryManager.fetchTwoBytes(currentAddress));
                   string += String.fromCharCode(charAscii);
 
                   currentAddress++;
@@ -185,7 +185,7 @@ module DOGES {
 
         public showBsod(msg): void {
             _Canvas.width = 479;
-            _Canvas.height = 472;
+            _Canvas.height = 460;
 
             // draw the blue background
             _DrawingContext.rect(0, 0, _Canvas.width, _Canvas.height);

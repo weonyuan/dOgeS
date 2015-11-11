@@ -91,13 +91,13 @@ module DOGES {
                                   "- Displays the user's current location.");
             this.commandList[this.commandList.length] = sc;
 
-            // bsod
+            // bsodwow
             sc = new ShellCommand(this.shellBsod,
                                   "bsodwow",
                                   "- Initiates the Blue Screen of Death.");
             this.commandList[this.commandList.length] = sc;
 
-            // status
+            // status <string>
             sc = new ShellCommand(this.shellStatus,
                                  "status",
                                  "<string> - Sets the status on the graphical taskbar.");
@@ -109,11 +109,17 @@ module DOGES {
                                   "- Loads the code in the User Program Input.");
             this.commandList[this.commandList.length] = sc;
 
-            // run
+            // run <pid>
             sc = new ShellCommand(this.shellRun,
               "run",
               "<pid> - Runs a program already in memory");
             this.commandList[this.commandList.length] = sc;
+
+            // runall
+            sc = new ShellCommand(this.shellRunAll,
+                "runall",
+                "- Runs all programs in memory");
+            this.commandList[this.commandList.length] = sc;            
 
             // suchspin
             sc = new ShellCommand(this.shellSpin,
@@ -121,8 +127,29 @@ module DOGES {
                 "- Dogey the Shiba will spin. Just for you.");
             this.commandList[this.commandList.length] = sc;
 
+            // clearmem
+            sc = new ShellCommand(this.shellClearMem,
+                "clearmem",
+                "- Clears all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
+
+            // quantum <int>
+            sc = new ShellCommand(this.shellQuantum,
+                "quantum",
+                "<int> - Sets the Round Robin quantum value.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
+            sc = new ShellCommand(this.shellPs,
+                "ps",
+                "- Displays all active processes.");
+            this.commandList[this.commandList.length] = sc;
+
             // kill <id> - kills the specified process id.
+            sc = new ShellCommand(this.shellKill,
+                "kill",
+                "<pid> - Kills the active process.");
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -327,10 +354,25 @@ module DOGES {
                         _StdOut.putText("Load allocates the appropriate space amount in the main memory and loads the user program there.");
                         break;
                     case "run":
-                      _StdOut.putText("Run executes the user program already allocated in the main memory.");
+                        _StdOut.putText("Run executes the user program already allocated in the main memory.");
+                        break;
+                    case "runall":
+                        _StdOut.putText("Runall executes all user programs already loaded in the main memory.");
                         break;
                     case "suchspin":
                         _StdOut.putText("Suchspin spins Dogey the Shiba infinitely without hurting your eyes (hopefully).");
+                        break;
+                    case "clearmem":
+                        _StdOut.putText("Clearmem clears all memory partitions and resets the memory table.");
+                        break;
+                    case "quantum":
+                        _StdOut.putText("Quantum sets the quantum value for Round Robin scheduling.");
+                        break;
+                    case "ps":
+                        _StdOut.putText("PS displays the PIDs of all active processes.");
+                        break;
+                    case "kill":
+                        _StdOut.putText("Kill removes an active process.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -423,52 +465,117 @@ module DOGES {
         public shellLoad(args) {
             // Validate the input by allowing only hexadecimal numbers and spaces
             var programInput: string = (<HTMLTextAreaElement> document.getElementById("taProgramInput")).value;
+            programInput = Utils.trim(programInput).replace(/(?:\r\n|\r|\n)/g, " ").replace(/ /gm, "");
             var currentChar: string = "";
             var isValid: boolean;
 
-            if (programInput.length > 0) {
-                for (var j = 0; j < programInput.length; j++) {
-                    // We want to read one character at a time
-                    currentChar = programInput.substring(j, j + 1);
-
-                    // If any character in user input is invalid, the entire input is invalid.
-                    if (!currentChar.match(/([a-fA-F0-9\s])/g)) {
-                        isValid = false;
-                    }
+            if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE * 2) {
+                if (!programInput.match(/^[0-9\s*A-F\s*]+$/ig)) {
+                    isValid = false;
                 }
 
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {
-                    var pid: number = MemoryManager.loadProgram(programInput);
                     _StdOut.putText("Much loading. Very appreciate.");
                     _Console.advanceLine();
-                    _StdOut.putText("Assigned Process ID: " + pid);
-                    _CPU.isExecuting = false;
+                    MemoryManager.loadProgram(programInput);
                 }
-            } else {
+            } else if (programInput.length > PROGRAM_LIMIT) {
+                _StdOut.putText("Wat. Dat program. So big. Cannot load.");
+            } else if (programInput.length === 0) {
                 _StdOut.putText("Need code input. Much appreciate.");
             }
         }
 
         public shellRun(args) {
+            var validPID;
             if (args.length > 0) {
-                if (_CurrentProgram.PID !== null) {
-                  if (args[0] === _CurrentProgram.PID.toString()) {
-                    // Run the program
-                    _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
-                  }
+                // Loop through the resident list if there is a PCB with the appropriate PID
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (args[0] === _ResidentList[i].PID.toString()) {
+                        validPID = i;
+                    }
+                }
+                if (validPID != null) {
+                    if (_ResidentList[validPID].state !== PS_TERMINATED) {
+                        _ReadyQueue.enqueue(_ResidentList[validPID]);
+                        ProcessManager.pcbLog(_ResidentList[validPID]);
+
+                        // Call the interrupt and run the program
+                        _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, args[0]));
+                    }
                 } else {
-                  _StdOut.putText("Please supply a valid PID.");
+                    _StdOut.putText("Please supply a valid PID.");
                 }
             } else {
                 _StdOut.putText("Usage: run <pid>  Please supply a valid PID.");
             }
         }
 
+        public shellRunAll(args) {
+            if (_ResidentList.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (_ResidentList[i] !== undefined
+                        && _ResidentList[i].state !== PS_TERMINATED) {
+                        _ResidentList[i].state = PS_READY;
+                        _ReadyQueue.enqueue(_ResidentList[i]);
+                        ProcessManager.pcbLog(_ResidentList[i]);
+                    }
+                }
+                _KernelInterruptQueue.enqueue(new Interrupt(RUN_PROGRAM_IRQ, ""));
+            } else {
+                _StdOut.putText("Please load in a process to initiate runall.");
+            }
+        }
+
         public shellSpin(args) {
             document.getElementById("dogey").style.animation = "2s spinRight infinite linear";
             document.getElementById("dogey").style.webkitAnimation = "2s spinRight infinite linear";
+        }
+
+        public shellClearMem(args) {
+            MemoryManager.clearAll();
+            _StdOut.putText("All memory partitions have been cleared.");
+        }
+
+        public shellQuantum(args) {
+            if (args.length > 0) {
+                _Quantum = parseInt(args[0]);
+            } else {
+                _StdOut.putText("Usage: quantum <int>  Please supply a valid quantum value.");
+            }
+        }
+
+        public shellPs(args) {
+            if (_ResidentList.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (_ResidentList[i].state !== PS_TERMINATED &&
+                        _ResidentList[i].state !== PS_NEW) {
+                        _StdOut.putText("PID " + _ResidentList[i].PID + "; ");
+                    } else {
+                        _StdOut.putText("Wat. No active processes.");
+                    }
+                }    
+            } else {
+                _StdOut.putText("Wat. No active processes.");
+            }
+        }
+
+        public shellKill(args) {
+            if (args.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (args[0] === _ResidentList[i].PID.toString()) {
+                        _ResidentList[i].state = PS_TERMINATED;
+                        MemoryManager.clearSegment(_ResidentList[i].base);
+                        Control.memoryManagerLog(_Memory.memArray);
+                        ProcessManager.pcbLog(_ResidentList[i]);
+                        _ResidentList.splice(i, 1);
+                        _StdOut.putText("Killed PID " + args[0]);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

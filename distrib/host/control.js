@@ -53,16 +53,16 @@ var DOGES;
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("btnStartOS").focus();
             // Check for our testing and enrichment core, which
-            // may be referenced here (from index.html) as function Glados().
-            if (typeof Glados === "function") {
-                // function Glados() is here, so instantiate Her into
-                // the global (and properly capitalized) _GLaDOS variable.
-                _GLaDOS = new Glados();
-                _GLaDOS.init();
+            // may be referenced here (from index.html) as function Gladoges().
+            if (typeof Gladoges === "function") {
+                // function Gladoges() is here, so instantiate Her into
+                // the global (and properly capitalized) _GLaDOgeS variable.
+                _GLaDOgeS = new Gladoges();
+                _GLaDOgeS.init();
             }
         };
         Control.memoryManagerLog = function (memArray) {
-            // create HTML table
+            // Create HTML table
             document.getElementById("memoryTable").innerHTML = "";
             for (var i = 0; i < memArray.length; i++) {
                 if (i % 8 === 0) {
@@ -122,7 +122,7 @@ var DOGES;
         // Updates the CPU panel
         Control.cpuLog = function () {
             document.getElementById("cpu-pc").innerHTML = _CPU.PC.toString();
-            document.getElementById("cpu-accumulator").innerHTML = _CPU.Acc.toString();
+            document.getElementById("cpu-accumulator").innerHTML = _CPU.Acc.toString(16).toUpperCase();
             document.getElementById("cpu-xRegister").innerHTML = _CPU.Xreg.toString();
             document.getElementById("cpu-yRegister").innerHTML = _CPU.Yreg.toString();
             document.getElementById("cpu-zFlag").innerHTML = _CPU.Zflag.toString();
@@ -161,7 +161,7 @@ var DOGES;
             _taskbarClockID = setInterval(DOGES.Devices.taskbarClockPulse, 100);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new DOGES.Kernel();
-            _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.            
+            _Kernel.krnBootstrap(); // _GLaDOgeS.afterStartup() will get called in there, if configured.            
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");

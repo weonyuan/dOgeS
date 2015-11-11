@@ -11,10 +11,11 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 var APP_NAME = "dOgeS"; // such app
-var APP_VERSION = "0.2"; // very post-alpha
+var APP_VERSION = "3.0"; // rapid development. much fast.
 var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
+// Interrupts
 var KEYBOARD_IRQ = 1;
 var SYSCALL_IRQ = 2;
 var UNKNOWN_OPCODE_IRQ = 3;
@@ -22,7 +23,17 @@ var CPU_BREAK_IRQ = 4;
 var RUN_PROGRAM_IRQ = 5;
 var STEP_IRQ = 6;
 var STEP_MODE_IRQ = 7;
-var PROGRAM_LIMIT = 1; // at least for project 2...
+var MEMORY_VIOLATION_IRQ = 8;
+var CONTEXT_SWITCH_IRQ = 9;
+// Process States (used for context switching)
+var PS_NEW = 0;
+var PS_READY = 1;
+var PS_RUNNING = 2;
+var PS_WAITING = 3;
+var PS_TERMINATED = 4;
+// Scheduling routines
+var RR_SCH = 0;
+var PROGRAM_LIMIT = 3;
 var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
 var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
@@ -31,8 +42,15 @@ var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
 var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID = 0;
+var _ProcessManager;
+var _CpuScheduler;
+var _CycleCount = 0;
+var _ResidentList = null;
+var _ReadyQueue = null;
+var _Quantum = 6; // Quantum for Round Robin scheduling
 var _StepMode = false;
-var _CurrentProgram;
+var _CurrentProgram = null;
+var _CurrentScheduler = 0; // Default to Round Robin
 var _MemoryManager;
 var _Memory;
 var _OSclock = 0; // Page 23.
@@ -63,8 +81,8 @@ var _hardwareClockID = null;
 var _taskbarClockID = null;
 var _CurrentBufferIndex = 0;
 // For testing (and enrichment)...
-var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
-var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.
+var Gladoges = null; // This is the function Gladoges() in gladoges.js
+var _GLaDOgeS = null; // If the above is linked in, this is the instantiated instance of Gladoges.
 var onDocumentLoad = function () {
     DOGES.Control.hostInit();
 };

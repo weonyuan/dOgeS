@@ -26,6 +26,8 @@ var DOGES;
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new DOGES.Queue(); // Where device input lands before being processed out somewhere.
             _KernelBuffers.push("");
+            _ResidentList = new Array();
+            _ReadyQueue = new DOGES.Queue();
             // Initialize the console.
             _Console = new DOGES.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -48,8 +50,8 @@ var DOGES;
             _OsShell = new DOGES.Shell();
             _OsShell.init();
             // Finally, initiate student testing protocol.
-            if (_GLaDOS) {
-                _GLaDOS.afterStartup();
+            if (_GLaDOgeS) {
+                _GLaDOgeS.afterStartup();
             }
         };
         Kernel.prototype.krnShutdown = function () {
@@ -79,8 +81,7 @@ var DOGES;
             }
             else if (_CPU.isExecuting && !_StepMode) {
                 DOGES.Control.hostBtnStep_disable();
-                _CPU.cycle();
-                DOGES.ProcessManager.pcbLog();
+                this.handleCPUClockPulse();
             }
             else {
                 this.krnTrace("Idle");
@@ -119,27 +120,37 @@ var DOGES;
                     _StdIn.handleSyscall(params);
                     break;
                 case UNKNOWN_OPCODE_IRQ:
-                    this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchMemory(_CPU.PC - 1));
+                    this.krnTrace("Unknown opcode: " + DOGES.MemoryManager.fetchTwoBytes(_CPU.PC - 1));
+                    _CurrentProgram.state = PS_TERMINATED;
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 case CPU_BREAK_IRQ:
-                    _CPU.isExecuting = false;
-                    _CPU.init();
-                    // Once executed, the current program can't be run again
-                    _CurrentProgram.PID = null;
-                    DOGES.Control.cpuLog();
-                    DOGES.ProcessManager.clearLog();
-                    _Console.advanceLine();
-                    _OsShell.putPrompt();
+                    _CurrentProgram.state = PS_TERMINATED;
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 case RUN_PROGRAM_IRQ:
-                    _CPU.init();
-                    _CPU.isExecuting = true;
+                    if (_CPU.isExecuting
+                        && DOGES.CpuScheduler.determineContextSwitch()) {
+                        DOGES.CpuScheduler.performContextSwitch();
+                    }
+                    else {
+                        DOGES.ProcessManager.startRun();
+                    }
                     break;
                 case STEP_IRQ:
                     this.krnStep();
                     break;
                 case STEP_MODE_IRQ:
                     this.handleStepMode();
+                    break;
+                case MEMORY_VIOLATION_IRQ:
+                    // Terminate program
+                    this.krnTrace("Memory out of bounds. Terminating...");
+                    _CurrentProgram.state = PS_TERMINATED;
+                    DOGES.CpuScheduler.performContextSwitch();
+                    break;
+                case CONTEXT_SWITCH_IRQ:
+                    DOGES.CpuScheduler.performContextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -151,8 +162,9 @@ var DOGES;
         };
         // Every step will cycle the CPU and update the PCB log
         Kernel.prototype.krnStep = function () {
-            _CPU.cycle();
-            DOGES.ProcessManager.pcbLog();
+            if (_CurrentProgram !== null) {
+                this.handleCPUClockPulse();
+            }
         };
         // Responsible for enabling/disabling step button
         Kernel.prototype.handleStepMode = function () {
@@ -161,6 +173,23 @@ var DOGES;
             }
             else {
                 DOGES.Control.hostBtnStep_disable();
+            }
+        };
+        Kernel.prototype.handleCPUClockPulse = function () {
+            if (DOGES.CpuScheduler.determineContextSwitch()) {
+                this.krnInterruptHandler(CONTEXT_SWITCH_IRQ, _CurrentProgram);
+            }
+            _CPU.cycle();
+            for (var i = 0; i < _ResidentList.length; i++) {
+                if (_ResidentList[i].state === PS_READY) {
+                    _ResidentList[i].waiting++;
+                    _ResidentList[i].turnaround++;
+                    DOGES.ProcessManager.pcbLog(_ResidentList[i]);
+                }
+            }
+            if (_CurrentProgram !== null) {
+                _CurrentProgram.turnaround++;
+                DOGES.ProcessManager.pcbLog(_CurrentProgram);
             }
         };
         //
@@ -198,7 +227,6 @@ var DOGES;
         };
         Kernel.prototype.krnTrapError = function (msg) {
             DOGES.Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console
             _Console.showBsod(msg);
             this.krnShutdown();
         };

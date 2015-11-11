@@ -37,10 +37,29 @@ module DOGES {
             this.isExecuting = false;
         }
 
+        public start(currentProgram): void {
+            if (currentProgram !== null) {
+                this.PC = currentProgram.PC;
+                this.Acc = currentProgram.Acc;
+                this.Xreg = currentProgram.Xreg;
+                this.Yreg = currentProgram.Yreg;
+                this.Zflag = currentProgram.Zflag;
+            } else {
+                this.PC = 0;
+                this.Acc = 0;
+                this.Xreg = 0;
+                this.Yreg = 0;
+                this.Zflag = 0;
+            }
+            this.isExecuting = true;
+        }
+
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            _CycleCount++;
+
             this.execute(this.fetch());
 
             _CurrentProgram.PC = this.PC;
@@ -48,12 +67,11 @@ module DOGES {
             _CurrentProgram.Xreg = this.Xreg;
             _CurrentProgram.Yreg = this.Yreg;
             _CurrentProgram.Zflag = this.Zflag;
-            
             Control.cpuLog();
         }
 
         public fetch(): string {
-            return MemoryManager.fetchMemory(this.PC);
+            return MemoryManager.fetchTwoBytes(this.PC);
         }
 
         public execute(opcode): void {
@@ -85,6 +103,8 @@ module DOGES {
                 this.incByte();
             } else if (opcode === "FF") {
                 this.syscall();
+            } else {
+                _KernelInterruptQueue.enqueue(new Interrupt(UNKNOWN_OPCODE_IRQ, "UNKNOWN_OPCODE"));
             }
 
             // Increment program counter for every opcode executed
@@ -105,7 +125,7 @@ module DOGES {
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = MemoryManager.fetchMemory(addressBase10);
+            var source = MemoryManager.fetchTwoBytes(addressBase10);
             
             // Set the accumulator from the memory block value (base 10)
             this.Acc = this.translateBase16(source);
@@ -127,7 +147,7 @@ module DOGES {
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = MemoryManager.fetchMemory(addressBase10);
+            var source = MemoryManager.fetchTwoBytes(addressBase10);
 
             this.Acc += this.translateBase16(source);
         }
@@ -145,8 +165,8 @@ module DOGES {
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = MemoryManager.fetchMemory(addressBase10);
-            
+            var source = MemoryManager.fetchTwoBytes(addressBase10);
+
             // Set the X register from the memory block value (base 10)
             this.Xreg = this.translateBase16(source);
         }
@@ -164,7 +184,7 @@ module DOGES {
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = MemoryManager.fetchMemory(addressBase10);
+            var source = MemoryManager.fetchTwoBytes(addressBase10);
             
             // Set the Y register from the memory block value (base 10)
             this.Yreg = this.translateBase16(source);
@@ -192,7 +212,7 @@ module DOGES {
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = MemoryManager.fetchMemory(addressBase10);
+            var source = MemoryManager.fetchTwoBytes(addressBase10);
 
             if (parseInt(source, 16) === this.Xreg) {
                 this.Zflag = 1;
@@ -205,7 +225,7 @@ module DOGES {
         public bneBytes(): void {
             if (this.Zflag === 0) {
                 // Fetch the next two bytes and branch by that amount
-                this.PC += this.translateBase16(MemoryManager.fetchMemory(++this.PC)) + 1;
+                this.PC += this.translateBase16(MemoryManager.fetchTwoBytes(++this.PC)) + 1;
                 if (this.PC >= PROGRAM_SIZE) {
                     this.PC -= PROGRAM_SIZE;
                 }
@@ -221,7 +241,7 @@ module DOGES {
             memoryAddress = this.fetchNextTwoBytes(this.PC) + memoryAddress;
 
             var addressBase10 = this.translateBase16(memoryAddress);
-            var source = MemoryManager.fetchMemory(addressBase10);
+            var source = MemoryManager.fetchTwoBytes(addressBase10);
 
             var sourceInt = parseInt(source, 16) + 1;
             MemoryManager.storeToMemory(sourceInt.toString(16), addressBase10);
@@ -233,7 +253,7 @@ module DOGES {
         }
 
         public fetchNextTwoBytes(startAddress): string {
-            var nextTwoBytes = MemoryManager.fetchMemory(++this.PC);
+            var nextTwoBytes = MemoryManager.fetchTwoBytes(++this.PC);
 
             return nextTwoBytes;
         }

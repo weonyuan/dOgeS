@@ -2,16 +2,30 @@ module DOGES {
   export class MemoryManager {
     constructor() {}
 
-    public static loadProgram(programInput): number {
-      var newPcb = new Pcb();
-      _CurrentProgram = newPcb;
-      
-      this.loadToMemory(programInput);
+    // Loads the program into memory
+    public static loadProgram(programInput): void {
+      // Return a memory bound violation if Resident List is full
+      if (_ResidentList.length >= PROGRAM_LIMIT) {
+        _StdOut.putText("Memory very full. Cannot load. Much sadness.");
+      } else {
+        // Create a PCB
+        var newPcb = new Pcb();
 
-      return newPcb.PID;
+        // Find free memory to assign the base and limit registers
+        newPcb.base = this.fetchFreeBlock();
+        newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
+
+        // Push the new PCB into the Resident list
+        _ResidentList.push(newPcb);
+
+        // Then load the program into memory
+        this.loadToMemory(programInput, newPcb.base);
+
+        _StdOut.putText("Assigned Process ID: " + newPcb.PID);
+      }
     }
 
-    public static loadToMemory(programInput): void {
+    public static loadToMemory(programInput, startPoint): void {
       programInput = programInput.replace(/\s/g, "").toUpperCase();
 
       for (var i = 0; i < programInput.length / 2; i++) {
@@ -20,9 +34,9 @@ module DOGES {
         } else {
           currentCode = currentCode + 2;
         }
-        _Memory.memArray[i] = programInput.substring(currentCode, currentCode + 2);
+        _Memory.memArray[i + startPoint] = programInput.substring(currentCode, currentCode + 2);
         
-        DOGES.Control.memoryManagerLog(_Memory.memArray);
+        Control.memoryManagerLog(_Memory.memArray);
       }
     }
 
@@ -36,13 +50,51 @@ module DOGES {
         value = "0" + value;
       }
 
-      _Memory.memArray[targetAddress] = value.toUpperCase();
-      DOGES.Control.memoryManagerLog(_Memory.memArray);
+      if ((targetAddress + _CurrentProgram.base) <= _CurrentProgram.limit) {
+        _Memory.memArray[targetAddress + _CurrentProgram.base] = value.toUpperCase();
+        Control.memoryManagerLog(_Memory.memArray);
+      } else {
+        // Memory out of bounds
+        _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ, "");
+      }
+    }
+
+    // Finds the next available memory block and returns the appropriate address
+    public static fetchFreeBlock(): number {
+      var freeAddress = 0;
+      if (_ResidentList.length > 0) {
+        for (var i = 0; i < _ResidentList.length; i++) {
+          if ( _ResidentList[i] !== undefined
+            && _ResidentList[i].base === freeAddress) {
+            freeAddress += PROGRAM_SIZE;
+          }
+        }
+      }
+
+      return freeAddress;
     }
 
     // Returns two bytes already allocated in memory
-    public static fetchMemory(address): string {
-      return _Memory.memArray[address];
+    public static fetchTwoBytes(address): string {
+      return _Memory.memArray[_CurrentProgram.base + address];
+    }
+
+    // Clears one memory segment in main memory
+    public static clearSegment(startPoint): void {
+        if (startPoint === null || startPoint === undefined) {
+            startPoint = 0;
+        }
+
+        for (var i = startPoint; i < (startPoint + PROGRAM_SIZE); i++) {
+            _Memory.memArray[i] = "00";
+        }
+    }
+
+    // Clears all memory partitions
+    public static clearAll(): void {
+        _Memory.init();
+        _ResidentList = [];
+        Control.memoryManagerLog(_Memory.memArray);
     }
   }
 }

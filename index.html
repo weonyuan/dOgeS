@@ -10,7 +10,7 @@
 
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="distrib/globals.js"></script>
-   <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+   <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
    <script type="text/javascript" src="bootstrap.js"></script>
    <script type="text/javascript" src="bootstrap-switch.js"></script>
 
@@ -24,6 +24,7 @@
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
    <script type="text/javascript" src="distrib/os/canvastext.js"></script>
    <script type="text/javascript" src="distrib/os/console.js"></script>
+   <script type="text/javascript" src="distrib/os/cpuScheduler.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
    <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
@@ -37,8 +38,8 @@
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
-   <!-- Uncomment this line below to enable GLaDOS testing -->
-   <script type="text/javascript" src="glados.js"></script>
+   <!-- Uncomment this line below to enable GLaDOgeS testing -->
+   <script type="text/javascript" src="gladoges.js"></script>
 
    <style>
       .panel-body {
@@ -63,34 +64,34 @@
   </div>
   <div id="logo">< <img src="logo.png" id="dogey" style="position: relative; top: -4px;" width="40px" height="40px"> dOgeS ></div>
   <div id="divButtonBar" style="margin:4px;">
-     <div id="stepPanel">
-        <span style="margin-right: 5px">Step Mode</span>
-        <input id="stepModeSwitch"
-            type="checkbox"
-            name="step-mode"
-            data-size="small"
-            disabled />
-        <button id="btnStep"
-             class="btn btn-primary glyphicon glyphicon-forward"
-             onclick="DOGES.Control.hostBtnStep_click();"
-             disabled="true" />
-     </div>
-
-     <button id="btnStartOS"
-             class="btn btn-success glyphicon glyphicon-play"
-             tabindex="0"
-             onclick="DOGES.Control.hostBtnStartOS_click(this);" data-switch-toggle="disabled" />
+     <button id="btnReset"
+             class="btn btn-info glyphicon glyphicon-repeat"
+             tabindex="2"
+             onclick="DOGES.Control.hostBtnReset_click(this);"></button>
 
      <button id="btnHaltOS"
              class="btn btn-danger glyphicon glyphicon-stop"
              disabled="true"
              tabindex="1"
-             onclick="DOGES.Control.hostBtnHaltOS_click(this);" />
+             onclick="DOGES.Control.hostBtnHaltOS_click(this);"></button>
 
-     <button id="btnReset"
-             class="btn btn-info glyphicon glyphicon-repeat"
-             tabindex="2"
-             onclick="DOGES.Control.hostBtnReset_click(this);" />
+     <button id="btnStartOS"
+             class="btn btn-success glyphicon glyphicon-play"
+             tabindex="0"
+             onclick="DOGES.Control.hostBtnStartOS_click(this);" data-switch-toggle="disabled"></button>
+
+     <div id="stepPanel">
+        <input id="stepModeSwitch"
+               type="checkbox"
+               name="step-mode"
+               data-label-text="STEP"
+               data-size="small"
+               disabled />
+        <button id="btnStep"
+                class="btn btn-primary glyphicon glyphicon-forward"
+                onclick="DOGES.Control.hostBtnStep_click();"
+                disabled="true" />
+     </div>
   </div>
 </nav>
 <div id="divMain">
@@ -108,14 +109,7 @@
        <div id ="taHostLog" class="panel-body"></div>
    </div>
 
-   <div id="divUserProgramInput" class="panel panel-default">
-      <div class="panel-heading"><label>User Program Input</label></div>
-         <textarea name="taProgramInput"
-                   id  ="taProgramInput"
-         ></textarea>
-   </div>
-
-   <div id="divMemoryManager" class="panel panel-default" style="margin-bottom: 0">
+   <div id="divMemoryManager" class="panel panel-default">
       <div class="panel-heading"><label>Memory Manager</label></div>
       <div class="panel-body">
         <table id="memoryTable" class="table table-bordered"></table>
@@ -145,7 +139,7 @@
    </div>
 
    <div id="divPcb" class="panel panel-default">
-      <div class="panel-heading"><label>Current Process</label></div>
+      <div class="panel-heading"><label>Processes</label></div>
       <div class="panel-body">
         <table id="pcbTable" class="table">
           <tr>
@@ -155,17 +149,21 @@
             <th>X</th>
             <th>Y</th>
             <th>Z</th>
-          </tr>
-          <tr>
-            <td id="pcb-pid"></td>
-            <td id="pcb-pc"></td>
-            <td id="pcb-accumulator"></td>
-            <td id="pcb-xRegister"></td>
-            <td id="pcb-yRegister"></td>
-            <td id="pcb-zFlag"></td>
+            <th>Base</th>
+            <th>Limit</th>
+            <th>State</th>
+            <th>Turnaround</th>
+            <th>Waiting</th>
           </tr>
         </table>
       </div>
+   </div>
+
+   <div id="divUserProgramInput" class="panel panel-default" style="margin-bottom: 0">
+      <div class="panel-heading"><label>User Program Input</label></div>
+         <textarea name="taProgramInput"
+                   id  ="taProgramInput"
+         ></textarea>
    </div>
 </div>
 

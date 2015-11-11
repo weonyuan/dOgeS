@@ -3,13 +3,26 @@ var DOGES;
     var MemoryManager = (function () {
         function MemoryManager() {
         }
+        // Loads the program into memory
         MemoryManager.loadProgram = function (programInput) {
-            var newPcb = new DOGES.Pcb();
-            _CurrentProgram = newPcb;
-            this.loadToMemory(programInput);
-            return newPcb.PID;
+            // Return a memory bound violation if Resident List is full
+            if (_ResidentList.length >= PROGRAM_LIMIT) {
+                _StdOut.putText("Memory very full. Cannot load. Much sadness.");
+            }
+            else {
+                // Create a PCB
+                var newPcb = new DOGES.Pcb();
+                // Find free memory to assign the base and limit registers
+                newPcb.base = this.fetchFreeBlock();
+                newPcb.limit = newPcb.base + PROGRAM_SIZE - 1;
+                // Push the new PCB into the Resident list
+                _ResidentList.push(newPcb);
+                // Then load the program into memory
+                this.loadToMemory(programInput, newPcb.base);
+                _StdOut.putText("Assigned Process ID: " + newPcb.PID);
+            }
         };
-        MemoryManager.loadToMemory = function (programInput) {
+        MemoryManager.loadToMemory = function (programInput, startPoint) {
             programInput = programInput.replace(/\s/g, "").toUpperCase();
             for (var i = 0; i < programInput.length / 2; i++) {
                 if (i === 0) {
@@ -18,7 +31,7 @@ var DOGES;
                 else {
                     currentCode = currentCode + 2;
                 }
-                _Memory.memArray[i] = programInput.substring(currentCode, currentCode + 2);
+                _Memory.memArray[i + startPoint] = programInput.substring(currentCode, currentCode + 2);
                 DOGES.Control.memoryManagerLog(_Memory.memArray);
             }
         };
@@ -30,12 +43,46 @@ var DOGES;
             if (value.length === 1) {
                 value = "0" + value;
             }
-            _Memory.memArray[targetAddress] = value.toUpperCase();
-            DOGES.Control.memoryManagerLog(_Memory.memArray);
+            if ((targetAddress + _CurrentProgram.base) <= _CurrentProgram.limit) {
+                _Memory.memArray[targetAddress + _CurrentProgram.base] = value.toUpperCase();
+                DOGES.Control.memoryManagerLog(_Memory.memArray);
+            }
+            else {
+                // Memory out of bounds
+                _Kernel.krnInterruptHandler(MEMORY_VIOLATION_IRQ, "");
+            }
+        };
+        // Finds the next available memory block and returns the appropriate address
+        MemoryManager.fetchFreeBlock = function () {
+            var freeAddress = 0;
+            if (_ResidentList.length > 0) {
+                for (var i = 0; i < _ResidentList.length; i++) {
+                    if (_ResidentList[i] !== undefined
+                        && _ResidentList[i].base === freeAddress) {
+                        freeAddress += PROGRAM_SIZE;
+                    }
+                }
+            }
+            return freeAddress;
         };
         // Returns two bytes already allocated in memory
-        MemoryManager.fetchMemory = function (address) {
-            return _Memory.memArray[address];
+        MemoryManager.fetchTwoBytes = function (address) {
+            return _Memory.memArray[_CurrentProgram.base + address];
+        };
+        // Clears one memory segment in main memory
+        MemoryManager.clearSegment = function (startPoint) {
+            if (startPoint === null || startPoint === undefined) {
+                startPoint = 0;
+            }
+            for (var i = startPoint; i < (startPoint + PROGRAM_SIZE); i++) {
+                _Memory.memArray[i] = "00";
+            }
+        };
+        // Clears all memory partitions
+        MemoryManager.clearAll = function () {
+            _Memory.init();
+            _ResidentList = [];
+            DOGES.Control.memoryManagerLog(_Memory.memArray);
         };
         return MemoryManager;
     })();

@@ -27,7 +27,9 @@ module DOGES {
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
             _KernelBuffers.push("");
-            
+            _ResidentList = new Array();
+            _ReadyQueue = new Queue();
+                   
             // Initialize the console.
             _Console = new Console();          // The command line interface / console I/O device.
             _Console.init();
@@ -56,8 +58,8 @@ module DOGES {
             _OsShell.init();
 
             // Finally, initiate student testing protocol.
-            if (_GLaDOS) {
-                _GLaDOS.afterStartup();
+            if (_GLaDOgeS) {
+                _GLaDOgeS.afterStartup();
             }
         }
 
@@ -90,8 +92,7 @@ module DOGES {
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             } else if (_CPU.isExecuting && !_StepMode) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 Control.hostBtnStep_disable();
-                _CPU.cycle();
-                ProcessManager.pcbLog();
+                this.handleCPUClockPulse();
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
@@ -133,28 +134,36 @@ module DOGES {
                     _StdIn.handleSyscall(params);
                     break;
                 case UNKNOWN_OPCODE_IRQ:
-                    this.krnTrace("Unknown opcode: " + MemoryManager.fetchMemory(_CPU.PC - 1));
+                    this.krnTrace("Unknown opcode: " + MemoryManager.fetchTwoBytes(_CPU.PC - 1));
+                    _CurrentProgram.state = PS_TERMINATED;
+                    CpuScheduler.performContextSwitch();
                     break;
                 case CPU_BREAK_IRQ:
-                    _CPU.isExecuting = false;
-                    _CPU.init();
-
-                    // Once executed, the current program can't be run again
-                    _CurrentProgram.PID = null;
-                    Control.cpuLog();
-                    ProcessManager.clearLog();
-                    _Console.advanceLine();
-                    _OsShell.putPrompt();
+                    _CurrentProgram.state = PS_TERMINATED;
+                    CpuScheduler.performContextSwitch();
                     break;
                 case RUN_PROGRAM_IRQ:
-                    _CPU.init();
-                    _CPU.isExecuting = true;
+                    if (_CPU.isExecuting
+                        && CpuScheduler.determineContextSwitch()) {
+                        CpuScheduler.performContextSwitch();
+                    } else {
+                        ProcessManager.startRun();
+                    }
                     break;
                 case STEP_IRQ:
                     this.krnStep();
                     break;
                 case STEP_MODE_IRQ:
                     this.handleStepMode();
+                    break;
+                case MEMORY_VIOLATION_IRQ:
+                    // Terminate program
+                    this.krnTrace("Memory out of bounds. Terminating...");
+                    _CurrentProgram.state = PS_TERMINATED;
+                    CpuScheduler.performContextSwitch();
+                    break;
+                case CONTEXT_SWITCH_IRQ:
+                    CpuScheduler.performContextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
@@ -168,8 +177,9 @@ module DOGES {
 
         // Every step will cycle the CPU and update the PCB log
         public krnStep() {
-            _CPU.cycle();
-            ProcessManager.pcbLog();
+            if (_CurrentProgram !== null) {
+                this.handleCPUClockPulse();
+            }
         }
 
         // Responsible for enabling/disabling step button
@@ -178,6 +188,28 @@ module DOGES {
                 Control.hostBtnStep_enable();
             } else {
                 Control.hostBtnStep_disable();
+            }
+        }
+
+        public handleCPUClockPulse() {
+            if (CpuScheduler.determineContextSwitch()) {
+                this.krnInterruptHandler(CONTEXT_SWITCH_IRQ, _CurrentProgram);
+            }
+
+            _CPU.cycle();
+
+            for (var i = 0; i < _ResidentList.length; i++) {
+                if (_ResidentList[i].state === PS_READY) {
+                    _ResidentList[i].waiting++;
+                    _ResidentList[i].turnaround++;
+
+                    ProcessManager.pcbLog(_ResidentList[i]);
+                }
+            }
+
+            if (_CurrentProgram !== null) {
+                _CurrentProgram.turnaround++;
+                ProcessManager.pcbLog(_CurrentProgram);
             }
         }
 
@@ -218,7 +250,6 @@ module DOGES {
 
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
-            // TODO: Display error on console
             _Console.showBsod(msg);
             this.krnShutdown();
         }

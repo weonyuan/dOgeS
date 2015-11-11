@@ -12,12 +12,14 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "dOgeS";   // such app
-const APP_VERSION: string = "0.2";   // very post-alpha
+const APP_VERSION: string = "3.0";   // rapid development. much fast.
 
 const CPU_CLOCK_INTERVAL: number = 50;   // This is in ms (milliseconds) so 1000 = 1 second.
 
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
+
+// Interrupts
 const KEYBOARD_IRQ: number = 1;
 const SYSCALL_IRQ: number = 2;
 const UNKNOWN_OPCODE_IRQ: number = 3;
@@ -25,8 +27,20 @@ const CPU_BREAK_IRQ: number = 4;
 const RUN_PROGRAM_IRQ: number = 5;
 const STEP_IRQ: number = 6;
 const STEP_MODE_IRQ: number = 7;
+const MEMORY_VIOLATION_IRQ: number = 8;
+const CONTEXT_SWITCH_IRQ: number = 9;
 
-const PROGRAM_LIMIT: number = 1; // at least for project 2...
+// Process States (used for context switching)
+const PS_NEW: number = 0;
+const PS_READY: number = 1;
+const PS_RUNNING: number = 2;
+const PS_WAITING: number = 3;
+const PS_TERMINATED: number = 4;
+
+// Scheduling routines
+const RR_SCH: number = 0;
+
+const PROGRAM_LIMIT: number = 3;
 const PROGRAM_SIZE: number = 256; // every program is allocated 256 bytes
 const MEMORY_SIZE: number = PROGRAM_SIZE * PROGRAM_LIMIT;
 
@@ -36,10 +50,18 @@ const MEMORY_SIZE: number = PROGRAM_SIZE * PROGRAM_LIMIT;
 //
 var _CPU: DOGES.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _PID: number = 0;
+var _ProcessManager: DOGES.ProcessManager;
+var _CpuScheduler: DOGES.CpuScheduler;
+var _CycleCount: number = 0;
+
+var _ResidentList: any = null;
+var _ReadyQueue: any = null;
+var _Quantum: number = 6; // Quantum for Round Robin scheduling
 
 var _StepMode: boolean = false;
 
-var _CurrentProgram;
+var _CurrentProgram: any = null;
+var _CurrentScheduler: number = 0; // Default to Round Robin
 
 var _MemoryManager: DOGES.MemoryManager;
 var _Memory: DOGES.Memory;
@@ -83,8 +105,8 @@ var _taskbarClockID: number = null;
 var _CurrentBufferIndex: number = 0;
 
 // For testing (and enrichment)...
-var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
-var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.
+var Gladoges: any = null;  // This is the function Gladoges() in gladoges.js
+var _GLaDOgeS: any = null; // If the above is linked in, this is the instantiated instance of Gladoges.
 
 var onDocumentLoad = function() {
 	DOGES.Control.hostInit();

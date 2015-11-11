@@ -12,7 +12,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "dOgeS";   // such app
-const APP_VERSION: string = "0.3";   // very post-alpha
+const APP_VERSION: string = "3.0";   // rapid development. much fast.
 
 const CPU_CLOCK_INTERVAL: number = 50;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -105,8 +105,8 @@ var _taskbarClockID: number = null;
 var _CurrentBufferIndex: number = 0;
 
 // For testing (and enrichment)...
-var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
-var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.
+var Gladoges: any = null;  // This is the function Gladoges() in gladoges.js
+var _GLaDOgeS: any = null; // If the above is linked in, this is the instantiated instance of Gladoges.
 
 var onDocumentLoad = function() {
 	DOGES.Control.hostInit();

@@ -50,8 +50,8 @@ var DOGES;
             _OsShell = new DOGES.Shell();
             _OsShell.init();
             // Finally, initiate student testing protocol.
-            if (_GLaDOS) {
-                _GLaDOS.afterStartup();
+            if (_GLaDOgeS) {
+                _GLaDOgeS.afterStartup();
             }
         };
         Kernel.prototype.krnShutdown = function () {

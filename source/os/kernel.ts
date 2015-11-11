@@ -58,8 +58,8 @@ module DOGES {
             _OsShell.init();
 
             // Finally, initiate student testing protocol.
-            if (_GLaDOS) {
-                _GLaDOS.afterStartup();
+            if (_GLaDOgeS) {
+                _GLaDOgeS.afterStartup();
             }
         }
 

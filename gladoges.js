@@ -1,8 +1,8 @@
 //
-// glados.js - It's for testing. And enrichment.
+// gladoges.js - It's for testing. And enrichment.
 //
 
-function Glados() {
+function Gladoges() {
    this.version = 2112;
 
    this.init = function() {
@@ -91,7 +91,7 @@ function Glados() {
                                                      DOGES.Kernel.prototype.krnInterruptHandler(KEYBOARD_IRQ, [13, false]);                                        
                                                       }, 2000);
 
-            setTimeout(function(){ document.getElementById("taProgramInput").value = code2;
+            setTimeout(function(){ document.getElementById("taProgramInput").value = code3;
                                                      _KernelInputQueue.enqueue('l');
                                                      _KernelInputQueue.enqueue('o');
                                                      _KernelInputQueue.enqueue('a');

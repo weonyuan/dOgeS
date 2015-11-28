@@ -151,6 +151,12 @@ module DOGES {
                 "<pid> - Kills the active process.");
             this.commandList[this.commandList.length] = sc;
 
+            // setschedule <schedule>
+            sc = new ShellCommand(this.shellSetSchedule,
+              "setschedule",
+              "<schedule> - Sets the CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -374,6 +380,9 @@ module DOGES {
                     case "kill":
                         _StdOut.putText("Kill removes an active process.");
                         break;
+                    case "setschedule":
+                        _StdOut.putText("Setschedule sets the CPU scheduling routine.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -575,6 +584,20 @@ module DOGES {
                         break;
                     }
                 }
+            }
+        }
+
+        public shellSetSchedule(args) {
+            if (args.length > 0) {
+                if (args[0] === "fcfs") {
+                    _StdOut.putText("CPU scheduling set to FCFS.");
+                } else if (args[0] === "priority") {
+                    _StdOut.putText("CPU scheduling set to Priority.");
+                } else if (args[0] === "rr") {
+                    _StdOut.putText("CPU scheduler set to Round Robin.");
+                }
+            } else {
+              _StdOut.putText("Usage: setschedule <schedule>  Please supply a valid scheduling routine.");
             }
         }
     }

@@ -505,12 +505,15 @@ var DOGES;
         Shell.prototype.shellSetSchedule = function (args) {
             if (args.length > 0) {
                 if (args[0] === "fcfs") {
+                    _CurrentScheduler = FCFS_SCH;
                     _StdOut.putText("CPU scheduling set to FCFS.");
                 }
                 else if (args[0] === "priority") {
+                    _CurrentScheduler = PRIORITY_SCH;
                     _StdOut.putText("CPU scheduling set to Priority.");
                 }
                 else if (args[0] === "rr") {
+                    _CurrentScheduler = RR_SCH;
                     _StdOut.putText("CPU scheduler set to Round Robin.");
                 }
             }

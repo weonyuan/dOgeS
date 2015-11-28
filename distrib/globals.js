@@ -11,7 +11,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 var APP_NAME = "dOgeS"; // such app
-var APP_VERSION = "3.0"; // rapid development. much fast.
+var APP_VERSION = "4.0"; // rapid development. much fast.
 var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
@@ -33,6 +33,8 @@ var PS_WAITING = 3;
 var PS_TERMINATED = 4;
 // Scheduling routines
 var RR_SCH = 0;
+var FCFS_SCH = 1;
+var PRIORITY_SCH = 2;
 var PROGRAM_LIMIT = 3;
 var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
 var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;

@@ -12,7 +12,7 @@
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
 const APP_NAME: string    = "dOgeS";   // such app
-const APP_VERSION: string = "3.0";   // rapid development. much fast.
+const APP_VERSION: string = "4.0";   // rapid development. much fast.
 
 const CPU_CLOCK_INTERVAL: number = 50;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -39,6 +39,8 @@ const PS_TERMINATED: number = 4;
 
 // Scheduling routines
 const RR_SCH: number = 0;
+const FCFS_SCH: number = 1;
+const PRIORITY_SCH: number = 2;
 
 const PROGRAM_LIMIT: number = 3;
 const PROGRAM_SIZE: number = 256; // every program is allocated 256 bytes

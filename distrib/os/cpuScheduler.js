@@ -40,6 +40,7 @@ var DOGES;
                     this.fcfsSwitch(nextProgram);
                 }
                 else if (_CurrentScheduler === PRIORITY_SCH) {
+                    this.prioritySwitch(nextProgram);
                 }
             }
             else if (_CurrentProgram.state === PS_TERMINATED) {
@@ -50,6 +51,21 @@ var DOGES;
             }
             // Reset the cycle count after every context switch
             _CycleCount = 0;
+        };
+        // Find the next program to execute
+        CpuScheduler.findNextProgram = function () {
+            var nextProgram = null;
+            var lowestPriority = null;
+            if (_CurrentScheduler === PRIORITY_SCH) {
+                for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                }
+                console.log(_ReadyQueue);
+                nextProgram = _ReadyQueue.dequeue();
+            }
+            else {
+                nextProgram = _ReadyQueue.dequeue();
+            }
+            return nextProgram;
         };
         // RR Context Switching
         CpuScheduler.roundRobinSwitch = function (nextProgram) {
@@ -79,6 +95,9 @@ var DOGES;
         CpuScheduler.fcfsSwitch = function (nextProgram) {
             // wow. such recycle.
             this.roundRobinSwitch(nextProgram);
+        };
+        // Priority Context Switching
+        CpuScheduler.prioritySwitch = function (nextProgram) {
         };
         return CpuScheduler;
     })();

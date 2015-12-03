@@ -6,7 +6,7 @@
 
 module DOGES {
     export class DeviceDriver {
-        public version = '0.2';
+        public version = '4.0';
         public status = 'unloaded';
         public preemptable = false;
 

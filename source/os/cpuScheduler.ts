@@ -38,7 +38,7 @@ module DOGES {
             } else if (_CurrentScheduler === FCFS_SCH) {
                 this.fcfsSwitch(nextProgram);
             } else if (_CurrentScheduler === PRIORITY_SCH) {
-
+                this.prioritySwitch(nextProgram);
             }
         } else if (_CurrentProgram.state === PS_TERMINATED) {
             // CPU is finished running all programs
@@ -50,6 +50,24 @@ module DOGES {
 
         // Reset the cycle count after every context switch
         _CycleCount = 0;
+    }
+
+    // Find the next program to execute
+    public static findNextProgram(): any {
+        var nextProgram = null;
+        var lowestPriority = null;
+        if (_CurrentScheduler === PRIORITY_SCH) {
+            for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+
+            }
+            console.log(_ReadyQueue);
+
+            nextProgram = _ReadyQueue.dequeue();
+        } else {
+            nextProgram = _ReadyQueue.dequeue();
+        }
+
+        return nextProgram;
     }
 
     // RR Context Switching
@@ -81,6 +99,11 @@ module DOGES {
     public static fcfsSwitch(nextProgram): void {
         // wow. such recycle.
         this.roundRobinSwitch(nextProgram);
+    }
+
+    // Priority Context Switching
+    public static prioritySwitch(nextProgram): void {
+
     }
   }
 }

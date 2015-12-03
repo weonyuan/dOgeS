@@ -157,6 +157,12 @@ module DOGES {
               "<schedule> - Sets the CPU scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
 
+            // getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+              "getschedule",
+              "- Displays the current CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -383,6 +389,9 @@ module DOGES {
                     case "setschedule":
                         _StdOut.putText("Setschedule sets the CPU scheduling routine.");
                         break;
+                    case "getschedule":
+                        _StdOut.putText("Getschedule displays the current CPU scheduling routine.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -602,6 +611,16 @@ module DOGES {
             } else {
               _StdOut.putText("Usage: setschedule <schedule>  Please supply a valid scheduling routine.");
             }
+        }
+
+        public shellGetSchedule(args) {
+           if (_CurrentScheduler === FCFS_SCH) {
+               _StdOut.putText("The current CPU scheduler is FCFS.");
+           } else if (_CurrentScheduler === PRIORITY_SCH) {
+               _StdOut.putText("The current CPU scheduler is Priority.");
+           } else if (_CurrentScheduler === RR_SCH) {
+               _StdOut.putText("The current CPU scheduler is Round Robin.");
+           }
         }
     }
 }

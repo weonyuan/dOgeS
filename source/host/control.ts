@@ -1,4 +1,5 @@
 ///<reference path="../globals.ts" />
+///<reference path="../jquery.d.ts" />
 ///<reference path="../os/canvastext.ts" />
 
 /* ------------
@@ -29,6 +30,18 @@ module DOGES {
 
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+
+            // Activate Memory View switch
+            $("#memoryViewSwitch").bootstrapSwitch("state");
+            $("#memoryViewSwitch").on("switchChange.bootstrapSwitch", function(event, state) {
+                if (state) {
+                    $("#mainMemory").hide();
+                    $("#hardDrive").show();
+                } else {
+                    $("#mainMemory").show();
+                    $("#hardDrive").hide();
+                }
+            });
 
             // Activate pretty Step Mode switch and set interrupt for toggling
             $("#stepModeSwitch").bootstrapSwitch();
@@ -165,8 +178,9 @@ module DOGES {
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
-            // .. enable the Step Mode switch ...
+            // .. enable the Step Mode and Memory View switches ...
             $("#stepModeSwitch").bootstrapSwitch("toggleDisabled");
+            $("#memoryViewSwitch").bootstrapSwitch("toggleDisabled");
 
             // .. enable the Halt and Reset buttons ...
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;

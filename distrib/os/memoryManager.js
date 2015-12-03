@@ -1,3 +1,4 @@
+///<reference path="../globals.ts" />
 var DOGES;
 (function (DOGES) {
     var MemoryManager = (function () {

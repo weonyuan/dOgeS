@@ -1,3 +1,5 @@
+///<reference path="../globals.ts" />
+
 module DOGES {
   export class MemoryManager {
     constructor() {}

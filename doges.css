@@ -170,6 +170,29 @@ h3 {
   border-bottom: 1px solid #ddd;
 }
 
+.bootstrap-switch-id-memoryViewSwitch {
+  float: right;
+}
+
+#hardDrive {
+  display: none;
+}
+
+#hd-tsb {
+  text-align: center;
+  width: 15%;
+}
+
+#hd-meta {
+  text-align: left;
+  width: 12%;
+}
+
+#hd-data {
+  text-align: left;
+  width: 73%;
+}
+
 #divPcb {
   float: left;
   width: 54%;

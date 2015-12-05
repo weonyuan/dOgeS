@@ -174,21 +174,21 @@ h3 {
   float: right;
 }
 
-#hardDrive {
+#fileSystem {
   display: none;
 }
 
-#hd-tsb {
+#fs-tsb {
   text-align: center;
   width: 15%;
 }
 
-#hd-meta {
+#fs-meta {
   text-align: left;
   width: 12%;
 }
 
-#hd-data {
+#fs-data {
   text-align: left;
   width: 73%;
 }

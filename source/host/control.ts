@@ -36,10 +36,10 @@ module DOGES {
             $("#memoryViewSwitch").on("switchChange.bootstrapSwitch", function(event, state) {
                 if (state) {
                     $("#mainMemory").hide();
-                    $("#hardDrive").show();
+                    $("#fileSystem").show();
                 } else {
                     $("#mainMemory").show();
-                    $("#hardDrive").hide();
+                    $("#fileSystem").hide();
                 }
             });
 

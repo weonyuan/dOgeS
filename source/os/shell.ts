@@ -111,56 +111,62 @@ module DOGES {
 
             // run <pid>
             sc = new ShellCommand(this.shellRun,
-              "run",
-              "<pid> - Runs a program already in memory");
+                                  "run",
+                                  "<pid> - Runs a program already in memory");
             this.commandList[this.commandList.length] = sc;
 
             // runall
             sc = new ShellCommand(this.shellRunAll,
-                "runall",
-                "- Runs all programs in memory");
+                                  "runall",
+                                  "- Runs all programs in memory");
             this.commandList[this.commandList.length] = sc;            
 
             // suchspin
             sc = new ShellCommand(this.shellSpin,
-                "suchspin",
-                "- Dogey the Shiba will spin. Just for you.");
+                                  "suchspin",
+                                  "- Dogey the Shiba will spin. Just for you.");
             this.commandList[this.commandList.length] = sc;
 
             // clearmem
             sc = new ShellCommand(this.shellClearMem,
-                "clearmem",
-                "- Clears all memory partitions.");
+                                  "clearmem",
+                                  "- Clears all memory partitions.");
             this.commandList[this.commandList.length] = sc;
 
             // quantum <int>
             sc = new ShellCommand(this.shellQuantum,
-                "quantum",
-                "<int> - Sets the Round Robin quantum value.");
+                                  "quantum",
+                                  "<int> - Sets the Round Robin quantum value.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
             sc = new ShellCommand(this.shellPs,
-                "ps",
-                "- Displays all active processes.");
+                                  "ps",
+                                  "- Displays all active processes.");
             this.commandList[this.commandList.length] = sc;
 
             // kill <id> - kills the specified process id.
             sc = new ShellCommand(this.shellKill,
-                "kill",
-                "<pid> - Kills the active process.");
+                                  "kill",
+                                  "<pid> - Kills the active process.");
             this.commandList[this.commandList.length] = sc;
 
             // setschedule <schedule>
             sc = new ShellCommand(this.shellSetSchedule,
-              "setschedule",
-              "<schedule> - Sets the CPU scheduling algorithm.");
+                                  "setschedule",
+                                  "<schedule> - Sets the CPU scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
 
             // getschedule
             sc = new ShellCommand(this.shellGetSchedule,
-              "getschedule",
-              "- Displays the current CPU scheduling algorithm.");
+                                  "getschedule",
+                                  "- Displays the current CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // create <filename>
+            sc = new ShellCommand(this.shellCreateFile,
+                                  "create",
+                                  "<filename> - Creates a new file with the given name.");
             this.commandList[this.commandList.length] = sc;
 
             //
@@ -392,6 +398,9 @@ module DOGES {
                     case "getschedule":
                         _StdOut.putText("Getschedule displays the current CPU scheduling routine.");
                         break;
+                    case "create":
+                        _StdOut.putText("Create creates a new file with its filename as the given parameter.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -621,6 +630,15 @@ module DOGES {
            } else if (_CurrentScheduler === RR_SCH) {
                _StdOut.putText("The current CPU scheduler is Round Robin.");
            }
+        }
+
+        public shellCreateFile(args) {
+            if (args.length > 0) {
+                _krnFileSystemDriver.createFile(args[0]);
+                _StdOut.putText("Much success. Created file " + args[0]);
+            } else {
+                _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
+            }
         }
     }
 }

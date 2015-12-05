@@ -91,6 +91,9 @@ var DOGES;
             // getschedule
             sc = new DOGES.ShellCommand(this.shellGetSchedule, "getschedule", "- Displays the current CPU scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
+            // create <filename>
+            sc = new DOGES.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a new file with the given name.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -307,6 +310,9 @@ var DOGES;
                         break;
                     case "getschedule":
                         _StdOut.putText("Getschedule displays the current CPU scheduling routine.");
+                        break;
+                    case "create":
+                        _StdOut.putText("Create creates a new file with its filename as the given parameter.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -536,6 +542,15 @@ var DOGES;
             }
             else if (_CurrentScheduler === RR_SCH) {
                 _StdOut.putText("The current CPU scheduler is Round Robin.");
+            }
+        };
+        Shell.prototype.shellCreateFile = function (args) {
+            if (args.length > 0) {
+                _krnFileSystemDriver.createFile(args[0]);
+                _StdOut.putText("Much success. Created file " + args[0]);
+            }
+            else {
+                _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
             }
         };
         return Shell;

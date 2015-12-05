@@ -161,8 +161,8 @@ h3 {
 }
 
 #divMemoryManager .panel-body {
-  height: 150px;
-  overflow-x: hidden;
+  height: 160px;
+  overflow-x: auto;
   overflow-y: auto;
 }
 
@@ -178,17 +178,17 @@ h3 {
   display: none;
 }
 
-#fs-tsb {
+.fs-tsb {
   text-align: center;
   width: 15%;
 }
 
-#fs-meta {
-  text-align: left;
+.fs-meta {
+  text-align: center;
   width: 12%;
 }
 
-#fs-data {
+.fs-data {
   text-align: left;
   width: 73%;
 }

@@ -47,8 +47,7 @@ module DOGES {
             // Load the File System Driver
             this.krnTrace("Loading the file system driver.");
             _krnFileSystemDriver = new DeviceDriverFileSystem();    // Construct the file system.
-            _krnFileSystemDriver.driverEntry();
-            _krnFileSystemDriver.format();
+            _krnFileSystemDriver.init();
             this.krnTrace(_krnFileSystemDriver.status);
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)

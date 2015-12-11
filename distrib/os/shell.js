@@ -94,6 +94,9 @@ var DOGES;
             // create <filename>
             sc = new DOGES.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a new file with the given name.");
             this.commandList[this.commandList.length] = sc;
+            // write <filename> <string>
+            sc = new DOGES.ShellCommand(this.shellWriteFile, "write", "<filename> <string> - Writes the string into the designated file.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -313,6 +316,9 @@ var DOGES;
                         break;
                     case "create":
                         _StdOut.putText("Create creates a new file with its filename as the given parameter.");
+                        break;
+                    case "write":
+                        _StdOut.putText("Write writes the given data into the designated file.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -551,6 +557,15 @@ var DOGES;
             }
             else {
                 _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
+            }
+        };
+        Shell.prototype.shellWriteFile = function (args) {
+            if (args.length > 1) {
+                _krnFileSystemDriver.writeFile(args[0], args[1]);
+                _StdOut.putText("Writing file " + args[0] + ". Very wait.");
+            }
+            else {
+                _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
             }
         };
         return Shell;

@@ -58,6 +58,7 @@ var DOGES;
                     }
                 }
             }
+            this.createMBR();
             this.displayFsLog();
         };
         // Initalize block data with zeroes
@@ -72,6 +73,10 @@ var DOGES;
         DeviceDriverFileSystem.prototype.init = function () {
             // Format the file system
             this.format();
+            this.driverEntry();
+        };
+        // Create the master boot record
+        DeviceDriverFileSystem.prototype.createMBR = function () {
             // Then initialize the MBR
             var mbrKey = this.findFreeDirEntry();
             // MBR is allocated to 0:0:0 but pointers are '-'
@@ -79,7 +84,6 @@ var DOGES;
             var mbrMeta = "1---";
             var mbrData = mbrMeta + "001100";
             this.writeData(mbrKey, mbrData);
-            this.driverEntry();
         };
         // Looks for the first bit in the meta section
         DeviceDriverFileSystem.prototype.isUsed = function (block) {
@@ -196,10 +200,18 @@ var DOGES;
             var dirEntryKey = this.findFile(filename);
             // Then get the data to retrieve the last three meta bits for data lookup
             var dirEntryData = sessionStorage.getItem(dirEntryKey);
-            var fileEntryKey = dirEntryData.substring(1, this.metaSize);
-            var fileEntryData = sessionStorage.getItem(fileEntryKey);
-            console.log(fileEntryData);
-            this.decodeString(fileEntryData);
+            var startFileAddress = dirEntryData.substring(1, this.metaSize);
+            var startFileData = sessionStorage.getItem(startFileAddress);
+            var startFileMeta = startFileData.substring(1, this.metaSize);
+            var fileEntryMeta = startFileMeta;
+            var data = this.decodeString(startFileData);
+            while (fileEntryMeta !== "---") {
+                var fileEntryData = sessionStorage.getItem(fileEntryMeta);
+                console.log(fileEntryData);
+                fileEntryMeta = fileEntryData.substring(1, this.metaSize);
+                data += this.decodeString(fileEntryData);
+            }
+            _StdOut.putText(data);
         };
         // Writes the data into the specified file
         DeviceDriverFileSystem.prototype.writeFile = function (filename, data) {

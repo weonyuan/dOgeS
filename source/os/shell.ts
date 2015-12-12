@@ -181,6 +181,12 @@ module DOGES {
                                   "<filename> - Reads the designated file's data.");
             this.commandList[this.commandList.length] = sc;
 
+            // format
+            sc = new ShellCommand(this.shellFormat,
+                                  "format",
+                                  "- Clears all data in the file system.");
+            this.commandList[this.commandList.length] = sc;
+
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -418,6 +424,9 @@ module DOGES {
                         break;
                     case "read":
                         _StdOut.putText("Read reads the given filename's data stored in the data entry.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Format clears all user data in the file system.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -661,8 +670,8 @@ module DOGES {
 
         public shellWriteFile(args) {
             if (args.length > 1) {
-                _krnFileSystemDriver.writeFile(args[0], args[1]);
                 _StdOut.putText("Writing file " + args[0] + ". Very wait.");
+                _krnFileSystemDriver.writeFile(args[0], args[1]);
             } else {
                 _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
             }
@@ -670,11 +679,15 @@ module DOGES {
 
         public shellReadFile(args) {
             if (args.length > 0) {
-                _krnFileSystemDriver.readFile(args[0]);
                 _StdOut.putText("Reading file " + args[0] + " now...");
+                _krnFileSystemDriver.readFile(args[0]);
             } else {
                 _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
             }
+        }
+
+        public shellFormat(args) {
+            _krnFileSystemDriver.format();
         }
     }
 }

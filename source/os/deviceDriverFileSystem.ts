@@ -55,6 +55,7 @@ module DOGES {
                 }
             }
 
+            this.createMBR();
             this.displayFsLog();
         }
 
@@ -72,7 +73,11 @@ module DOGES {
         public init(): void {
             // Format the file system
             this.format();
+            this.driverEntry();
+        }
 
+        // Create the master boot record
+        public createMBR(): void {
             // Then initialize the MBR
             var mbrKey = this.findFreeDirEntry();
 
@@ -82,8 +87,6 @@ module DOGES {
             var mbrData = mbrMeta + "001100";
             
             this.writeData(mbrKey, mbrData);
-
-            this.driverEntry();
         }
 
         // Looks for the first bit in the meta section
@@ -220,13 +223,22 @@ module DOGES {
             var dirEntryKey = this.findFile(filename);
             // Then get the data to retrieve the last three meta bits for data lookup
             var dirEntryData = sessionStorage.getItem(dirEntryKey);
+
+            var startFileAddress = dirEntryData.substring(1, this.metaSize);            
+            var startFileData = sessionStorage.getItem(startFileAddress);
+            var startFileMeta = startFileData.substring(1, this.metaSize);
+
+            var fileEntryMeta = startFileMeta;
+            var data = this.decodeString(startFileData);
+
+            while (fileEntryMeta !== "---") {
+                var fileEntryData = sessionStorage.getItem(fileEntryMeta);
+                console.log(fileEntryData);
+                fileEntryMeta = fileEntryData.substring(1, this.metaSize);
+                data += this.decodeString(fileEntryData);
+            }
             
-
-            var fileEntryKey = dirEntryData.substring(1, this.metaSize);
-            var fileEntryData = sessionStorage.getItem(fileEntryKey);
-            console.log(fileEntryData);
-
-            this.decodeString(fileEntryData);
+            _StdOut.putText(data);
         }
 
         // Writes the data into the specified file

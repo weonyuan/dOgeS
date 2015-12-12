@@ -24,7 +24,7 @@ var DOGES;
             if (blockSize === void 0) { blockSize = 0; }
             if (dataLength === void 0) { dataLength = 0; }
             if (metaSize === void 0) { metaSize = 0; }
-            // Override the base method pointers.
+            // Override the base method pointers
             _super.call(this, this.krnFsDriverEntry, this.krnFsISR);
             this.tracks = tracks;
             this.sectors = sectors;
@@ -32,18 +32,18 @@ var DOGES;
             this.blockSize = blockSize;
             this.dataLength = dataLength;
             this.metaSize = metaSize;
-            // Constants for the file system.
+            // Constants for the file system
             this.tracks = 4;
             this.sectors = 8;
             this.blocks = 8;
-            // Total size (bytes) of a block.
+            // Total size (bytes) of a block
             this.blockSize = 64;
             this.dataLength = 120;
-            // Bytes allocated for the block's meta.
+            // Bytes allocated for the block's meta
             this.metaSize = 4;
         }
         DeviceDriverFileSystem.prototype.krnFsDriverEntry = function () {
-            // Initialization routine for this, the kernel-mode File System Device Driver.
+            // Initialization routine for this, the kernel-mode File System Device Driver
             this.status = "File system driver loaded.";
             this.displayFsLog();
         };
@@ -119,14 +119,11 @@ var DOGES;
                 }
             }
         };
-        DeviceDriverFileSystem.prototype.findFreeBlock = function () {
-        };
         // Returns the TSB address location of the filename
         DeviceDriverFileSystem.prototype.findFile = function (filename) {
             var key = null;
             var data = null;
             var encodedFilename = this.encodeString(filename);
-            console.log("encodedFilename: " + encodedFilename);
             for (var i = 0; i < this.sectors; i++) {
                 for (var j = 0; j < this.blocks; j++) {
                     key = "0" + i.toString() + j.toString();
@@ -137,7 +134,6 @@ var DOGES;
                         return key;
                         break;
                     }
-                    console.log(key);
                 }
             }
             return null;
@@ -177,8 +173,8 @@ var DOGES;
         };
         // Used to determine whether to set the pointer null
         // or to the next block where the data surpasses its allocated size
-        DeviceDriverFileSystem.prototype.defineAddressPointer = function (data) {
-            if (data.length <= (this.blockSize - this.metaSize)) {
+        DeviceDriverFileSystem.prototype.defineAddressPointer = function (numChunks) {
+            if (numChunks <= 1) {
                 return "---";
             }
             else {
@@ -205,22 +201,50 @@ var DOGES;
             console.log(fileEntryData);
             this.decodeString(fileEntryData);
         };
-        // Writes the data into the specified file.
+        // Writes the data into the specified file
         DeviceDriverFileSystem.prototype.writeFile = function (filename, data) {
-            var length = data.length;
-            var startAddress = this.findFreeDataEntry(); // start point of file entry block
+            var dataChunks = [];
+            var chunkSize = this.blockSize - this.metaSize;
             var dirEntryKey = this.findFile(filename);
             var dirEntryData = sessionStorage.getItem(dirEntryKey);
-            dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
-            console.log(dirEntryData);
-            while (length / (this.blockSize - this.metaSize) > 0) {
-                var newKey = this.findFreeDataEntry();
-                var newData = "1" + this.defineAddressPointer(data) + this.encodeString(data);
-                // Write to the newly allocated file entry block
-                sessionStorage.setItem(newKey, newData);
-                length -= this.blockSize - this.metaSize;
+            var dirEntryMeta = dirEntryData.substring(1, this.metaSize);
+            // Data chunking process by 60 bytes
+            for (var i = 0; i < (data.length / (this.blockSize - this.metaSize)); i++) {
+                dataChunks.push(data.substring(i * chunkSize, (i + 1) * chunkSize));
             }
-            sessionStorage.setItem(dirEntryKey, dirEntryData);
+            // If data is not a multiple of the chunk size, push the remaining characters in
+            if (data.length % chunkSize === 0) {
+                dataChunks.push(data.substring(data.length % chunkSize, data.length));
+            }
+            // If TSB pointer is null or 000, data has not been written to the file yet
+            if (dirEntryMeta === "---" || dirEntryMeta === "000") {
+                // Allocate data blocks and store data there
+                var startAddress = this.findFreeDataEntry(); // start point of data entry block
+                dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
+                console.log(dataChunks);
+                // Write to a newly allocated data entry block until all data has been accounted for
+                while (dataChunks.length > 0) {
+                    var newKey = this.findFreeDataEntry();
+                    var newData = "1" + this.defineAddressPointer(dataChunks.length) + this.encodeString(dataChunks.splice(0, 1)[0]);
+                    sessionStorage.setItem(newKey, newData);
+                }
+                // Update the file's directory entry
+                sessionStorage.setItem(dirEntryKey, dirEntryData);
+            }
+            else {
+                // File already has data stored, so overwrite the data
+                while (dataChunks.length > 0) {
+                    var currentDataEntry = sessionStorage.getItem(dirEntryMeta);
+                    var newKey = currentDataEntry.substring(1, this.metaSize);
+                    if (newKey === "---") {
+                        newKey = this.defineAddressPointer(dataChunks.length);
+                    }
+                    var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
+                    sessionStorage.setItem(dirEntryMeta, newData);
+                    // Adjust the directory entry pointer
+                    dirEntryMeta = newKey;
+                }
+            }
             this.displayFsLog();
         };
         DeviceDriverFileSystem.prototype.deleteFile = function (filename) {

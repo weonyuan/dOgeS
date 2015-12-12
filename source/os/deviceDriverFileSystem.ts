@@ -19,24 +19,24 @@ module DOGES {
                     public blockSize: number = 0,
                     public dataLength: number = 0,
                     public metaSize: number = 0) {
-            // Override the base method pointers.
+            // Override the base method pointers
             super(this.krnFsDriverEntry, this.krnFsISR);
 
-            // Constants for the file system.
+            // Constants for the file system
             this.tracks = 4;
             this.sectors = 8;
             this.blocks = 8;
 
-            // Total size (bytes) of a block.
+            // Total size (bytes) of a block
             this.blockSize = 64;
             this.dataLength = 120;
 
-            // Bytes allocated for the block's meta.
+            // Bytes allocated for the block's meta
             this.metaSize = 4;
         }
 
         public krnFsDriverEntry(): void {
-            // Initialization routine for this, the kernel-mode File System Device Driver.
+            // Initialization routine for this, the kernel-mode File System Device Driver
             this.status = "File system driver loaded.";
             this.displayFsLog();
         }
@@ -131,17 +131,12 @@ module DOGES {
             }
         }
 
-        public findFreeBlock(): void {
-
-        }
-
         // Returns the TSB address location of the filename
         public findFile(filename): string {
             var key = null;
             var data = null;
             var encodedFilename = this.encodeString(filename);
 
-            console.log("encodedFilename: " + encodedFilename);
             for (var i = 0; i < this.sectors; i++) {
                 for (var j = 0; j < this.blocks; j++) {
                     key = "0" + i.toString() + j.toString();
@@ -153,7 +148,6 @@ module DOGES {
                         return key;
                         break;
                     }
-                    console.log(key);
                 }
             }
 
@@ -202,8 +196,8 @@ module DOGES {
 
         // Used to determine whether to set the pointer null
         // or to the next block where the data surpasses its allocated size
-        public defineAddressPointer(data): string {
-            if (data.length <= (this.blockSize - this.metaSize)) {
+        public defineAddressPointer(numChunks): string {
+            if (numChunks <= 1) {
                 return "---";
             } else {
                 return this.findFreeDataEntry();
@@ -235,29 +229,62 @@ module DOGES {
             this.decodeString(fileEntryData);
         }
 
-        // Writes the data into the specified file.
+        // Writes the data into the specified file
         public writeFile(filename, data): void {
-            var length = data.length;
-            var startAddress = this.findFreeDataEntry();    // start point of file entry block
+            var dataChunks: string[] = [];
+            var chunkSize: number = this.blockSize - this.metaSize;
+            var dirEntryKey: string = this.findFile(filename);
+            var dirEntryData: string = sessionStorage.getItem(dirEntryKey);
+            var dirEntryMeta: string = dirEntryData.substring(1, this.metaSize);
 
-            var dirEntryKey = this.findFile(filename);
-            var dirEntryData = sessionStorage.getItem(dirEntryKey);
-            dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
+            // Data chunking process by 60 bytes
+            for (var i = 0; i < (data.length / (this.blockSize - this.metaSize)); i++) {
+                dataChunks.push(data.substring(i * chunkSize, (i + 1) * chunkSize));
+            }
 
-            console.log(dirEntryData);
+            // If data is not a multiple of the chunk size, push the remaining characters in
+            if (data.length % chunkSize === 0) {
+                dataChunks.push(data.substring(data.length % chunkSize, data.length));
+            }
 
-            while (length / (this.blockSize - this.metaSize) > 0) {
-                var newKey = this.findFreeDataEntry();
-                var newData = "1" + this.defineAddressPointer(data) + this.encodeString(data);
+            // If TSB pointer is null or 000, data has not been written to the file yet
+            if (dirEntryMeta === "---" || dirEntryMeta === "000") {
+                // Allocate data blocks and store data there
+                var startAddress = this.findFreeDataEntry();    // start point of data entry block
+                dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
 
-                // Write to the newly allocated file entry block
-                sessionStorage.setItem(newKey, newData);
+                console.log(dataChunks);
 
+                // Write to a newly allocated data entry block until all data has been accounted for
+                while (dataChunks.length > 0) {
+                    var newKey = this.findFreeDataEntry();
+                    var newData = "1" + this.defineAddressPointer(dataChunks.length) + this.encodeString(dataChunks.splice(0, 1)[0]);
 
-                length -= this.blockSize - this.metaSize;
+                    sessionStorage.setItem(newKey, newData);
+                }
+                
+                // Update the file's directory entry
+                sessionStorage.setItem(dirEntryKey, dirEntryData);
+            } else {
+                // File already has data stored, so overwrite the data
+                while (dataChunks.length > 0) {
+                    var currentDataEntry: string = sessionStorage.getItem(dirEntryMeta);
+                    var newKey = currentDataEntry.substring(1, this.metaSize);
+
+                    if (newKey === "---") {
+                        newKey = this.defineAddressPointer(dataChunks.length);
+                    }
+
+                    var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
+
+                    sessionStorage.setItem(dirEntryMeta, newData);
+
+                    // Adjust the directory entry pointer
+                    dirEntryMeta = newKey;
+                }
+
             }
             
-            sessionStorage.setItem(dirEntryKey, dirEntryData);
 
             this.displayFsLog();
         }

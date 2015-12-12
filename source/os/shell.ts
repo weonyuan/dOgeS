@@ -166,7 +166,7 @@ module DOGES {
             // create <filename>
             sc = new ShellCommand(this.shellCreateFile,
                                   "create",
-                                  "<filename> - Creates a new file with the given name.");
+                                  "<filename> - Creates a new file with the designated name.");
             this.commandList[this.commandList.length] = sc;
 
             // write <filename> <string>
@@ -181,10 +181,22 @@ module DOGES {
                                   "<filename> - Reads the designated file's data.");
             this.commandList[this.commandList.length] = sc;
 
+            // delete <filename>
+            sc = new ShellCommand(this.shellDeleteFile,
+                                  "delete",
+                                  "<filename> - Deletes the designated file.");
+            this.commandList[this.commandList.length] = sc;
+
             // format
             sc = new ShellCommand(this.shellFormat,
                                   "format",
                                   "- Clears all data in the file system.");
+            this.commandList[this.commandList.length] = sc;
+
+            // ls
+            sc = new ShellCommand(this.shellLs,
+                                  "ls",
+                                  "- Lists all files in the file system.");
             this.commandList[this.commandList.length] = sc;
 
             //
@@ -425,8 +437,14 @@ module DOGES {
                     case "read":
                         _StdOut.putText("Read reads the given filename's data stored in the data entry.");
                         break;
+                    case "delete":
+                        _StdOut.putText("Delete deletes the given file including its data stored in the file system.");
+                        break;
                     case "format":
                         _StdOut.putText("Format clears all user data in the file system.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Ls lists all files in the file system.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -686,8 +704,21 @@ module DOGES {
             }
         }
 
+        public shellDeleteFile(args) {
+            if (args.length > 0) {
+                _krnFileSystemDriver.deleteFile(args[0]);
+                _StdOut.putText("Deleted file " + args[0]);
+            } else {
+                _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
+            }
+        }
+
         public shellFormat(args) {
             _krnFileSystemDriver.format();
+        }
+
+        public shellLs(args) {
+            _krnFileSystemDriver.listFiles();
         }
     }
 }

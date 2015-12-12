@@ -14,11 +14,11 @@ module DOGES {
     // Extends DeviceDriver
     export class DeviceDriverFileSystem extends DeviceDriver {
         constructor(public tracks: number = 0,
-                    public sectors: number = 0,
-                    public blocks: number = 0,
-                    public blockSize: number = 0,
-                    public dataLength: number = 0,
-                    public metaSize: number = 0) {
+            public sectors: number = 0,
+            public blocks: number = 0,
+            public blockSize: number = 0,
+            public dataLength: number = 0,
+            public metaSize: number = 0) {
             // Override the base method pointers
             super(this.krnFsDriverEntry, this.krnFsISR);
 
@@ -85,7 +85,7 @@ module DOGES {
             // to prevent other files overwriting this
             var mbrMeta = "1---";
             var mbrData = mbrMeta + "001100";
-            
+
             this.writeData(mbrKey, mbrData);
         }
 
@@ -106,9 +106,9 @@ module DOGES {
         public findFreeDirEntry(): string {
             var key = null;
             for (var i = 0; i < this.sectors; i++) {
-                for (var j = 0; j < this.blocks; j++) { 
+                for (var j = 0; j < this.blocks; j++) {
                     key = "0" + i.toString() + j.toString();
-                    
+
                     if (!this.isUsed(sessionStorage.getItem(key))) {
                         return key;
                         break;
@@ -212,7 +212,7 @@ module DOGES {
             if (filename.length <= this.blockSize - this.metaSize) {
                 this.writeData(this.findFreeDirEntry(), data);
             } else {
-                console.log("error: filename too large.");                
+                console.log("error: filename too large.");
             }
 
             this.displayFsLog();
@@ -224,7 +224,7 @@ module DOGES {
             // Then get the data to retrieve the last three meta bits for data lookup
             var dirEntryData = sessionStorage.getItem(dirEntryKey);
 
-            var startFileAddress = dirEntryData.substring(1, this.metaSize);            
+            var startFileAddress = dirEntryData.substring(1, this.metaSize);
             var startFileData = sessionStorage.getItem(startFileAddress);
             var startFileMeta = startFileData.substring(1, this.metaSize);
 
@@ -237,7 +237,7 @@ module DOGES {
                 fileEntryMeta = fileEntryData.substring(1, this.metaSize);
                 data += this.decodeString(fileEntryData);
             }
-            
+
             _StdOut.putText(data);
         }
 
@@ -287,7 +287,7 @@ module DOGES {
                 }
 
                 while (dataChunks.length > 0) {
-                    currentDataEntry = sessionStorage.getItem(dirEntryMeta);                    
+                    currentDataEntry = sessionStorage.getItem(dirEntryMeta);
 
                     var newKey = this.defineAddressPointer(dataChunks.length);
                     console.log("newKey: " + newKey);
@@ -301,13 +301,44 @@ module DOGES {
                 }
 
             }
-            
+
 
             this.displayFsLog();
         }
 
         public deleteFile(filename): void {
+            var dirEntryKey: string = this.findFile(filename);
+            var dirEntryData: string = sessionStorage.getItem(dirEntryKey);
 
+            // Clear its data from the data entry
+            var dataEntryKey: string = dirEntryData.substring(1, this.metaSize);
+            while (dataEntryKey !== "---" && dataEntryKey !== "000") {
+                var currentData: string = sessionStorage.getItem(dataEntryKey);
+                var currentKey: string = dataEntryKey;
+                dataEntryKey = currentData.substring(1, this.metaSize);
+                console.log(dataEntryKey);
+                sessionStorage.setItem(currentKey, this.initializeBlock());
+            }
+
+            // Then clear the file from directory entry
+            sessionStorage.setItem(dirEntryKey, this.initializeBlock());
+
+            this.displayFsLog();
+        }
+
+        public listFiles(): void {
+            // Iterate over directory entry
+            for (var i = 0; i < this.sectors; i++) {
+                for (var j = 1; j < this.blocks; j++) {
+                    var key = "0" + i.toString() + j.toString();
+                    var dirEntry = sessionStorage.getItem(key);
+
+                    if (this.isUsed(dirEntry)) {
+                        _StdOut.putText(key + ": " + this.decodeString(dirEntry));
+                        _StdOut.advanceLine();
+                    }
+                }
+            }
         }
 
         // Writes the encoded data into the specified TSB address.

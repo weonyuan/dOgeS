@@ -264,6 +264,33 @@ var DOGES;
             this.displayFsLog();
         };
         DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
+            var dirEntryKey = this.findFile(filename);
+            var dirEntryData = sessionStorage.getItem(dirEntryKey);
+            // Clear its data from the data entry
+            var dataEntryKey = dirEntryData.substring(1, this.metaSize);
+            while (dataEntryKey !== "---" && dataEntryKey !== "000") {
+                var currentData = sessionStorage.getItem(dataEntryKey);
+                var currentKey = dataEntryKey;
+                dataEntryKey = currentData.substring(1, this.metaSize);
+                console.log(dataEntryKey);
+                sessionStorage.setItem(currentKey, this.initializeBlock());
+            }
+            // Then clear the file from directory entry
+            sessionStorage.setItem(dirEntryKey, this.initializeBlock());
+            this.displayFsLog();
+        };
+        DeviceDriverFileSystem.prototype.listFiles = function () {
+            // Iterate over directory entry
+            for (var i = 0; i < this.sectors; i++) {
+                for (var j = 1; j < this.blocks; j++) {
+                    var key = "0" + i.toString() + j.toString();
+                    var dirEntry = sessionStorage.getItem(key);
+                    if (this.isUsed(dirEntry)) {
+                        _StdOut.putText(key + ": " + this.decodeString(dirEntry));
+                        _StdOut.advanceLine();
+                    }
+                }
+            }
         };
         // Writes the encoded data into the specified TSB address.
         DeviceDriverFileSystem.prototype.writeData = function (key, data) {

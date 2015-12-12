@@ -92,7 +92,7 @@ var DOGES;
             sc = new DOGES.ShellCommand(this.shellGetSchedule, "getschedule", "- Displays the current CPU scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
             // create <filename>
-            sc = new DOGES.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a new file with the given name.");
+            sc = new DOGES.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a new file with the designated name.");
             this.commandList[this.commandList.length] = sc;
             // write <filename> <string>
             sc = new DOGES.ShellCommand(this.shellWriteFile, "write", "<filename> <string> - Writes the string into the designated file.");
@@ -100,8 +100,14 @@ var DOGES;
             // read <filename>
             sc = new DOGES.ShellCommand(this.shellReadFile, "read", "<filename> - Reads the designated file's data.");
             this.commandList[this.commandList.length] = sc;
+            // delete <filename>
+            sc = new DOGES.ShellCommand(this.shellDeleteFile, "delete", "<filename> - Deletes the designated file.");
+            this.commandList[this.commandList.length] = sc;
             // format
             sc = new DOGES.ShellCommand(this.shellFormat, "format", "- Clears all data in the file system.");
+            this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new DOGES.ShellCommand(this.shellLs, "ls", "- Lists all files in the file system.");
             this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
@@ -329,8 +335,14 @@ var DOGES;
                     case "read":
                         _StdOut.putText("Read reads the given filename's data stored in the data entry.");
                         break;
+                    case "delete":
+                        _StdOut.putText("Delete deletes the given file including its data stored in the file system.");
+                        break;
                     case "format":
                         _StdOut.putText("Format clears all user data in the file system.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Ls lists all files in the file system.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -589,8 +601,20 @@ var DOGES;
                 _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
             }
         };
+        Shell.prototype.shellDeleteFile = function (args) {
+            if (args.length > 0) {
+                _krnFileSystemDriver.deleteFile(args[0]);
+                _StdOut.putText("Deleted file " + args[0]);
+            }
+            else {
+                _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
+            }
+        };
         Shell.prototype.shellFormat = function (args) {
             _krnFileSystemDriver.format();
+        };
+        Shell.prototype.shellLs = function (args) {
+            _krnFileSystemDriver.listFiles();
         };
         return Shell;
     })();

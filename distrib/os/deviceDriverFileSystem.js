@@ -148,13 +148,92 @@ var DOGES;
             for (var i = 0; i < data.length; i++) {
                 encodedString += data.charCodeAt(i).toString(16);
             }
-            console.log(encodedString.length);
             // Then pad the string with 0s if necessary
             for (var j = encodedString.length; j < this.dataLength; j++) {
                 encodedString += "0";
             }
-            console.log(encodedString);
             return encodedString;
+        };
+        // Decodes the string from hex to ASCII
+        DeviceDriverFileSystem.prototype.decodeString = function (data) {
+            var decodedString = "";
+            var hexPair = "";
+            for (var i = this.metaSize; i < data.length; i++) {
+                hexPair += data.charAt(i);
+                if (hexPair.length % 2 === 0) {
+                    // We've reached the end of the data
+                    if (hexPair === "00") {
+                        break;
+                    }
+                    else {
+                        // Decode the pair from hex to ASCII
+                        decodedString += String.fromCharCode(parseInt(hexPair, 16));
+                    }
+                    hexPair = "";
+                }
+            }
+            console.log(decodedString);
+            return decodedString;
+        };
+        // Used to determine whether to set the pointer null
+        // or to the next block where the data surpasses its allocated size
+        DeviceDriverFileSystem.prototype.defineAddressPointer = function (data) {
+            if (data.length <= (this.blockSize - this.metaSize)) {
+                return "---";
+            }
+            else {
+                return this.findFreeDataEntry();
+            }
+        };
+        DeviceDriverFileSystem.prototype.createFile = function (filename) {
+            var data = "1000" + filename;
+            if (filename.length <= this.blockSize - this.metaSize) {
+                this.writeData(this.findFreeDirEntry(), data);
+            }
+            else {
+                console.log("error: filename too large.");
+            }
+            this.displayFsLog();
+        };
+        DeviceDriverFileSystem.prototype.readFile = function (filename) {
+            // First find the filename
+            var dirEntryKey = this.findFile(filename);
+            // Then get the data to retrieve the last three meta bits for data lookup
+            var dirEntryData = sessionStorage.getItem(dirEntryKey);
+            var fileEntryKey = dirEntryData.substring(1, this.metaSize);
+            var fileEntryData = sessionStorage.getItem(fileEntryKey);
+            console.log(fileEntryData);
+            this.decodeString(fileEntryData);
+        };
+        // Writes the data into the specified file.
+        DeviceDriverFileSystem.prototype.writeFile = function (filename, data) {
+            var length = data.length;
+            var startAddress = this.findFreeDataEntry(); // start point of file entry block
+            var dirEntryKey = this.findFile(filename);
+            var dirEntryData = sessionStorage.getItem(dirEntryKey);
+            dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
+            console.log(dirEntryData);
+            while (length / (this.blockSize - this.metaSize) > 0) {
+                var newKey = this.findFreeDataEntry();
+                var newData = "1" + this.defineAddressPointer(data) + this.encodeString(data);
+                // Write to the newly allocated file entry block
+                sessionStorage.setItem(newKey, newData);
+                length -= this.blockSize - this.metaSize;
+            }
+            sessionStorage.setItem(dirEntryKey, dirEntryData);
+            this.displayFsLog();
+        };
+        DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
+        };
+        // Writes the encoded data into the specified TSB address.
+        DeviceDriverFileSystem.prototype.writeData = function (key, data) {
+            if (data !== undefined &&
+                data !== null) {
+                var encodedData = data.substring(0, this.metaSize);
+                // Encode the data from ASCII to hex
+                encodedData += this.encodeString(data.substring(this.metaSize));
+                sessionStorage.setItem(key, encodedData);
+            }
         };
         // Display the file system log
         DeviceDriverFileSystem.prototype.displayFsLog = function () {
@@ -181,51 +260,6 @@ var DOGES;
                         row.appendChild(cell);
                     }
                 }
-            }
-        };
-        // Used to determine whether to set the pointer null
-        // or to the next block where the data surpasses its allocated size
-        DeviceDriverFileSystem.prototype.defineAddressPointer = function (data) {
-            if (data.length <= (this.blockSize - this.metaSize)) {
-                return "---";
-            }
-            else {
-                return this.findFreeDataEntry();
-            }
-        };
-        DeviceDriverFileSystem.prototype.createFile = function (filename) {
-            var data = "1000" + filename;
-            if (filename.length <= this.blockSize - this.metaSize) {
-                this.writeData(this.findFreeDirEntry(), data);
-            }
-            else {
-                console.log("error: filename too large.");
-            }
-            this.displayFsLog();
-        };
-        DeviceDriverFileSystem.prototype.readFile = function (filename) {
-        };
-        // Writes the data into the specified file.
-        DeviceDriverFileSystem.prototype.writeFile = function (filename, data) {
-            var length = data.length;
-            while (length / (this.blockSize - this.metaSize) > 0) {
-                var newKey = this.findFreeDataEntry();
-                var newData = "1" + this.defineAddressPointer(data) + this.encodeString(data);
-                sessionStorage.setItem(newKey, newData);
-                length -= this.blockSize - this.metaSize;
-            }
-            this.displayFsLog();
-        };
-        DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
-        };
-        // Writes the encoded data into the specified TSB address.
-        DeviceDriverFileSystem.prototype.writeData = function (key, data) {
-            if (data !== undefined &&
-                data !== null) {
-                var encodedData = data.substring(0, this.metaSize);
-                // Encode the data from ASCII to hex
-                encodedData += this.encodeString(data.substring(this.metaSize));
-                sessionStorage.setItem(key, encodedData);
             }
         };
         return DeviceDriverFileSystem;

@@ -97,6 +97,9 @@ var DOGES;
             // write <filename> <string>
             sc = new DOGES.ShellCommand(this.shellWriteFile, "write", "<filename> <string> - Writes the string into the designated file.");
             this.commandList[this.commandList.length] = sc;
+            // read <filename>
+            sc = new DOGES.ShellCommand(this.shellReadFile, "read", "<filename> - Reads the designated file's data.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -319,6 +322,9 @@ var DOGES;
                         break;
                     case "write":
                         _StdOut.putText("Write writes the given data into the designated file.");
+                        break;
+                    case "read":
+                        _StdOut.putText("Read reads the given filename's data stored in the data entry.");
                         break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
@@ -566,6 +572,15 @@ var DOGES;
             }
             else {
                 _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
+            }
+        };
+        Shell.prototype.shellReadFile = function (args) {
+            if (args.length > 0) {
+                _krnFileSystemDriver.readFile(args[0]);
+                _StdOut.putText("Reading file " + args[0] + " now...");
+            }
+            else {
+                _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
             }
         };
         return Shell;

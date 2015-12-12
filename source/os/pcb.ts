@@ -11,7 +11,9 @@ module DOGES {
                 public limit: number = 0,
                 public state: number = PS_NEW,
                 public turnaround: number = 0,
-                public waiting: number = 0) {
+                public waiting: number = 0,
+                public inFileSystem: boolean = false,
+                public priority: number = 0) {
     }
   }
 }

@@ -1,7 +1,7 @@
 var DOGES;
 (function (DOGES) {
     var Pcb = (function () {
-        function Pcb(PC, Acc, Xreg, Yreg, Zflag, PID, base, limit, state, turnaround, waiting) {
+        function Pcb(PC, Acc, Xreg, Yreg, Zflag, PID, base, limit, state, turnaround, waiting, inFileSystem, priority) {
             if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = 0; }
             if (Xreg === void 0) { Xreg = 0; }
@@ -13,6 +13,8 @@ var DOGES;
             if (state === void 0) { state = PS_NEW; }
             if (turnaround === void 0) { turnaround = 0; }
             if (waiting === void 0) { waiting = 0; }
+            if (inFileSystem === void 0) { inFileSystem = false; }
+            if (priority === void 0) { priority = 0; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -24,6 +26,8 @@ var DOGES;
             this.state = state;
             this.turnaround = turnaround;
             this.waiting = waiting;
+            this.inFileSystem = inFileSystem;
+            this.priority = priority;
         }
         return Pcb;
     })();

@@ -253,9 +253,7 @@ module DOGES {
                 var startAddress = this.findFreeDataEntry();    // start point of data entry block
                 dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
 
-                console.log(dataChunks);
-
-                // Write to a newly allocated data entry block until all data has been accounted for
+                // Write to newly allocated data entry blocks until all data has been accounted for
                 while (dataChunks.length > 0) {
                     var newKey = this.findFreeDataEntry();
                     var newData = "1" + this.defineAddressPointer(dataChunks.length) + this.encodeString(dataChunks.splice(0, 1)[0]);
@@ -267,13 +265,20 @@ module DOGES {
                 sessionStorage.setItem(dirEntryKey, dirEntryData);
             } else {
                 // File already has data stored, so overwrite the data
-                while (dataChunks.length > 0) {
-                    var currentDataEntry: string = sessionStorage.getItem(dirEntryMeta);
-                    var newKey = currentDataEntry.substring(1, this.metaSize);
+                var currentDataEntry: string = sessionStorage.getItem(dirEntryMeta);
+                var currentKey = currentDataEntry.substring(1, this.metaSize);
 
-                    if (newKey === "---") {
-                        newKey = this.defineAddressPointer(dataChunks.length);
-                    }
+                while (currentKey !== "---") {
+                    currentDataEntry = sessionStorage.getItem(currentKey);
+                    sessionStorage.setItem(currentKey, this.initializeBlock());
+                    currentKey = currentDataEntry.substring(1, this.metaSize);
+                }
+
+                while (dataChunks.length > 0) {
+                    currentDataEntry = sessionStorage.getItem(dirEntryMeta);                    
+
+                    var newKey = this.defineAddressPointer(dataChunks.length);
+                    console.log("newKey: " + newKey);
 
                     var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
 

@@ -539,6 +539,7 @@ module DOGES {
             var programInput: string = (<HTMLTextAreaElement> document.getElementById("taProgramInput")).value;
             programInput = Utils.trim(programInput).replace(/(?:\r\n|\r|\n)/g, " ").replace(/ /gm, "");
             var currentChar: string = "";
+            var priority: number = DEFAULT_PRIORITY;
             var isValid: boolean;
 
             if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE * 2) {
@@ -551,7 +552,10 @@ module DOGES {
                 } else {
                     _StdOut.putText("Much loading. Very appreciate.");
                     _Console.advanceLine();
-                    MemoryManager.loadProgram(programInput);
+                    if (args[0] !== undefined && args[0] !== null) {
+                        priority = parseInt(args[0]);
+                    }
+                    MemoryManager.loadProgram(programInput, priority);
                 }
             } else if (programInput.length > PROGRAM_LIMIT) {
                 _StdOut.putText("Wat. Dat program. So big. Cannot load.");
@@ -679,7 +683,7 @@ module DOGES {
 
         public shellCreateFile(args) {
             if (args.length > 0) {
-                _krnFileSystemDriver.createFile(args[0]);
+                _FileSystem.createFile(args[0]);
                 _StdOut.putText("Much success. Created file " + args[0]);
             } else {
                 _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
@@ -689,7 +693,7 @@ module DOGES {
         public shellWriteFile(args) {
             if (args.length > 1) {
                 _StdOut.putText("Writing file " + args[0] + ". Very wait.");
-                _krnFileSystemDriver.writeFile(args[0], args[1]);
+                _FileSystem.writeFile(args[0], args[1]);
             } else {
                 _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
             }
@@ -698,7 +702,8 @@ module DOGES {
         public shellReadFile(args) {
             if (args.length > 0) {
                 _StdOut.putText("Reading file " + args[0] + " now...");
-                _krnFileSystemDriver.readFile(args[0]);
+                var result = _FileSystem.readFile(args[0]);
+                _StdOut.putText(result);
             } else {
                 _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
             }
@@ -706,7 +711,7 @@ module DOGES {
 
         public shellDeleteFile(args) {
             if (args.length > 0) {
-                _krnFileSystemDriver.deleteFile(args[0]);
+                _FileSystem.deleteFile(args[0]);
                 _StdOut.putText("Deleted file " + args[0]);
             } else {
                 _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
@@ -714,11 +719,11 @@ module DOGES {
         }
 
         public shellFormat(args) {
-            _krnFileSystemDriver.format();
+            _FileSystem.format();
         }
 
         public shellLs(args) {
-            _krnFileSystemDriver.listFiles();
+            _FileSystem.listFiles();
         }
     }
 }

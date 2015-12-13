@@ -109,7 +109,7 @@ var DOGES;
             }
         };
         // Returns the next available block address in file entry
-        DeviceDriverFileSystem.prototype.findFreefileEntry = function () {
+        DeviceDriverFileSystem.prototype.findFreeFileEntry = function () {
             var key = null;
             for (var i = 1; i < this.tracks; i++) {
                 for (var j = 0; j < this.sectors; j++) {
@@ -123,8 +123,8 @@ var DOGES;
                 }
             }
         };
-        // Returns the TSB address location of the filename
-        DeviceDriverFileSystem.prototype.findFile = function (filename) {
+        // Returns the TSB address location of the filename in directory entry
+        DeviceDriverFileSystem.prototype.findDirEntryByFilename = function (filename) {
             var key = null;
             var data = null;
             var encodedFilename = this.encodeString(filename);
@@ -182,7 +182,7 @@ var DOGES;
                 return "---";
             }
             else {
-                return this.findFreefileEntry();
+                return this.findFreeFileEntry();
             }
         };
         DeviceDriverFileSystem.prototype.createFile = function (filename) {
@@ -197,27 +197,31 @@ var DOGES;
         };
         DeviceDriverFileSystem.prototype.readFile = function (filename) {
             // First find the filename
-            var dirEntryKey = this.findFile(filename);
-            // Then get the data to retrieve the last three meta bits for data lookup
+            var dirEntryKey = this.findDirEntryByFilename(filename);
+            // Then find the file in the directory entry
             var dirEntry = sessionStorage.getItem(dirEntryKey);
-            var startFileAddress = dirEntry.substring(1, this.metaSize);
-            var startFileData = sessionStorage.getItem(startFileAddress);
-            var startFileMeta = startFileData.substring(1, this.metaSize);
-            var fileEntryMeta = startFileMeta;
-            var data = this.decodeString(startFileData);
+            // TSB of the file's data starting point
+            var startFileKey = dirEntry.substring(1, this.metaSize);
+            var startFile = sessionStorage.getItem(startFileKey);
+            // TSB pointer to next data block of file
+            // var startFileMeta = startFile.substring(1, this.metaSize);
+            var fileEntryMeta = startFile.substring(1, this.metaSize);
+            // var fileEntryMeta = startFileMeta;
+            var data = this.decodeString(startFile);
+            // Keep reading until we reach a null pointer
             while (fileEntryMeta !== "---") {
                 var fileEntry = sessionStorage.getItem(fileEntryMeta);
                 console.log(fileEntry);
                 fileEntryMeta = fileEntry.substring(1, this.metaSize);
                 data += this.decodeString(fileEntry);
             }
-            _StdOut.putText(data);
+            return data;
         };
         // Writes the data into the specified file
         DeviceDriverFileSystem.prototype.writeFile = function (filename, data) {
             var dataChunks = [];
             var chunkSize = this.blockSize - this.metaSize;
-            var dirEntryKey = this.findFile(filename);
+            var dirEntryKey = this.findDirEntryByFilename(filename);
             var dirEntry = sessionStorage.getItem(dirEntryKey);
             var dirEntryMeta = dirEntry.substring(1, this.metaSize);
             // Data chunking process by 60 bytes
@@ -230,14 +234,20 @@ var DOGES;
             }
             // If TSB pointer is null or 000, data has not been written to the file yet
             if (dirEntryMeta === "---" || dirEntryMeta === "000") {
+                console.log("allocate new file blocks");
                 // Allocate data blocks and store data there
-                var startAddress = this.findFreefileEntry(); // start point of file entry block
-                dirEntry = "1" + startAddress + dirEntry.substring(this.metaSize);
+                var startAddress = this.findFreeFileEntry(); // start point of file entry block
+                var dirEntry = "1" + startAddress + dirEntry.substring(this.metaSize);
                 // Write to newly allocated file entry blocks until all data has been accounted for
+                // Then allocate and add the new data in
                 while (dataChunks.length > 0) {
-                    var newKey = this.findFreefileEntry();
-                    var newData = "1" + this.defineAddressPointer(dataChunks.length) + this.encodeString(dataChunks.splice(0, 1)[0]);
-                    sessionStorage.setItem(newKey, newData);
+                    sessionStorage.setItem(dirEntryMeta, "1");
+                    var newKey = this.defineAddressPointer(dataChunks.length);
+                    console.log("newKey: " + newKey);
+                    var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
+                    sessionStorage.setItem(dirEntryMeta, newData);
+                    // Adjust the directory entry pointer
+                    dirEntryMeta = newKey;
                 }
                 // Update the file's directory entry
                 sessionStorage.setItem(dirEntryKey, dirEntry);
@@ -262,7 +272,7 @@ var DOGES;
             this.displayFsLog();
         };
         DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
-            var dirEntryKey = this.findFile(filename);
+            var dirEntryKey = this.findDirEntryByFilename(filename);
             var dirEntry = sessionStorage.getItem(dirEntryKey);
             // Clear its data from the file entry
             var fileEntryKey = dirEntry.substring(1, this.metaSize);

@@ -70,14 +70,24 @@ module DOGES {
         return nextProgram;
     }
 
+    public static programSwapping(previousProgram): void {
+        if (_CurrentProgram.inFileSystem === true) {
+            if (previousProgram.state !== PS_TERMINATED) {
+                MemoryManager.rollOut(previousProgram);
+            }
+
+            MemoryManager.rollIn(_CurrentProgram);
+        }
+    }
+
     // RR Context Switching
     public static roundRobinSwitch(nextProgram): void {
-      if (_CurrentProgram.state !== PS_TERMINATED) {
+        if (_CurrentProgram.state !== PS_TERMINATED) {
         // If the current program is not finished executing,
         // change its state to Ready and push it back into Ready queue
         _CurrentProgram.state = PS_READY;
         _ReadyQueue.enqueue(_CurrentProgram);
-      } else if (_CurrentProgram.state === PS_TERMINATED) {
+        } else if (_CurrentProgram.state === PS_TERMINATED) {
         // If the program is finished, remove the program from the
         // Resident list and clear allocated memory
         for (var i = 0; i < _ResidentList.length; i++) {
@@ -87,12 +97,15 @@ module DOGES {
           }
         }
         MemoryManager.clearSegment(_CurrentProgram.base);
-      }
+        }
 
-      // Then set the next program as the current program so it can run
-      _CurrentProgram = nextProgram;
-      _CurrentProgram.state = PS_RUNNING;
-      _CPU.start(_CurrentProgram);
+        var previousProgram = _CurrentProgram;
+
+        // Then set the next program as the current program so it can run
+        _CurrentProgram = nextProgram;
+        _CurrentProgram.state = PS_RUNNING;
+        this.programSwapping(previousProgram);
+        _CPU.start(_CurrentProgram);
     }
 
     // FCFS Context Switching
@@ -101,7 +114,7 @@ module DOGES {
         this.roundRobinSwitch(nextProgram);
     }
 
-    // Priority Context Switching
+    // TODO: Priority Context Switching
     public static prioritySwitch(nextProgram): void {
 
     }

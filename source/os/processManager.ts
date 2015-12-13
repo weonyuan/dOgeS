@@ -140,5 +140,10 @@ module DOGES {
         return "ERR";
       }
     }
+
+    // Generates a filename for the process to be swapped
+    public static createProcessFilename(pcb): string {
+      return "process" + pcb.PID;
+    }
   }
 }

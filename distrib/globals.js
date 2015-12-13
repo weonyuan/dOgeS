@@ -12,7 +12,7 @@
 //
 var APP_NAME = "dOgeS"; // such app
 var APP_VERSION = "4.0"; // rapid development. much fast.
-var CPU_CLOCK_INTERVAL = 50; // This is in ms (milliseconds) so 1000 = 1 second.
+var CPU_CLOCK_INTERVAL = 110; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 // Interrupts
@@ -38,6 +38,7 @@ var PRIORITY_SCH = 2;
 var PROGRAM_LIMIT = 3;
 var PROGRAM_SIZE = 256; // every program is allocated 256 bytes
 var MEMORY_SIZE = PROGRAM_SIZE * PROGRAM_LIMIT;
+var DEFAULT_PRIORITY = 20;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -79,7 +80,7 @@ var _OsShell;
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
-var _krnFileSystemDriver;
+var _FileSystem;
 var _hardwareClockID = null;
 var _taskbarClockID = null;
 var _CurrentBufferIndex = 0;

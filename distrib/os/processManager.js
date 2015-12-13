@@ -127,6 +127,10 @@ var DOGES;
                 return "ERR";
             }
         };
+        // Generates a filename for the process to be swapped
+        ProcessManager.createProcessFilename = function (pcb) {
+            return "process" + pcb.PID;
+        };
         return ProcessManager;
     })();
     DOGES.ProcessManager = ProcessManager;

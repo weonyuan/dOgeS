@@ -14,7 +14,7 @@ var DOGES;
             if (turnaround === void 0) { turnaround = 0; }
             if (waiting === void 0) { waiting = 0; }
             if (inFileSystem === void 0) { inFileSystem = false; }
-            if (priority === void 0) { priority = 0; }
+            if (priority === void 0) { priority = DEFAULT_PRIORITY; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;

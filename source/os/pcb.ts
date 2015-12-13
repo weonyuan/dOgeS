@@ -13,7 +13,7 @@ module DOGES {
                 public turnaround: number = 0,
                 public waiting: number = 0,
                 public inFileSystem: boolean = false,
-                public priority: number = 0) {
+                public priority: number = DEFAULT_PRIORITY) {
     }
   }
 }

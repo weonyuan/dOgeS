@@ -67,6 +67,14 @@ var DOGES;
             }
             return nextProgram;
         };
+        CpuScheduler.programSwapping = function (previousProgram) {
+            if (_CurrentProgram.inFileSystem === true) {
+                if (previousProgram.state !== PS_TERMINATED) {
+                    DOGES.MemoryManager.rollOut(previousProgram);
+                }
+                DOGES.MemoryManager.rollIn(_CurrentProgram);
+            }
+        };
         // RR Context Switching
         CpuScheduler.roundRobinSwitch = function (nextProgram) {
             if (_CurrentProgram.state !== PS_TERMINATED) {
@@ -86,9 +94,11 @@ var DOGES;
                 }
                 DOGES.MemoryManager.clearSegment(_CurrentProgram.base);
             }
+            var previousProgram = _CurrentProgram;
             // Then set the next program as the current program so it can run
             _CurrentProgram = nextProgram;
             _CurrentProgram.state = PS_RUNNING;
+            this.programSwapping(previousProgram);
             _CPU.start(_CurrentProgram);
         };
         // FCFS Context Switching
@@ -96,7 +106,7 @@ var DOGES;
             // wow. such recycle.
             this.roundRobinSwitch(nextProgram);
         };
-        // Priority Context Switching
+        // TODO: Priority Context Switching
         CpuScheduler.prioritySwitch = function (nextProgram) {
         };
         return CpuScheduler;

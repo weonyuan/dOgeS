@@ -49,6 +49,7 @@ var DOGES;
                 pcbHTML.getElementsByClassName("state")[0].textContent = this.getProcessStateString(pcb.state);
                 pcbHTML.getElementsByClassName("turnaround")[0].textContent = pcb.turnaround.toString();
                 pcbHTML.getElementsByClassName("waiting")[0].textContent = pcb.waiting.toString();
+                pcbHTML.getElementsByClassName("location")[0].textContent = this.getLocationString(pcb.inFileSystem);
             }
             else {
                 this.createPcbRow(pcb);
@@ -105,6 +106,10 @@ var DOGES;
             cell.className = "waiting";
             cell.textContent = pcb.waiting;
             pcbHTML.appendChild(cell);
+            cell = document.createElement("td");
+            cell.className = "location";
+            cell.textContent = this.getLocationString(pcb.inFileSystem);
+            pcbHTML.appendChild(cell);
         };
         // Returns the appropriate state by its defined integer constant
         ProcessManager.getProcessStateString = function (stateInt) {
@@ -125,6 +130,15 @@ var DOGES;
             }
             else {
                 return "ERR";
+            }
+        };
+        // Returns the appropriate location by its defined boolean
+        ProcessManager.getLocationString = function (inFileSystem) {
+            if (inFileSystem) {
+                return "File System";
+            }
+            else {
+                return "Memory";
             }
         };
         // Generates a filename for the process to be swapped

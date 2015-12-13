@@ -117,8 +117,8 @@ module DOGES {
             }
         }
 
-        // Returns the next available block address in data entry
-        public findFreeDataEntry(): string {
+        // Returns the next available block address in file entry
+        public findFreefileEntry(): string {
             var key = null;
             for (var i = 1; i < this.tracks; i++) {
                 for (var j = 0; j < this.sectors; j++) {
@@ -203,7 +203,7 @@ module DOGES {
             if (numChunks <= 1) {
                 return "---";
             } else {
-                return this.findFreeDataEntry();
+                return this.findFreefileEntry();
             }
         }
 
@@ -222,9 +222,9 @@ module DOGES {
             // First find the filename
             var dirEntryKey = this.findFile(filename);
             // Then get the data to retrieve the last three meta bits for data lookup
-            var dirEntryData = sessionStorage.getItem(dirEntryKey);
+            var dirEntry = sessionStorage.getItem(dirEntryKey);
 
-            var startFileAddress = dirEntryData.substring(1, this.metaSize);
+            var startFileAddress = dirEntry.substring(1, this.metaSize);
             var startFileData = sessionStorage.getItem(startFileAddress);
             var startFileMeta = startFileData.substring(1, this.metaSize);
 
@@ -232,10 +232,10 @@ module DOGES {
             var data = this.decodeString(startFileData);
 
             while (fileEntryMeta !== "---") {
-                var fileEntryData = sessionStorage.getItem(fileEntryMeta);
-                console.log(fileEntryData);
-                fileEntryMeta = fileEntryData.substring(1, this.metaSize);
-                data += this.decodeString(fileEntryData);
+                var fileEntry = sessionStorage.getItem(fileEntryMeta);
+                console.log(fileEntry);
+                fileEntryMeta = fileEntry.substring(1, this.metaSize);
+                data += this.decodeString(fileEntry);
             }
 
             _StdOut.putText(data);
@@ -246,8 +246,8 @@ module DOGES {
             var dataChunks: string[] = [];
             var chunkSize: number = this.blockSize - this.metaSize;
             var dirEntryKey: string = this.findFile(filename);
-            var dirEntryData: string = sessionStorage.getItem(dirEntryKey);
-            var dirEntryMeta: string = dirEntryData.substring(1, this.metaSize);
+            var dirEntry: string = sessionStorage.getItem(dirEntryKey);
+            var dirEntryMeta: string = dirEntry.substring(1, this.metaSize);
 
             // Data chunking process by 60 bytes
             for (var i = 0; i < (data.length / (this.blockSize - this.metaSize)); i++) {
@@ -262,32 +262,30 @@ module DOGES {
             // If TSB pointer is null or 000, data has not been written to the file yet
             if (dirEntryMeta === "---" || dirEntryMeta === "000") {
                 // Allocate data blocks and store data there
-                var startAddress = this.findFreeDataEntry();    // start point of data entry block
-                dirEntryData = "1" + startAddress + dirEntryData.substring(this.metaSize);
+                var startAddress = this.findFreefileEntry();    // start point of file entry block
+                dirEntry = "1" + startAddress + dirEntry.substring(this.metaSize);
 
-                // Write to newly allocated data entry blocks until all data has been accounted for
+                // Write to newly allocated file entry blocks until all data has been accounted for
                 while (dataChunks.length > 0) {
-                    var newKey = this.findFreeDataEntry();
+                    var newKey = this.findFreefileEntry();
                     var newData = "1" + this.defineAddressPointer(dataChunks.length) + this.encodeString(dataChunks.splice(0, 1)[0]);
 
                     sessionStorage.setItem(newKey, newData);
                 }
                 
                 // Update the file's directory entry
-                sessionStorage.setItem(dirEntryKey, dirEntryData);
+                sessionStorage.setItem(dirEntryKey, dirEntry);
             } else {
                 // File already has data stored, so overwrite the data
-                var currentDataEntry: string = sessionStorage.getItem(dirEntryMeta);
-                var currentKey = currentDataEntry.substring(1, this.metaSize);
+                var fileEntry: string = sessionStorage.getItem(dirEntryMeta);
+                var fileEntryKey: string = fileEntry.substring(1, this.metaSize);
 
-                while (currentKey !== "---") {
-                    currentDataEntry = sessionStorage.getItem(currentKey);
-                    sessionStorage.setItem(currentKey, this.initializeBlock());
-                    currentKey = currentDataEntry.substring(1, this.metaSize);
-                }
+                // Clear the old data
+                this.clearBlocks(fileEntryKey);
 
+                // Then allocate and add the new data in
                 while (dataChunks.length > 0) {
-                    currentDataEntry = sessionStorage.getItem(dirEntryMeta);
+                    sessionStorage.setItem(dirEntryMeta, "1");
 
                     var newKey = this.defineAddressPointer(dataChunks.length);
                     console.log("newKey: " + newKey);
@@ -308,17 +306,11 @@ module DOGES {
 
         public deleteFile(filename): void {
             var dirEntryKey: string = this.findFile(filename);
-            var dirEntryData: string = sessionStorage.getItem(dirEntryKey);
+            var dirEntry: string = sessionStorage.getItem(dirEntryKey);
 
-            // Clear its data from the data entry
-            var dataEntryKey: string = dirEntryData.substring(1, this.metaSize);
-            while (dataEntryKey !== "---" && dataEntryKey !== "000") {
-                var currentData: string = sessionStorage.getItem(dataEntryKey);
-                var currentKey: string = dataEntryKey;
-                dataEntryKey = currentData.substring(1, this.metaSize);
-                console.log(dataEntryKey);
-                sessionStorage.setItem(currentKey, this.initializeBlock());
-            }
+            // Clear its data from the file entry
+            var fileEntryKey: string = dirEntry.substring(1, this.metaSize);
+            this.clearBlocks(fileEntryKey);
 
             // Then clear the file from directory entry
             sessionStorage.setItem(dirEntryKey, this.initializeBlock());
@@ -338,6 +330,15 @@ module DOGES {
                         _StdOut.advanceLine();
                     }
                 }
+            }
+        }
+
+        public clearBlocks(key): void {
+            while (key !== "---" && key !== "000") {
+                var currentData: string = sessionStorage.getItem(key);
+                var currentKey: string = key;
+                key = currentData.substring(1, this.metaSize);
+                sessionStorage.setItem(currentKey, this.initializeBlock());
             }
         }
 

@@ -24,15 +24,15 @@ module DOGES {
         return false;
     }
 
-    // Perform Round Robin context switching
+    // Perform context switching
     public static performContextSwitch(): void {
         // Grab the next program once context switch is
         // done on the current program
-        var nextProgram = _ReadyQueue.dequeue();
+        var nextProgram = this.findNextProgram();
 
         // Update the display
         ProcessManager.pcbLog(_CurrentProgram);
-        if (nextProgram !== null) {
+        if (nextProgram !== null && nextProgram !== undefined) {
             if (_CurrentScheduler === RR_SCH) {
                 this.roundRobinSwitch(nextProgram);
             } else if (_CurrentScheduler === FCFS_SCH) {
@@ -40,6 +40,14 @@ module DOGES {
             } else if (_CurrentScheduler === PRIORITY_SCH) {
                 this.prioritySwitch(nextProgram);
             }
+
+            var previousProgram = _CurrentProgram;
+
+            // Then set the next program as the current program so it can run
+            _CurrentProgram = nextProgram;
+            _CurrentProgram.state = PS_RUNNING;
+            this.programSwapping(previousProgram);
+            _CPU.start(_CurrentProgram);
         } else if (_CurrentProgram.state === PS_TERMINATED) {
             // CPU is finished running all programs
             ProcessManager.stopProgram();
@@ -56,14 +64,26 @@ module DOGES {
     public static findNextProgram(): any {
         var nextProgram = null;
         var lowestPriority = null;
+
+        // If Priority scheduling, find the next program with
+        // the lowest priority (top priority)
         if (_CurrentScheduler === PRIORITY_SCH) {
+            // How low can you go?
+            var lowestPriority = Number.MAX_VALUE;
+            var lowestPriorityLocation = 0;
+
             for (var i = 0; i < _ReadyQueue.getSize(); i++) {
-
+                if (_ReadyQueue.q[i].priority < lowestPriority) {
+                    lowestPriority = _ReadyQueue.q[i].priority;
+                    lowestPriorityLocation = i;
+                }
             }
-            console.log(_ReadyQueue);
 
-            nextProgram = _ReadyQueue.dequeue();
+            // Take the top priority program out of queue
+            // for execution
+            nextProgram = _ReadyQueue.q.splice(lowestPriorityLocation, 1)[0];
         } else {
+            // Otherwise, just pop off the next program in line
             nextProgram = _ReadyQueue.dequeue();
         }
 
@@ -71,6 +91,9 @@ module DOGES {
     }
 
     public static programSwapping(previousProgram): void {
+        // If the current program is in the file system, roll out the
+        // last program into the file system to bring the current one
+        // to memory
         if (_CurrentProgram.inFileSystem === true) {
             if (previousProgram.state !== PS_TERMINATED) {
                 MemoryManager.rollOut(previousProgram);
@@ -88,24 +111,16 @@ module DOGES {
         _CurrentProgram.state = PS_READY;
         _ReadyQueue.enqueue(_CurrentProgram);
         } else if (_CurrentProgram.state === PS_TERMINATED) {
-        // If the program is finished, remove the program from the
-        // Resident list and clear allocated memory
-        for (var i = 0; i < _ResidentList.length; i++) {
-          if (_CurrentProgram.PID === _ResidentList[i].PID) {
-            _ResidentList.splice(i, 1);
-            break;
+          // If the program is finished, remove the program from the
+          // Resident list and clear allocated memory
+          for (var i = 0; i < _ResidentList.length; i++) {
+            if (_CurrentProgram.PID === _ResidentList[i].PID) {
+              _ResidentList.splice(i, 1);
+              break;
+            }
           }
+          MemoryManager.clearSegment(_CurrentProgram.base);
         }
-        MemoryManager.clearSegment(_CurrentProgram.base);
-        }
-
-        var previousProgram = _CurrentProgram;
-
-        // Then set the next program as the current program so it can run
-        _CurrentProgram = nextProgram;
-        _CurrentProgram.state = PS_RUNNING;
-        this.programSwapping(previousProgram);
-        _CPU.start(_CurrentProgram);
     }
 
     // FCFS Context Switching
@@ -116,7 +131,13 @@ module DOGES {
 
     // TODO: Priority Context Switching
     public static prioritySwitch(nextProgram): void {
-
+        for (var i = 0; i < _ResidentList.length; i++) {
+          if (_CurrentProgram.PID === _ResidentList[i].PID) {
+            _ResidentList.splice(i, 1);
+            break;
+          }
+        }
+        MemoryManager.clearSegment(_CurrentProgram.base);
     }
   }
 }

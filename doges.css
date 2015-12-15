@@ -136,7 +136,7 @@ h3 {
   display: inline-block;
   float: right;
   margin-bottom: 10px;
-  width: 35%;
+  width: 30%;
 }
 
 #divLog,
@@ -195,7 +195,7 @@ h3 {
 
 #divPcb {
   float: left;
-  width: 62%;
+  width: 67%;
 }
 
 #divPcb table {

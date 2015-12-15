@@ -49,6 +49,7 @@ var DOGES;
                 pcbHTML.getElementsByClassName("state")[0].textContent = this.getProcessStateString(pcb.state);
                 pcbHTML.getElementsByClassName("turnaround")[0].textContent = pcb.turnaround.toString();
                 pcbHTML.getElementsByClassName("waiting")[0].textContent = pcb.waiting.toString();
+                pcbHTML.getElementsByClassName("priority")[0].textContent = pcb.priority.toString();
                 pcbHTML.getElementsByClassName("location")[0].textContent = this.getLocationString(pcb.inFileSystem);
             }
             else {
@@ -105,6 +106,10 @@ var DOGES;
             cell = document.createElement("td");
             cell.className = "waiting";
             cell.textContent = pcb.waiting;
+            pcbHTML.appendChild(cell);
+            cell = document.createElement("td");
+            cell.className = "priority";
+            cell.textContent = pcb.priority;
             pcbHTML.appendChild(cell);
             cell = document.createElement("td");
             cell.className = "location";

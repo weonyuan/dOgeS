@@ -547,15 +547,22 @@ module DOGES {
                     isValid = false;
                 }
 
+                if (args[0] !== undefined && args[0] !== null) {
+                    priority = parseInt(args[0]);
+                }
+
+                console.log(priority);
+
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {
-                    _StdOut.putText("Much loading. Very appreciate.");
-                    _Console.advanceLine();
-                    if (args[0] !== undefined && args[0] !== null) {
-                        priority = parseInt(args[0]);
+                    if (priority >= 0) {
+                      _StdOut.putText("Much loading. Very appreciate.");
+                      _Console.advanceLine();
+                      MemoryManager.loadProgram(programInput, priority);
+                    } else {
+                        _StdOut.putText("Such priority. Much invalid. Must be zero or a positive number.");
                     }
-                    MemoryManager.loadProgram(programInput, priority);
                 }
             } else if (programInput.length > PROGRAM_LIMIT) {
                 _StdOut.putText("Wat. Dat program. So big. Cannot load.");

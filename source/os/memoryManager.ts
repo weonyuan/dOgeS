@@ -78,12 +78,10 @@ module DOGES {
         // Look up the program from the file system
         var programFilename = ProcessManager.createProcessFilename(program);
         var data = _FileSystem.readFile(programFilename);
-        console.log(programFilename);
 
         // Then load the program from the file system to main memory
-        // this.loadToMemory(data, program.base);
+        this.loadToMemory(data, program.base);
         _FileSystem.deleteFile(programFilename);
-
 
         program.limit = program.base + PROGRAM_SIZE - 1;
         program.inFileSystem = false;
@@ -127,14 +125,15 @@ module DOGES {
             && _ResidentList[i].base !== null) {
             freeAddress += PROGRAM_SIZE;
 
-            console.log(_ResidentList[i]);
             if (freeAddress >= PROGRAM_SIZE * PROGRAM_LIMIT) {
                 freeAddress = null;
             }
+
+            console.log(freeAddress);
           }
         }
       }
-      console.log(freeAddress);
+      
       return freeAddress;
     }
 

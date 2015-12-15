@@ -25,14 +25,14 @@ var DOGES;
             }
             return false;
         };
-        // Perform Round Robin context switching
+        // Perform context switching
         CpuScheduler.performContextSwitch = function () {
             // Grab the next program once context switch is
             // done on the current program
-            var nextProgram = _ReadyQueue.dequeue();
+            var nextProgram = this.findNextProgram();
             // Update the display
             DOGES.ProcessManager.pcbLog(_CurrentProgram);
-            if (nextProgram !== null) {
+            if (nextProgram !== null && nextProgram !== undefined) {
                 if (_CurrentScheduler === RR_SCH) {
                     this.roundRobinSwitch(nextProgram);
                 }
@@ -42,6 +42,12 @@ var DOGES;
                 else if (_CurrentScheduler === PRIORITY_SCH) {
                     this.prioritySwitch(nextProgram);
                 }
+                var previousProgram = _CurrentProgram;
+                // Then set the next program as the current program so it can run
+                _CurrentProgram = nextProgram;
+                _CurrentProgram.state = PS_RUNNING;
+                this.programSwapping(previousProgram);
+                _CPU.start(_CurrentProgram);
             }
             else if (_CurrentProgram.state === PS_TERMINATED) {
                 // CPU is finished running all programs
@@ -56,18 +62,32 @@ var DOGES;
         CpuScheduler.findNextProgram = function () {
             var nextProgram = null;
             var lowestPriority = null;
+            // If Priority scheduling, find the next program with
+            // the lowest priority (top priority)
             if (_CurrentScheduler === PRIORITY_SCH) {
+                // How low can you go?
+                var lowestPriority = Number.MAX_VALUE;
+                var lowestPriorityLocation = 0;
                 for (var i = 0; i < _ReadyQueue.getSize(); i++) {
+                    if (_ReadyQueue.q[i].priority < lowestPriority) {
+                        lowestPriority = _ReadyQueue.q[i].priority;
+                        lowestPriorityLocation = i;
+                    }
                 }
-                console.log(_ReadyQueue);
-                nextProgram = _ReadyQueue.dequeue();
+                // Take the top priority program out of queue
+                // for execution
+                nextProgram = _ReadyQueue.q.splice(lowestPriorityLocation, 1)[0];
             }
             else {
+                // Otherwise, just pop off the next program in line
                 nextProgram = _ReadyQueue.dequeue();
             }
             return nextProgram;
         };
         CpuScheduler.programSwapping = function (previousProgram) {
+            // If the current program is in the file system, roll out the
+            // last program into the file system to bring the current one
+            // to memory
             if (_CurrentProgram.inFileSystem === true) {
                 if (previousProgram.state !== PS_TERMINATED) {
                     DOGES.MemoryManager.rollOut(previousProgram);
@@ -94,12 +114,6 @@ var DOGES;
                 }
                 DOGES.MemoryManager.clearSegment(_CurrentProgram.base);
             }
-            var previousProgram = _CurrentProgram;
-            // Then set the next program as the current program so it can run
-            _CurrentProgram = nextProgram;
-            _CurrentProgram.state = PS_RUNNING;
-            this.programSwapping(previousProgram);
-            _CPU.start(_CurrentProgram);
         };
         // FCFS Context Switching
         CpuScheduler.fcfsSwitch = function (nextProgram) {
@@ -108,6 +122,13 @@ var DOGES;
         };
         // TODO: Priority Context Switching
         CpuScheduler.prioritySwitch = function (nextProgram) {
+            for (var i = 0; i < _ResidentList.length; i++) {
+                if (_CurrentProgram.PID === _ResidentList[i].PID) {
+                    _ResidentList.splice(i, 1);
+                    break;
+                }
+            }
+            DOGES.MemoryManager.clearSegment(_CurrentProgram.base);
         };
         return CpuScheduler;
     })();

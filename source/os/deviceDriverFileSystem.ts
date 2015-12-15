@@ -237,7 +237,6 @@ module DOGES {
             // Keep reading until we reach a null pointer
             while (fileEntryMeta !== "---") {
                 var fileEntry = sessionStorage.getItem(fileEntryMeta);
-                console.log(fileEntry);
                 fileEntryMeta = fileEntry.substring(1, this.metaSize);
                 data += this.decodeString(fileEntry);
             }
@@ -265,14 +264,15 @@ module DOGES {
 
             // If TSB pointer is null or 000, data has not been written to the file yet
             if (dirEntryMeta === "---" || dirEntryMeta === "000") {
-                console.log("allocate new file blocks");
                 // Allocate data blocks and store data there
                 var startAddress = this.findFreeFileEntry();    // start point of file entry block
                 var dirEntry = "1" + startAddress + dirEntry.substring(this.metaSize);
-
+                dirEntryMeta = dirEntry.substring(1, this.metaSize);
+                
                 // Write to newly allocated file entry blocks until all data has been accounted for
                 // Then allocate and add the new data in
                 while (dataChunks.length > 0) {
+                    console.log(dataChunks);
                     sessionStorage.setItem(dirEntryMeta, "1");
 
                     var newKey = this.defineAddressPointer(dataChunks.length);

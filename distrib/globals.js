@@ -12,7 +12,7 @@
 //
 var APP_NAME = "dOgeS"; // such app
 var APP_VERSION = "4.0"; // rapid development. much fast.
-var CPU_CLOCK_INTERVAL = 110; // This is in ms (milliseconds) so 1000 = 1 second.
+var CPU_CLOCK_INTERVAL = 60; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 // Interrupts

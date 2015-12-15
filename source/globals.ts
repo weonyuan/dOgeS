@@ -14,7 +14,7 @@
 const APP_NAME: string    = "dOgeS";   // such app
 const APP_VERSION: string = "4.0";   // rapid development. much fast.
 
-const CPU_CLOCK_INTERVAL: number = 110;   // This is in ms (milliseconds) so 1000 = 1 second.
+const CPU_CLOCK_INTERVAL: number = 60;   // This is in ms (milliseconds) so 1000 = 1 second.
 
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.

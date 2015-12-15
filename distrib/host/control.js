@@ -1,4 +1,5 @@
 ///<reference path="../globals.ts" />
+///<reference path="../jquery.d.ts" />
 ///<reference path="../os/canvastext.ts" />
 /* ------------
      Control.ts
@@ -28,6 +29,18 @@ var DOGES;
         }
         Control.hostInit = function () {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
+            // Activate Memory View switch
+            $("#memoryViewSwitch").bootstrapSwitch("state");
+            $("#memoryViewSwitch").on("switchChange.bootstrapSwitch", function (event, state) {
+                if (state) {
+                    $("#mainMemory").hide();
+                    $("#fileSystem").show();
+                }
+                else {
+                    $("#mainMemory").show();
+                    $("#fileSystem").hide();
+                }
+            });
             // Activate pretty Step Mode switch and set interrupt for toggling
             $("#stepModeSwitch").bootstrapSwitch();
             $("#stepModeSwitch").on("switchChange.bootstrapSwitch", function (event, state) {
@@ -142,8 +155,9 @@ var DOGES;
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
-            // .. enable the Step Mode switch ...
+            // .. enable the Step Mode and Memory View switches ...
             $("#stepModeSwitch").bootstrapSwitch("toggleDisabled");
+            $("#memoryViewSwitch").bootstrapSwitch("toggleDisabled");
             // .. enable the Halt and Reset buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;

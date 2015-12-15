@@ -27,6 +27,7 @@
    <script type="text/javascript" src="distrib/os/cpuScheduler.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriverFileSystem.js"></script>
    <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
    <script type="text/javascript" src="distrib/os/pcb.js"></script>
    <script type="text/javascript" src="distrib/os/processManager.js"></script>
@@ -39,7 +40,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment this line below to enable GLaDOgeS testing -->
-   <script type="text/javascript" src="gladoges.js"></script>
+   <!--<script type="text/javascript" src="gladoges.js"></script>-->
 
    <style>
       .panel-body {
@@ -110,13 +111,65 @@
    </div>
 
    <div id="divMemoryManager" class="panel panel-default">
-      <div class="panel-heading"><label>Memory Manager</label></div>
+        <div class="panel-heading">
+            <label>Memory Manager</label>
+            <input id="memoryViewSwitch"
+                 type="checkbox"
+                 name="memory-view"
+                 data-on-color="primary"
+                 data-on-text="FS"
+                 data-off-color="success"
+                 data-off-text="MAIN"
+                 data-size="small"
+                 disabled />
+        </div>
+        <div id="mainMemory" class="panel-body">
+          <table id="memoryTable" class="table table-bordered"></table>
+        </div>
+        <div id="fileSystem" class="panel-body">
+            <table id="fsTable" class="table">
+              <tr>
+                  <th class="fs-tsb">TSB</th>
+                  <th class="fs-meta">Meta</th>
+                  <th class="fs-data">Data</th>
+              </tr>
+              <tbody id="fsContent">
+              </tbody>
+            </table>
+       </div>
+   </div>
+
+   <div id="divUserProgramInput" class="panel panel-default">
+      <div class="panel-heading"><label>User Program Input</label></div>
+         <textarea name="taProgramInput"
+                   id  ="taProgramInput"
+         ></textarea>
+   </div>
+
+   <div id="divPcb" class="panel panel-default">
+      <div class="panel-heading"><label>Processes</label></div>
       <div class="panel-body">
-        <table id="memoryTable" class="table table-bordered"></table>
+        <table id="pcbTable" class="table">
+          <tr>
+            <th>PID</th>
+            <th>PC</th>
+            <th>Acc</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>Z</th>
+            <th>Base</th>
+            <th>Limit</th>
+            <th>State</th>
+            <th>Turnaround</th>
+            <th>Waiting</th>
+            <th>Priority</th>
+            <th>Location</th>
+          </tr>
+        </table>
       </div>
    </div>
 
-   <div id="divCpu" class="panel panel-default">
+   <div id="divCpu" class="panel panel-default" style="margin-bottom: 0">
       <div class="panel-heading"><label>CPU</label></div>
       <div class="panel-body">
         <table id="cpuTable" class="table">
@@ -136,34 +189,6 @@
           </tr>
         </table>
       </div>
-   </div>
-
-   <div id="divPcb" class="panel panel-default">
-      <div class="panel-heading"><label>Processes</label></div>
-      <div class="panel-body">
-        <table id="pcbTable" class="table">
-          <tr>
-            <th>PID</th>
-            <th>PC</th>
-            <th>Acc</th>
-            <th>X</th>
-            <th>Y</th>
-            <th>Z</th>
-            <th>Base</th>
-            <th>Limit</th>
-            <th>State</th>
-            <th>Turnaround</th>
-            <th>Waiting</th>
-          </tr>
-        </table>
-      </div>
-   </div>
-
-   <div id="divUserProgramInput" class="panel panel-default" style="margin-bottom: 0">
-      <div class="panel-heading"><label>User Program Input</label></div>
-         <textarea name="taProgramInput"
-                   id  ="taProgramInput"
-         ></textarea>
    </div>
 </div>
 

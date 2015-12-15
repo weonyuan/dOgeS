@@ -111,44 +111,92 @@ module DOGES {
 
             // run <pid>
             sc = new ShellCommand(this.shellRun,
-              "run",
-              "<pid> - Runs a program already in memory");
+                                  "run",
+                                  "<pid> - Runs a program already in memory");
             this.commandList[this.commandList.length] = sc;
 
             // runall
             sc = new ShellCommand(this.shellRunAll,
-                "runall",
-                "- Runs all programs in memory");
+                                  "runall",
+                                  "- Runs all programs in memory");
             this.commandList[this.commandList.length] = sc;            
 
             // suchspin
             sc = new ShellCommand(this.shellSpin,
-                "suchspin",
-                "- Dogey the Shiba will spin. Just for you.");
+                                  "suchspin",
+                                  "- Dogey the Shiba will spin. Just for you.");
             this.commandList[this.commandList.length] = sc;
 
             // clearmem
             sc = new ShellCommand(this.shellClearMem,
-                "clearmem",
-                "- Clears all memory partitions.");
+                                  "clearmem",
+                                  "- Clears all memory partitions.");
             this.commandList[this.commandList.length] = sc;
 
             // quantum <int>
             sc = new ShellCommand(this.shellQuantum,
-                "quantum",
-                "<int> - Sets the Round Robin quantum value.");
+                                  "quantum",
+                                  "<int> - Sets the Round Robin quantum value.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
             sc = new ShellCommand(this.shellPs,
-                "ps",
-                "- Displays all active processes.");
+                                  "ps",
+                                  "- Displays all active processes.");
             this.commandList[this.commandList.length] = sc;
 
             // kill <id> - kills the specified process id.
             sc = new ShellCommand(this.shellKill,
-                "kill",
-                "<pid> - Kills the active process.");
+                                  "kill",
+                                  "<pid> - Kills the active process.");
+            this.commandList[this.commandList.length] = sc;
+
+            // setschedule <schedule>
+            sc = new ShellCommand(this.shellSetSchedule,
+                                  "setschedule",
+                                  "<rr/fcfs/priority> - Sets the CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // getschedule
+            sc = new ShellCommand(this.shellGetSchedule,
+                                  "getschedule",
+                                  "- Displays the current CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+
+            // create <filename>
+            sc = new ShellCommand(this.shellCreateFile,
+                                  "create",
+                                  "<filename> - Creates a new file with the designated name.");
+            this.commandList[this.commandList.length] = sc;
+
+            // write <filename> <string>
+            sc = new ShellCommand(this.shellWriteFile,
+                                  "write",
+                                  "<filename> <string> - Writes the string into the designated file.");
+            this.commandList[this.commandList.length] = sc;
+
+            // read <filename>
+            sc = new ShellCommand(this.shellReadFile,
+                                  "read",
+                                  "<filename> - Reads the designated file's data.");
+            this.commandList[this.commandList.length] = sc;
+
+            // delete <filename>
+            sc = new ShellCommand(this.shellDeleteFile,
+                                  "delete",
+                                  "<filename> - Deletes the designated file.");
+            this.commandList[this.commandList.length] = sc;
+
+            // format
+            sc = new ShellCommand(this.shellFormat,
+                                  "format",
+                                  "- Clears all data in the file system.");
+            this.commandList[this.commandList.length] = sc;
+
+            // ls
+            sc = new ShellCommand(this.shellLs,
+                                  "ls",
+                                  "- Lists all files in the file system.");
             this.commandList[this.commandList.length] = sc;
 
             //
@@ -374,6 +422,30 @@ module DOGES {
                     case "kill":
                         _StdOut.putText("Kill removes an active process.");
                         break;
+                    case "setschedule":
+                        _StdOut.putText("Setschedule sets the CPU scheduling routine.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("Getschedule displays the current CPU scheduling routine.");
+                        break;
+                    case "create":
+                        _StdOut.putText("Create creates a new file with its filename as the given parameter.");
+                        break;
+                    case "write":
+                        _StdOut.putText("Write writes the given data into the designated file.");
+                        break;
+                    case "read":
+                        _StdOut.putText("Read reads the given filename's data stored in the data entry.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("Delete deletes the given file including its data stored in the file system.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Format clears all user data in the file system.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Ls lists all files in the file system.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -467,6 +539,7 @@ module DOGES {
             var programInput: string = (<HTMLTextAreaElement> document.getElementById("taProgramInput")).value;
             programInput = Utils.trim(programInput).replace(/(?:\r\n|\r|\n)/g, " ").replace(/ /gm, "");
             var currentChar: string = "";
+            var priority: number = DEFAULT_PRIORITY;
             var isValid: boolean;
 
             if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE * 2) {
@@ -474,12 +547,22 @@ module DOGES {
                     isValid = false;
                 }
 
+                if (args[0] !== undefined && args[0] !== null) {
+                    priority = parseInt(args[0]);
+                }
+
+                console.log(priority);
+
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {
-                    _StdOut.putText("Much loading. Very appreciate.");
-                    _Console.advanceLine();
-                    MemoryManager.loadProgram(programInput);
+                    if (priority >= 0) {
+                      _StdOut.putText("Much loading. Very appreciate.");
+                      _Console.advanceLine();
+                      MemoryManager.loadProgram(programInput, priority);
+                    } else {
+                        _StdOut.putText("Such priority. Much invalid. Must be zero or a positive number.");
+                    }
                 }
             } else if (programInput.length > PROGRAM_LIMIT) {
                 _StdOut.putText("Wat. Dat program. So big. Cannot load.");
@@ -576,6 +659,108 @@ module DOGES {
                     }
                 }
             }
+        }
+
+        public shellSetSchedule(args) {
+            if (args.length > 0) {
+                if (args[0] === "fcfs") {
+                    _CurrentScheduler = FCFS_SCH;
+                    _StdOut.putText("CPU scheduling set to FCFS.");
+                } else if (args[0] === "priority") {
+                    _CurrentScheduler = PRIORITY_SCH;
+                    _StdOut.putText("CPU scheduling set to Priority.");
+                } else if (args[0] === "rr") {
+                    _CurrentScheduler = RR_SCH;
+                    _StdOut.putText("CPU scheduler set to Round Robin.");
+                }
+            } else {
+              _StdOut.putText("Usage: setschedule <schedule>  Please supply a valid scheduling routine.");
+            }
+        }
+
+        public shellGetSchedule(args) {
+           if (_CurrentScheduler === FCFS_SCH) {
+               _StdOut.putText("The current CPU scheduler is FCFS.");
+           } else if (_CurrentScheduler === PRIORITY_SCH) {
+               _StdOut.putText("The current CPU scheduler is Priority.");
+           } else if (_CurrentScheduler === RR_SCH) {
+               _StdOut.putText("The current CPU scheduler is Round Robin.");
+           }
+        }
+
+        public shellCreateFile(args) {
+            if (args.length > 0) {
+                _StdOut.putText("Creating file " + args[0] + ". Very wait.");
+                _StdOut.advanceLine();
+
+                var response = _FileSystem.createFile(args[0]);
+                _StdOut.putText(response.header);
+            } else {
+                _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
+            }
+        }
+
+        public shellWriteFile(args) {
+            if (args.length > 1) {
+                _StdOut.putText("Writing file " + args[0] + ". Very wait.");
+                _StdOut.advanceLine();
+
+                var data = args[1];
+
+                for (var i = 2; i < args.length; i++) {
+                    data += " " + args[i];
+                }
+
+                // If data is encapsulated in quotes, disregard them
+                if (data.charAt(0) === '"' && data.charAt(data.length - 1) === '"') {
+                    data = data.substring(1, data.length - 1);
+                }
+
+                var response = _FileSystem.writeFile(args[0], data);
+                _StdOut.putText(response.header);
+            } else {
+                _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
+            }
+        }
+
+        public shellReadFile(args) {
+            if (args.length > 0) {
+                _StdOut.putText("Reading file " + args[0] + " now...");
+                _StdOut.advanceLine();
+
+                var response = _FileSystem.readFile(args[0]);
+                _StdOut.putText(response.header);
+                
+                if (response.status === "SUCCESS") {
+                  _StdOut.advanceLine();
+                  _StdOut.putText(response.body);
+                }
+            } else {
+                _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
+            }
+        }
+
+        public shellDeleteFile(args) {
+            if (args.length > 0) {
+                var response = _FileSystem.deleteFile(args[0]);
+                _StdOut.putText(response.header);
+            } else {
+                _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
+            }
+        }
+
+        public shellFormat(args) {
+            _FileSystem.format();
+            _StdOut.putText("File system very formatted. Such clean.");
+        }
+
+        public shellLs(args) {
+            var response = _FileSystem.listFiles();
+            for (var i = 0; i < response.body.length; i++) {
+                _StdOut.putText(response.body[i]);
+                _StdOut.advanceLine();
+            }
+            _StdOut.putText(response.header);
         }
     }
 }

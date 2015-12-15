@@ -85,6 +85,30 @@ var DOGES;
             // kill <id> - kills the specified process id.
             sc = new DOGES.ShellCommand(this.shellKill, "kill", "<pid> - Kills the active process.");
             this.commandList[this.commandList.length] = sc;
+            // setschedule <schedule>
+            sc = new DOGES.ShellCommand(this.shellSetSchedule, "setschedule", "<rr/fcfs/priority> - Sets the CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+            // getschedule
+            sc = new DOGES.ShellCommand(this.shellGetSchedule, "getschedule", "- Displays the current CPU scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+            // create <filename>
+            sc = new DOGES.ShellCommand(this.shellCreateFile, "create", "<filename> - Creates a new file with the designated name.");
+            this.commandList[this.commandList.length] = sc;
+            // write <filename> <string>
+            sc = new DOGES.ShellCommand(this.shellWriteFile, "write", "<filename> <string> - Writes the string into the designated file.");
+            this.commandList[this.commandList.length] = sc;
+            // read <filename>
+            sc = new DOGES.ShellCommand(this.shellReadFile, "read", "<filename> - Reads the designated file's data.");
+            this.commandList[this.commandList.length] = sc;
+            // delete <filename>
+            sc = new DOGES.ShellCommand(this.shellDeleteFile, "delete", "<filename> - Deletes the designated file.");
+            this.commandList[this.commandList.length] = sc;
+            // format
+            sc = new DOGES.ShellCommand(this.shellFormat, "format", "- Clears all data in the file system.");
+            this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new DOGES.ShellCommand(this.shellLs, "ls", "- Lists all files in the file system.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -296,6 +320,30 @@ var DOGES;
                     case "kill":
                         _StdOut.putText("Kill removes an active process.");
                         break;
+                    case "setschedule":
+                        _StdOut.putText("Setschedule sets the CPU scheduling routine.");
+                        break;
+                    case "getschedule":
+                        _StdOut.putText("Getschedule displays the current CPU scheduling routine.");
+                        break;
+                    case "create":
+                        _StdOut.putText("Create creates a new file with its filename as the given parameter.");
+                        break;
+                    case "write":
+                        _StdOut.putText("Write writes the given data into the designated file.");
+                        break;
+                    case "read":
+                        _StdOut.putText("Read reads the given filename's data stored in the data entry.");
+                        break;
+                    case "delete":
+                        _StdOut.putText("Delete deletes the given file including its data stored in the file system.");
+                        break;
+                    case "format":
+                        _StdOut.putText("Format clears all user data in the file system.");
+                        break;
+                    case "ls":
+                        _StdOut.putText("Ls lists all files in the file system.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -387,18 +435,28 @@ var DOGES;
             var programInput = document.getElementById("taProgramInput").value;
             programInput = DOGES.Utils.trim(programInput).replace(/(?:\r\n|\r|\n)/g, " ").replace(/ /gm, "");
             var currentChar = "";
+            var priority = DEFAULT_PRIORITY;
             var isValid;
             if (programInput.length > 0 && programInput.length <= PROGRAM_SIZE * 2) {
                 if (!programInput.match(/^[0-9\s*A-F\s*]+$/ig)) {
                     isValid = false;
                 }
+                if (args[0] !== undefined && args[0] !== null) {
+                    priority = parseInt(args[0]);
+                }
+                console.log(priority);
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 }
                 else {
-                    _StdOut.putText("Much loading. Very appreciate.");
-                    _Console.advanceLine();
-                    DOGES.MemoryManager.loadProgram(programInput);
+                    if (priority >= 0) {
+                        _StdOut.putText("Much loading. Very appreciate.");
+                        _Console.advanceLine();
+                        DOGES.MemoryManager.loadProgram(programInput, priority);
+                    }
+                    else {
+                        _StdOut.putText("Such priority. Much invalid. Must be zero or a positive number.");
+                    }
                 }
             }
             else if (programInput.length > PROGRAM_LIMIT) {
@@ -495,6 +553,102 @@ var DOGES;
                     }
                 }
             }
+        };
+        Shell.prototype.shellSetSchedule = function (args) {
+            if (args.length > 0) {
+                if (args[0] === "fcfs") {
+                    _CurrentScheduler = FCFS_SCH;
+                    _StdOut.putText("CPU scheduling set to FCFS.");
+                }
+                else if (args[0] === "priority") {
+                    _CurrentScheduler = PRIORITY_SCH;
+                    _StdOut.putText("CPU scheduling set to Priority.");
+                }
+                else if (args[0] === "rr") {
+                    _CurrentScheduler = RR_SCH;
+                    _StdOut.putText("CPU scheduler set to Round Robin.");
+                }
+            }
+            else {
+                _StdOut.putText("Usage: setschedule <schedule>  Please supply a valid scheduling routine.");
+            }
+        };
+        Shell.prototype.shellGetSchedule = function (args) {
+            if (_CurrentScheduler === FCFS_SCH) {
+                _StdOut.putText("The current CPU scheduler is FCFS.");
+            }
+            else if (_CurrentScheduler === PRIORITY_SCH) {
+                _StdOut.putText("The current CPU scheduler is Priority.");
+            }
+            else if (_CurrentScheduler === RR_SCH) {
+                _StdOut.putText("The current CPU scheduler is Round Robin.");
+            }
+        };
+        Shell.prototype.shellCreateFile = function (args) {
+            if (args.length > 0) {
+                _StdOut.putText("Creating file " + args[0] + ". Very wait.");
+                _StdOut.advanceLine();
+                var response = _FileSystem.createFile(args[0]);
+                _StdOut.putText(response.header);
+            }
+            else {
+                _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
+            }
+        };
+        Shell.prototype.shellWriteFile = function (args) {
+            if (args.length > 1) {
+                _StdOut.putText("Writing file " + args[0] + ". Very wait.");
+                _StdOut.advanceLine();
+                var data = args[1];
+                for (var i = 2; i < args.length; i++) {
+                    data += " " + args[i];
+                }
+                // If data is encapsulated in quotes, disregard them
+                if (data.charAt(0) === '"' && data.charAt(data.length - 1) === '"') {
+                    data = data.substring(1, data.length - 1);
+                }
+                var response = _FileSystem.writeFile(args[0], data);
+                _StdOut.putText(response.header);
+            }
+            else {
+                _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
+            }
+        };
+        Shell.prototype.shellReadFile = function (args) {
+            if (args.length > 0) {
+                _StdOut.putText("Reading file " + args[0] + " now...");
+                _StdOut.advanceLine();
+                var response = _FileSystem.readFile(args[0]);
+                _StdOut.putText(response.header);
+                if (response.status === "SUCCESS") {
+                    _StdOut.advanceLine();
+                    _StdOut.putText(response.body);
+                }
+            }
+            else {
+                _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
+            }
+        };
+        Shell.prototype.shellDeleteFile = function (args) {
+            if (args.length > 0) {
+                var response = _FileSystem.deleteFile(args[0]);
+                _StdOut.putText(response.header);
+            }
+            else {
+                _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
+            }
+        };
+        Shell.prototype.shellFormat = function (args) {
+            _FileSystem.format();
+            _StdOut.putText("File system very formatted. Such clean.");
+        };
+        Shell.prototype.shellLs = function (args) {
+            var response = _FileSystem.listFiles();
+            for (var i = 0; i < response.body.length; i++) {
+                _StdOut.putText(response.body[i]);
+                _StdOut.advanceLine();
+            }
+            _StdOut.putText(response.header);
         };
         return Shell;
     })();

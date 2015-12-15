@@ -45,10 +45,11 @@ h3 {
   background-color: rgba(0, 0, 0, 0.4);
   color: white;
   float: left;
+  font-size: 0.85em;
   margin: 8px;
   margin-right: 20px;
   padding: 10px;
-  width: 40%;
+  width: 38%;
   height: 33%;
 }
 
@@ -65,10 +66,12 @@ h3 {
 #logo {
   color: white;
   display: inline-block;
-  font-size: 24pt;
+  font-size: 22pt;
+  font-family: cursive;
   font-weight: bold;
   margin-top: 5px;
-  width: 19%;
+  text-align: center;
+  width: 23%;
 }
 
 @keyframes spinRight {
@@ -91,7 +94,7 @@ h3 {
   float: right;
   position: absolute;
   right: 0px;
-  width: 33%;
+  width: 38%;
 }
 
 #divButtonBar button {
@@ -109,7 +112,7 @@ h3 {
   color: white;
   display: inline-block;
   float: right;
-  margin-right: 35px;
+  margin-right: 4%;
   padding-left: 10px;
   width: 166px;
   height: 33%;
@@ -133,7 +136,7 @@ h3 {
   display: inline-block;
   float: right;
   margin-bottom: 10px;
-  width: 43%;
+  width: 30%;
 }
 
 #divLog,
@@ -158,8 +161,8 @@ h3 {
 }
 
 #divMemoryManager .panel-body {
-  height: 150px;
-  overflow-x: hidden;
+  height: 160px;
+  overflow-x: auto;
   overflow-y: auto;
 }
 
@@ -167,9 +170,32 @@ h3 {
   border-bottom: 1px solid #ddd;
 }
 
+.bootstrap-switch-id-memoryViewSwitch {
+  float: right;
+}
+
+#fileSystem {
+  display: none;
+}
+
+.fs-tsb {
+  text-align: center;
+  width: 15%;
+}
+
+.fs-meta {
+  text-align: center;
+  width: 12%;
+}
+
+.fs-data {
+  text-align: left;
+  width: 73%;
+}
+
 #divPcb {
   float: left;
-  width: 54%;
+  width: 67%;
 }
 
 #divPcb table {

@@ -49,6 +49,7 @@ var DOGES;
         };
         DeviceDriverFileSystem.prototype.krnFsISR = function (params) {
         };
+        // Format the entire file system but retai
         DeviceDriverFileSystem.prototype.format = function () {
             for (var i = 0; i < this.tracks; i++) {
                 for (var j = 0; j < this.sectors; j++) {
@@ -172,7 +173,6 @@ var DOGES;
                     hexPair = "";
                 }
             }
-            console.log(decodedString);
             return decodedString;
         };
         // Used to determine whether to set the pointer null
@@ -185,19 +185,51 @@ var DOGES;
                 return this.findFreeFileEntry();
             }
         };
+        //////////////////////////////////////////////////////////////////////////
+        //                                                                      //
+        // FILE OPERATIONS                                                      //
+        //                                                                      //
+        //////////////////////////////////////////////////////////////////////////
         DeviceDriverFileSystem.prototype.createFile = function (filename) {
+            var response = {
+                "status": "ERROR",
+                "header": ""
+            };
+            // Filename too big
+            if (filename.length > this.blockSize - this.metaSize) {
+                response.header = "The filename is too long.";
+                return response;
+            }
+            // Directory entry is full
+            if (this.findFreeDirEntry() === null) {
+                response.header = "Directory entry is full. Cannot create file.";
+                return response;
+            }
+            // File already exists
+            if (this.findDirEntryByFilename(filename) !== null) {
+                response.header = "There is already an existing file with this name.";
+                return response;
+            }
             var data = "1000" + filename;
-            if (filename.length <= this.blockSize - this.metaSize) {
-                this.writeData(this.findFreeDirEntry(), data);
-            }
-            else {
-                console.log("error: filename too large.");
-            }
+            this.writeData(this.findFreeDirEntry(), data);
             this.displayFsLog();
+            response.status = "SUCCESS";
+            response.header = "Much success. Created file " + filename + ".";
+            return response;
         };
         DeviceDriverFileSystem.prototype.readFile = function (filename) {
+            var response = {
+                "status": "ERROR",
+                "header": "",
+                "body": ""
+            };
             // First find the filename
             var dirEntryKey = this.findDirEntryByFilename(filename);
+            // File does not exist
+            if (dirEntryKey === null) {
+                response.header = "Cannot read file " + filename + ". File does not exist.";
+                return response;
+            }
             // Then find the file in the directory entry
             var dirEntry = sessionStorage.getItem(dirEntryKey);
             // TSB of the file's data starting point
@@ -206,7 +238,6 @@ var DOGES;
             // TSB pointer to next data block of file
             // var startFileMeta = startFile.substring(1, this.metaSize);
             var fileEntryMeta = startFile.substring(1, this.metaSize);
-            // var fileEntryMeta = startFileMeta;
             var data = this.decodeString(startFile);
             // Keep reading until we reach a null pointer
             while (fileEntryMeta !== "---") {
@@ -214,13 +245,30 @@ var DOGES;
                 fileEntryMeta = fileEntry.substring(1, this.metaSize);
                 data += this.decodeString(fileEntry);
             }
-            return data;
+            response.status = "SUCCESS";
+            response.header = "File " + filename + " successfully read.";
+            response.body = data;
+            return response;
         };
-        // Writes the data into the specified file
+        // Write the data into the specified file
         DeviceDriverFileSystem.prototype.writeFile = function (filename, data) {
+            var response = {
+                "status": "ERROR",
+                "header": ""
+            };
             var dataChunks = [];
             var chunkSize = this.blockSize - this.metaSize;
             var dirEntryKey = this.findDirEntryByFilename(filename);
+            // File does not exist
+            if (dirEntryKey === null) {
+                response.header = "Cannot write file " + filename + " . File does not exist.";
+                return response;
+            }
+            // Out of file entry blocks
+            if (dataChunks.length > this.getNumFreeFileEntries()) {
+                response.header = "Data too big. There is not enough free space on file system to write file.";
+                return response;
+            }
             var dirEntry = sessionStorage.getItem(dirEntryKey);
             var dirEntryMeta = dirEntry.substring(1, this.metaSize);
             // Data chunking process by 60 bytes
@@ -240,10 +288,8 @@ var DOGES;
                 // Write to newly allocated file entry blocks until all data has been accounted for
                 // Then allocate and add the new data in
                 while (dataChunks.length > 0) {
-                    console.log(dataChunks);
                     sessionStorage.setItem(dirEntryMeta, "1");
                     var newKey = this.defineAddressPointer(dataChunks.length);
-                    console.log("newKey: " + newKey);
                     var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
                     sessionStorage.setItem(dirEntryMeta, newData);
                     // Adjust the directory entry pointer
@@ -262,7 +308,6 @@ var DOGES;
                 while (dataChunks.length > 0) {
                     sessionStorage.setItem(dirEntryMeta, "1");
                     var newKey = this.defineAddressPointer(dataChunks.length);
-                    console.log("newKey: " + newKey);
                     var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
                     sessionStorage.setItem(dirEntryMeta, newData);
                     // Adjust the directory entry pointer
@@ -270,9 +315,22 @@ var DOGES;
                 }
             }
             this.displayFsLog();
+            response.status = "SUCCESS";
+            response.header = "Data successfully written to file " + filename + ".";
+            return response;
         };
         DeviceDriverFileSystem.prototype.deleteFile = function (filename) {
+            var response = {
+                "status": "ERROR",
+                "header": ""
+            };
+            // Look up the file through the directory entry first
             var dirEntryKey = this.findDirEntryByFilename(filename);
+            // File does not exist
+            if (dirEntryKey === null) {
+                response.header = "Cannot delete file " + filename + ". File does not exist.";
+                return response;
+            }
             var dirEntry = sessionStorage.getItem(dirEntryKey);
             // Clear its data from the file entry
             var fileEntryKey = dirEntry.substring(1, this.metaSize);
@@ -280,20 +338,32 @@ var DOGES;
             // Then clear the file from directory entry
             sessionStorage.setItem(dirEntryKey, this.initializeBlock());
             this.displayFsLog();
+            response.status = "SUCCESS";
+            response.header = "Successfully deleted file " + filename + ".";
+            return response;
         };
+        // List all files stored in the directory entry
         DeviceDriverFileSystem.prototype.listFiles = function () {
+            var response = {
+                "status": "ERROR",
+                "header": "",
+                "body": []
+            };
             // Iterate over directory entry
             for (var i = 0; i < this.sectors; i++) {
                 for (var j = 1; j < this.blocks; j++) {
                     var key = "0" + i.toString() + j.toString();
                     var dirEntry = sessionStorage.getItem(key);
                     if (this.isUsed(dirEntry)) {
-                        _StdOut.putText(key + ": " + this.decodeString(dirEntry));
-                        _StdOut.advanceLine();
+                        response.body.push(key + ": " + this.decodeString(dirEntry));
                     }
                 }
             }
+            response.status = "SUCCESS";
+            response.header = "Successfully listed all files in the file system.";
+            return response;
         };
+        // Clear the specified block or a chain of block data
         DeviceDriverFileSystem.prototype.clearBlocks = function (key) {
             while (key !== "---" && key !== "000") {
                 var currentData = sessionStorage.getItem(key);
@@ -302,7 +372,24 @@ var DOGES;
                 sessionStorage.setItem(currentKey, this.initializeBlock());
             }
         };
-        // Writes the encoded data into the specified TSB address.
+        // Get the number of free file entry blocks
+        // Kinda similar to getFreeFileEntry but this iterates through whole file system
+        DeviceDriverFileSystem.prototype.getNumFreeFileEntries = function () {
+            var key = null;
+            var numEntries = 0;
+            for (var i = 1; i < this.tracks; i++) {
+                for (var j = 0; j < this.sectors; j++) {
+                    for (var k = 0; k < this.blocks; k++) {
+                        key = i.toString() + j.toString() + k.toString();
+                        if (!this.isUsed(sessionStorage.getItem(key))) {
+                            numEntries++;
+                        }
+                    }
+                }
+            }
+            return numEntries;
+        };
+        // Write the encoded data into the specified TSB address
         DeviceDriverFileSystem.prototype.writeData = function (key, data) {
             if (data !== undefined &&
                 data !== null) {

@@ -106,7 +106,6 @@ var DOGES;
                         if (freeAddress >= PROGRAM_SIZE * PROGRAM_LIMIT) {
                             freeAddress = null;
                         }
-                        console.log(freeAddress);
                     }
                 }
             }

@@ -45,6 +45,7 @@ module DOGES {
 
         }
 
+        // Format the entire file system but retai
         public format(): void {
             for (var i = 0; i < this.tracks; i++) {
                 for (var j = 0; j < this.sectors; j++) {
@@ -193,7 +194,6 @@ module DOGES {
                 }
             }
 
-            console.log(decodedString);
             return decodedString;
         }
 
@@ -207,20 +207,62 @@ module DOGES {
             }
         }
 
-        public createFile(filename): void {
-            var data = "1000" + filename;
-            if (filename.length <= this.blockSize - this.metaSize) {
-                this.writeData(this.findFreeDirEntry(), data);
-            } else {
-                console.log("error: filename too large.");
+        //////////////////////////////////////////////////////////////////////////
+        //                                                                      //
+        // FILE OPERATIONS                                                      //
+        //                                                                      //
+        //////////////////////////////////////////////////////////////////////////
+        public createFile(filename): any {
+            var response = {
+                "status": "ERROR",
+                "header": ""
+            };
+
+            // Filename too big
+            if (filename.length > this.blockSize - this.metaSize) {
+                response.header = "The filename is too long.";
+                return response;
             }
 
+            // Directory entry is full
+            if (this.findFreeDirEntry() === null) {
+                response.header = "Directory entry is full. Cannot create file.";
+                return response;
+            }
+
+            // File already exists
+            if (this.findDirEntryByFilename(filename) !== null) {
+                response.header = "There is already an existing file with this name.";
+                return response;
+            }
+
+            var data = "1000" + filename;
+            this.writeData(this.findFreeDirEntry(), data);
+
             this.displayFsLog();
+
+            response.status = "SUCCESS";
+            response.header = "Much success. Created file " + filename + ".";
+
+            return response;
         }
 
-        public readFile(filename): string {
+        public readFile(filename): any {
+            var response = {
+                "status": "ERROR",
+                "header": "",
+                "body": ""
+            };
+
             // First find the filename
             var dirEntryKey = this.findDirEntryByFilename(filename);
+
+            // File does not exist
+            if (dirEntryKey === null) {
+                response.header = "Cannot read file " + filename + ". File does not exist.";
+                return response;
+            }
+
             // Then find the file in the directory entry
             var dirEntry = sessionStorage.getItem(dirEntryKey);
 
@@ -231,7 +273,6 @@ module DOGES {
             // TSB pointer to next data block of file
             // var startFileMeta = startFile.substring(1, this.metaSize);
             var fileEntryMeta = startFile.substring(1, this.metaSize);
-            // var fileEntryMeta = startFileMeta;
             var data = this.decodeString(startFile);
 
             // Keep reading until we reach a null pointer
@@ -241,14 +282,36 @@ module DOGES {
                 data += this.decodeString(fileEntry);
             }
 
-            return data;
+            response.status = "SUCCESS";
+            response.header = "File " + filename + " successfully read.";
+            response.body = data;
+
+            return response;
         }
 
-        // Writes the data into the specified file
-        public writeFile(filename, data): void {
+        // Write the data into the specified file
+        public writeFile(filename, data): any {
+            var response = {
+                "status": "ERROR",
+                "header": ""
+            };
+
             var dataChunks: string[] = [];
             var chunkSize: number = this.blockSize - this.metaSize;
             var dirEntryKey: string = this.findDirEntryByFilename(filename);
+
+            // File does not exist
+            if (dirEntryKey === null) {
+                response.header = "Cannot write file " + filename + " . File does not exist.";
+                return response;
+            }
+
+            // Out of file entry blocks
+            if (dataChunks.length > this.getNumFreeFileEntries()) {
+                response.header = "Data too big. There is not enough free space on file system to write file.";
+                return response;
+            }
+
             var dirEntry: string = sessionStorage.getItem(dirEntryKey);
             var dirEntryMeta: string = dirEntry.substring(1, this.metaSize);
 
@@ -272,12 +335,9 @@ module DOGES {
                 // Write to newly allocated file entry blocks until all data has been accounted for
                 // Then allocate and add the new data in
                 while (dataChunks.length > 0) {
-                    console.log(dataChunks);
                     sessionStorage.setItem(dirEntryMeta, "1");
 
                     var newKey = this.defineAddressPointer(dataChunks.length);
-                    console.log("newKey: " + newKey);
-
                     var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
 
                     sessionStorage.setItem(dirEntryMeta, newData);
@@ -301,8 +361,6 @@ module DOGES {
                     sessionStorage.setItem(dirEntryMeta, "1");
 
                     var newKey = this.defineAddressPointer(dataChunks.length);
-                    console.log("newKey: " + newKey);
-
                     var newData = "1" + newKey + this.encodeString(dataChunks.splice(0, 1)[0]);
 
                     sessionStorage.setItem(dirEntryMeta, newData);
@@ -310,15 +368,31 @@ module DOGES {
                     // Adjust the directory entry pointer
                     dirEntryMeta = newKey;
                 }
-
             }
 
-
             this.displayFsLog();
+
+            response.status = "SUCCESS";
+            response.header = "Data successfully written to file " + filename + ".";
+
+            return response;
         }
 
-        public deleteFile(filename): void {
+        public deleteFile(filename): any {
+            var response = {
+                "status": "ERROR",
+                "header": ""
+            };
+
+            // Look up the file through the directory entry first
             var dirEntryKey: string = this.findDirEntryByFilename(filename);
+
+            // File does not exist
+            if (dirEntryKey === null) {
+                response.header = "Cannot delete file " + filename + ". File does not exist.";
+                return response;
+            }
+
             var dirEntry: string = sessionStorage.getItem(dirEntryKey);
 
             // Clear its data from the file entry
@@ -329,9 +403,21 @@ module DOGES {
             sessionStorage.setItem(dirEntryKey, this.initializeBlock());
 
             this.displayFsLog();
+
+            response.status = "SUCCESS";
+            response.header = "Successfully deleted file " + filename + ".";
+
+            return response;
         }
 
-        public listFiles(): void {
+        // List all files stored in the directory entry
+        public listFiles(): any {
+            var response = {
+                "status": "ERROR",
+                "header": "",
+                "body": []
+            };
+
             // Iterate over directory entry
             for (var i = 0; i < this.sectors; i++) {
                 for (var j = 1; j < this.blocks; j++) {
@@ -339,13 +425,17 @@ module DOGES {
                     var dirEntry = sessionStorage.getItem(key);
 
                     if (this.isUsed(dirEntry)) {
-                        _StdOut.putText(key + ": " + this.decodeString(dirEntry));
-                        _StdOut.advanceLine();
+                        response.body.push(key + ": " + this.decodeString(dirEntry));
                     }
                 }
             }
+
+            response.status = "SUCCESS";
+            response.header = "Successfully listed all files in the file system.";
+            return response;
         }
 
+        // Clear the specified block or a chain of block data
         public clearBlocks(key): void {
             while (key !== "---" && key !== "000") {
                 var currentData: string = sessionStorage.getItem(key);
@@ -355,7 +445,28 @@ module DOGES {
             }
         }
 
-        // Writes the encoded data into the specified TSB address.
+        // Get the number of free file entry blocks
+        // Kinda similar to getFreeFileEntry but this iterates through whole file system
+        public getNumFreeFileEntries(): number {
+            var key = null;
+            var numEntries = 0;
+
+            for (var i = 1; i < this.tracks; i++) {
+                for (var j = 0; j < this.sectors; j++) {
+                    for (var k = 0; k < this.blocks; k++) {
+                        key = i.toString() + j.toString() + k.toString();
+
+                        if (!this.isUsed(sessionStorage.getItem(key))) {
+                            numEntries++;
+                        }
+                    }
+                }
+            }
+
+            return numEntries;
+        }
+
+        // Write the encoded data into the specified TSB address
         public writeData(key, data): void {
             if (data !== undefined &&
                 data !== null) {

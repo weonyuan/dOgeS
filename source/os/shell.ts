@@ -154,7 +154,7 @@ module DOGES {
             // setschedule <schedule>
             sc = new ShellCommand(this.shellSetSchedule,
                                   "setschedule",
-                                  "<schedule> - Sets the CPU scheduling algorithm.");
+                                  "<rr/fcfs/priority> - Sets the CPU scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
 
             // getschedule
@@ -690,8 +690,11 @@ module DOGES {
 
         public shellCreateFile(args) {
             if (args.length > 0) {
-                _FileSystem.createFile(args[0]);
-                _StdOut.putText("Much success. Created file " + args[0]);
+                _StdOut.putText("Creating file " + args[0] + ". Very wait.");
+                _StdOut.advanceLine();
+
+                var response = _FileSystem.createFile(args[0]);
+                _StdOut.putText(response.header);
             } else {
                 _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
             }
@@ -700,7 +703,21 @@ module DOGES {
         public shellWriteFile(args) {
             if (args.length > 1) {
                 _StdOut.putText("Writing file " + args[0] + ". Very wait.");
-                _FileSystem.writeFile(args[0], args[1]);
+                _StdOut.advanceLine();
+
+                var data = args[1];
+
+                for (var i = 2; i < args.length; i++) {
+                    data += " " + args[i];
+                }
+
+                // If data is encapsulated in quotes, disregard them
+                if (data.charAt(0) === '"' && data.charAt(data.length - 1) === '"') {
+                    data = data.substring(1, data.length - 1);
+                }
+
+                var response = _FileSystem.writeFile(args[0], data);
+                _StdOut.putText(response.header);
             } else {
                 _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
             }
@@ -709,8 +726,15 @@ module DOGES {
         public shellReadFile(args) {
             if (args.length > 0) {
                 _StdOut.putText("Reading file " + args[0] + " now...");
-                var result = _FileSystem.readFile(args[0]);
-                _StdOut.putText(result);
+                _StdOut.advanceLine();
+
+                var response = _FileSystem.readFile(args[0]);
+                _StdOut.putText(response.header);
+                
+                if (response.status === "SUCCESS") {
+                  _StdOut.advanceLine();
+                  _StdOut.putText(response.body);
+                }
             } else {
                 _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
             }
@@ -718,8 +742,8 @@ module DOGES {
 
         public shellDeleteFile(args) {
             if (args.length > 0) {
-                _FileSystem.deleteFile(args[0]);
-                _StdOut.putText("Deleted file " + args[0]);
+                var response = _FileSystem.deleteFile(args[0]);
+                _StdOut.putText(response.header);
             } else {
                 _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
             }
@@ -727,10 +751,16 @@ module DOGES {
 
         public shellFormat(args) {
             _FileSystem.format();
+            _StdOut.putText("File system very formatted. Such clean.");
         }
 
         public shellLs(args) {
-            _FileSystem.listFiles();
+            var response = _FileSystem.listFiles();
+            for (var i = 0; i < response.body.length; i++) {
+                _StdOut.putText(response.body[i]);
+                _StdOut.advanceLine();
+            }
+            _StdOut.putText(response.header);
         }
     }
 }

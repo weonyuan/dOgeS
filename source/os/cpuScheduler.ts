@@ -87,6 +87,8 @@ module DOGES {
             nextProgram = _ReadyQueue.dequeue();
         }
 
+        console.log(nextProgram);
+
         return nextProgram;
     }
 

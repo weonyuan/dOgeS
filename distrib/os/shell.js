@@ -86,7 +86,7 @@ var DOGES;
             sc = new DOGES.ShellCommand(this.shellKill, "kill", "<pid> - Kills the active process.");
             this.commandList[this.commandList.length] = sc;
             // setschedule <schedule>
-            sc = new DOGES.ShellCommand(this.shellSetSchedule, "setschedule", "<schedule> - Sets the CPU scheduling algorithm.");
+            sc = new DOGES.ShellCommand(this.shellSetSchedule, "setschedule", "<rr/fcfs/priority> - Sets the CPU scheduling algorithm.");
             this.commandList[this.commandList.length] = sc;
             // getschedule
             sc = new DOGES.ShellCommand(this.shellGetSchedule, "getschedule", "- Displays the current CPU scheduling algorithm.");
@@ -586,8 +586,10 @@ var DOGES;
         };
         Shell.prototype.shellCreateFile = function (args) {
             if (args.length > 0) {
-                _FileSystem.createFile(args[0]);
-                _StdOut.putText("Much success. Created file " + args[0]);
+                _StdOut.putText("Creating file " + args[0] + ". Very wait.");
+                _StdOut.advanceLine();
+                var response = _FileSystem.createFile(args[0]);
+                _StdOut.putText(response.header);
             }
             else {
                 _StdOut.putText("Usage: create <filename>  Please supply a valid filename.");
@@ -596,7 +598,17 @@ var DOGES;
         Shell.prototype.shellWriteFile = function (args) {
             if (args.length > 1) {
                 _StdOut.putText("Writing file " + args[0] + ". Very wait.");
-                _FileSystem.writeFile(args[0], args[1]);
+                _StdOut.advanceLine();
+                var data = args[1];
+                for (var i = 2; i < args.length; i++) {
+                    data += " " + args[i];
+                }
+                // If data is encapsulated in quotes, disregard them
+                if (data.charAt(0) === '"' && data.charAt(data.length - 1) === '"') {
+                    data = data.substring(1, data.length - 1);
+                }
+                var response = _FileSystem.writeFile(args[0], data);
+                _StdOut.putText(response.header);
             }
             else {
                 _StdOut.putText("Usage: write <filename> <data>  Please supply a valid filename and data.");
@@ -605,8 +617,13 @@ var DOGES;
         Shell.prototype.shellReadFile = function (args) {
             if (args.length > 0) {
                 _StdOut.putText("Reading file " + args[0] + " now...");
-                var result = _FileSystem.readFile(args[0]);
-                _StdOut.putText(result);
+                _StdOut.advanceLine();
+                var response = _FileSystem.readFile(args[0]);
+                _StdOut.putText(response.header);
+                if (response.status === "SUCCESS") {
+                    _StdOut.advanceLine();
+                    _StdOut.putText(response.body);
+                }
             }
             else {
                 _StdOut.putText("Usage: read <filename>  Please supply a valid filename.");
@@ -614,8 +631,8 @@ var DOGES;
         };
         Shell.prototype.shellDeleteFile = function (args) {
             if (args.length > 0) {
-                _FileSystem.deleteFile(args[0]);
-                _StdOut.putText("Deleted file " + args[0]);
+                var response = _FileSystem.deleteFile(args[0]);
+                _StdOut.putText(response.header);
             }
             else {
                 _StdOut.putText("Usage: delete <filename>  Please supply a valid filename.");
@@ -623,9 +640,15 @@ var DOGES;
         };
         Shell.prototype.shellFormat = function (args) {
             _FileSystem.format();
+            _StdOut.putText("File system very formatted. Such clean.");
         };
         Shell.prototype.shellLs = function (args) {
-            _FileSystem.listFiles();
+            var response = _FileSystem.listFiles();
+            for (var i = 0; i < response.body.length; i++) {
+                _StdOut.putText(response.body[i]);
+                _StdOut.advanceLine();
+            }
+            _StdOut.putText(response.header);
         };
         return Shell;
     })();

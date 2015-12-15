@@ -82,6 +82,7 @@ var DOGES;
                 // Otherwise, just pop off the next program in line
                 nextProgram = _ReadyQueue.dequeue();
             }
+            console.log(nextProgram);
             return nextProgram;
         };
         CpuScheduler.programSwapping = function (previousProgram) {

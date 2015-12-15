@@ -66,7 +66,7 @@ var DOGES;
             // the lowest priority (top priority)
             if (_CurrentScheduler === PRIORITY_SCH) {
                 // How low can you go?
-                var lowestPriority = Number.MAX_VALUE;
+                lowestPriority = Number.MAX_VALUE;
                 var lowestPriorityLocation = 0;
                 for (var i = 0; i < _ReadyQueue.getSize(); i++) {
                     if (_ReadyQueue.q[i].priority < lowestPriority) {

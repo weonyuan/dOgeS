@@ -7,7 +7,7 @@ module DOGES {
     public static startRun(): void {
       if (_ReadyQueue.getSize() > 0) {
           if (_CurrentProgram === null) {
-              _CurrentProgram = _ReadyQueue.dequeue();
+              _CurrentProgram = CpuScheduler.findNextProgram();
 
               _CurrentProgram.state = PS_RUNNING;
               _CPU.start(_CurrentProgram);

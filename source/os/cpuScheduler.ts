@@ -63,13 +63,13 @@ module DOGES {
     // Find the next program to execute
     public static findNextProgram(): any {
         var nextProgram = null;
-        var lowestPriority = null;
+        var lowestPriority: number = null;
 
         // If Priority scheduling, find the next program with
         // the lowest priority (top priority)
         if (_CurrentScheduler === PRIORITY_SCH) {
             // How low can you go?
-            var lowestPriority = Number.MAX_VALUE;
+            lowestPriority = Number.MAX_VALUE;
             var lowestPriorityLocation = 0;
 
             for (var i = 0; i < _ReadyQueue.getSize(); i++) {

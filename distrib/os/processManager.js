@@ -7,7 +7,7 @@ var DOGES;
         ProcessManager.startRun = function () {
             if (_ReadyQueue.getSize() > 0) {
                 if (_CurrentProgram === null) {
-                    _CurrentProgram = _ReadyQueue.dequeue();
+                    _CurrentProgram = DOGES.CpuScheduler.findNextProgram();
                     _CurrentProgram.state = PS_RUNNING;
                     _CPU.start(_CurrentProgram);
                 }

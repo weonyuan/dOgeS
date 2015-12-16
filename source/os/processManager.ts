@@ -51,6 +51,8 @@ module DOGES {
         pcbHTML.getElementsByClassName("xRegister")[0].textContent = pcb.Xreg.toString();
         pcbHTML.getElementsByClassName("yRegister")[0].textContent = pcb.Yreg.toString();
         pcbHTML.getElementsByClassName("zFlag")[0].textContent = pcb.Zflag.toString();
+        pcbHTML.getElementsByClassName("base")[0].textContent = pcb.base.toString();
+        pcbHTML.getElementsByClassName("limit")[0].textContent = pcb.limit.toString();
         pcbHTML.getElementsByClassName("state")[0].textContent = this.getProcessStateString(pcb.state);
         pcbHTML.getElementsByClassName("turnaround")[0].textContent = pcb.turnaround.toString();
         pcbHTML.getElementsByClassName("waiting")[0].textContent = pcb.waiting.toString();

@@ -34,11 +34,11 @@ module DOGES {
         ProcessManager.pcbLog(_CurrentProgram);
         if (nextProgram !== null && nextProgram !== undefined) {
             if (_CurrentScheduler === RR_SCH) {
-                this.roundRobinSwitch(nextProgram);
+                this.roundRobinSwitch();
             } else if (_CurrentScheduler === FCFS_SCH) {
-                this.fcfsSwitch(nextProgram);
+                this.fcfsSwitch();
             } else if (_CurrentScheduler === PRIORITY_SCH) {
-                this.prioritySwitch(nextProgram);
+                this.prioritySwitch();
             }
 
             var previousProgram = _CurrentProgram;
@@ -87,8 +87,6 @@ module DOGES {
             nextProgram = _ReadyQueue.dequeue();
         }
 
-        console.log(nextProgram);
-
         return nextProgram;
     }
 
@@ -98,15 +96,27 @@ module DOGES {
         // to memory
         if (_CurrentProgram.inFileSystem === true) {
             if (previousProgram.state !== PS_TERMINATED) {
-                MemoryManager.rollOut(previousProgram);
+                var rollout = MemoryManager.rollOut(previousProgram);
+
+                if (rollout) {
+                    _Kernel.krnTrace("Successfully rolled out process " + previousProgram.PID + ".");
+                } else {
+                    _Kernel.krnTrace("Failed to roll out process " + previousProgram.PID + ".");
+                }
             }
 
-            MemoryManager.rollIn(_CurrentProgram);
+            var rollin = MemoryManager.rollIn(_CurrentProgram);
+
+            if (rollin) {
+                _Kernel.krnTrace("Successfully rolled in process " + _CurrentProgram.PID + ".");
+            } else {
+                _Kernel.krnTrace("Failed to roll in process " + _CurrentProgram.PID + ".");
+            }
         }
     }
 
     // RR Context Switching
-    public static roundRobinSwitch(nextProgram): void {
+    public static roundRobinSwitch(): void {
         if (_CurrentProgram.state !== PS_TERMINATED) {
         // If the current program is not finished executing,
         // change its state to Ready and push it back into Ready queue
@@ -126,13 +136,13 @@ module DOGES {
     }
 
     // FCFS Context Switching
-    public static fcfsSwitch(nextProgram): void {
+    public static fcfsSwitch(): void {
         // wow. such recycle.
-        this.roundRobinSwitch(nextProgram);
+        this.roundRobinSwitch();
     }
 
-    // TODO: Priority Context Switching
-    public static prioritySwitch(nextProgram): void {
+    // Priority Context Switching
+    public static prioritySwitch(): void {
         for (var i = 0; i < _ResidentList.length; i++) {
           if (_CurrentProgram.PID === _ResidentList[i].PID) {
             _ResidentList.splice(i, 1);

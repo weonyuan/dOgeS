@@ -551,8 +551,6 @@ module DOGES {
                     priority = parseInt(args[0]);
                 }
 
-                console.log(priority);
-
                 if (isValid === false) {
                     _StdOut.putText("Wat. Such invalid code.");
                 } else {

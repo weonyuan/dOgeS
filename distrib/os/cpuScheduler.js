@@ -34,13 +34,13 @@ var DOGES;
             DOGES.ProcessManager.pcbLog(_CurrentProgram);
             if (nextProgram !== null && nextProgram !== undefined) {
                 if (_CurrentScheduler === RR_SCH) {
-                    this.roundRobinSwitch(nextProgram);
+                    this.roundRobinSwitch();
                 }
                 else if (_CurrentScheduler === FCFS_SCH) {
-                    this.fcfsSwitch(nextProgram);
+                    this.fcfsSwitch();
                 }
                 else if (_CurrentScheduler === PRIORITY_SCH) {
-                    this.prioritySwitch(nextProgram);
+                    this.prioritySwitch();
                 }
                 var previousProgram = _CurrentProgram;
                 // Then set the next program as the current program so it can run
@@ -82,7 +82,6 @@ var DOGES;
                 // Otherwise, just pop off the next program in line
                 nextProgram = _ReadyQueue.dequeue();
             }
-            console.log(nextProgram);
             return nextProgram;
         };
         CpuScheduler.programSwapping = function (previousProgram) {
@@ -91,13 +90,25 @@ var DOGES;
             // to memory
             if (_CurrentProgram.inFileSystem === true) {
                 if (previousProgram.state !== PS_TERMINATED) {
-                    DOGES.MemoryManager.rollOut(previousProgram);
+                    var rollout = DOGES.MemoryManager.rollOut(previousProgram);
+                    if (rollout) {
+                        _Kernel.krnTrace("Successfully rolled out process " + previousProgram.PID + ".");
+                    }
+                    else {
+                        _Kernel.krnTrace("Failed to roll out process " + previousProgram.PID + ".");
+                    }
                 }
-                DOGES.MemoryManager.rollIn(_CurrentProgram);
+                var rollin = DOGES.MemoryManager.rollIn(_CurrentProgram);
+                if (rollin) {
+                    _Kernel.krnTrace("Successfully rolled in process " + _CurrentProgram.PID + ".");
+                }
+                else {
+                    _Kernel.krnTrace("Failed to roll in process " + _CurrentProgram.PID + ".");
+                }
             }
         };
         // RR Context Switching
-        CpuScheduler.roundRobinSwitch = function (nextProgram) {
+        CpuScheduler.roundRobinSwitch = function () {
             if (_CurrentProgram.state !== PS_TERMINATED) {
                 // If the current program is not finished executing,
                 // change its state to Ready and push it back into Ready queue
@@ -117,12 +128,12 @@ var DOGES;
             }
         };
         // FCFS Context Switching
-        CpuScheduler.fcfsSwitch = function (nextProgram) {
+        CpuScheduler.fcfsSwitch = function () {
             // wow. such recycle.
-            this.roundRobinSwitch(nextProgram);
+            this.roundRobinSwitch();
         };
-        // TODO: Priority Context Switching
-        CpuScheduler.prioritySwitch = function (nextProgram) {
+        // Priority Context Switching
+        CpuScheduler.prioritySwitch = function () {
             for (var i = 0; i < _ResidentList.length; i++) {
                 if (_CurrentProgram.PID === _ResidentList[i].PID) {
                     _ResidentList.splice(i, 1);

@@ -6,17 +6,16 @@ var DOGES;
         }
         // Loads the program into memory
         MemoryManager.loadProgram = function (programInput, priority) {
-            // Return a memory bound violation if Resident List is full
             // Create a PCB
             var newPcb = new DOGES.Pcb();
             // Find free memory to assign the base and limit registers
             newPcb.base = this.fetchFreeBlock();
             newPcb.priority = priority;
-            if (newPcb.base === null) {
-                // _StdOut.putText("Memory very full. Cannot load. Much sadness.");
+            if (newPcb.base === -1) {
                 var processFilename = DOGES.ProcessManager.createProcessFilename(newPcb);
                 _FileSystem.createFile(processFilename);
                 newPcb.inFileSystem = true;
+                newPcb.limit = -1;
                 _FileSystem.writeFile(processFilename, programInput);
             }
             else {
@@ -30,7 +29,6 @@ var DOGES;
             _StdOut.putText("Assigned Process ID: " + newPcb.PID);
         };
         MemoryManager.loadToMemory = function (programInput, startPoint) {
-            programInput = programInput.replace(/\s/g, "").toUpperCase();
             for (var i = 0; i < programInput.length / 2; i++) {
                 if (i === 0) {
                     var currentCode = 0;
@@ -61,30 +59,56 @@ var DOGES;
         };
         // Takes the program out of the file system and puts it in main memory
         // for continued execution
+        // Returns a boolean of the roll in status
         MemoryManager.rollIn = function (program) {
+            _Kernel.krnTrace("Rolling in process " + program.PID + ".");
             program.base = this.fetchFreeBlock();
+            // No free memory available
+            if (program.base === null || program.base === -1) {
+                return false;
+            }
             // Look up the program from the file system
             var programFilename = DOGES.ProcessManager.createProcessFilename(program);
-            var data = _FileSystem.readFile(programFilename);
+            var readFile = _FileSystem.readFile(programFilename);
+            // Failed to read data from file
+            if (readFile.status === "ERROR") {
+                return false;
+            }
             // Then load the program from the file system to main memory
-            this.loadToMemory(data, program.base);
-            _FileSystem.deleteFile(programFilename);
+            this.loadToMemory(readFile.body, program.base);
+            var deleteFile = _FileSystem.deleteFile(programFilename);
+            // File can't be deleted in file system
+            if (deleteFile.status === "ERROR") {
+                return false;
+            }
             program.limit = program.base + PROGRAM_SIZE - 1;
             program.inFileSystem = false;
+            return true;
         };
         // Takes the program out of main memory and stores it in the file system
         // for later execution
+        // Returns a boolean of the roll out status
         MemoryManager.rollOut = function (program) {
+            _Kernel.krnTrace("Rolling out process " + program.PID + ".");
             // Create a new file for the rolled-out program
             var programFilename = DOGES.ProcessManager.createProcessFilename(program);
             var programInput = this.fetchProgramInput(program.base);
-            _FileSystem.createFile(programFilename);
+            var createdFile = _FileSystem.createFile(programFilename);
+            // File can't be created in file system
+            if (createdFile.status === "ERROR") {
+                return false;
+            }
             // Then write the program data into the file system
-            _FileSystem.writeFile(programFilename, programInput);
+            var writtenFile = _FileSystem.writeFile(programFilename, programInput);
+            // File can't be written in file system
+            if (writtenFile.status === "ERROR") {
+                return false;
+            }
             program.state = PS_READY;
-            program.base = null;
-            program.limit = null;
+            program.base = -1;
+            program.limit = -1;
             program.inFileSystem = true;
+            return true;
         };
         // Returns the program input in that particular memory segment
         MemoryManager.fetchProgramInput = function (startAddress) {
@@ -101,10 +125,10 @@ var DOGES;
                 for (var i = 0; i < _ResidentList.length; i++) {
                     if (_ResidentList[i] !== undefined
                         && _ResidentList[i].base === freeAddress
-                        && _ResidentList[i].base !== null) {
+                        && _ResidentList[i].base !== -1) {
                         freeAddress += PROGRAM_SIZE;
                         if (freeAddress >= PROGRAM_SIZE * PROGRAM_LIMIT) {
-                            freeAddress = null;
+                            freeAddress = -1;
                         }
                     }
                 }
@@ -117,7 +141,7 @@ var DOGES;
         };
         // Clears one memory segment in main memory
         MemoryManager.clearSegment = function (startPoint) {
-            if (startPoint === null || startPoint === undefined) {
+            if (startPoint === null || startPoint === undefined || startPoint === -1) {
                 startPoint = 0;
             }
             for (var i = startPoint; i < (startPoint + PROGRAM_SIZE); i++) {
